@@ -48,7 +48,7 @@ void IRMethod::compile() {
     if (!isStatic) {
         Var &var = newVar();
         //var.typeRef = curPod-
-        var.name = "self";
+        var.name = "__self";
     }
     for(int i=0; i<method->vars.size(); ++i) {
         FMethodVar *fvar = &method->vars[i];
@@ -68,7 +68,7 @@ void IRMethod::compile() {
     initLocals();
 }
 
-void IRMethod::print(PodLoader *podManager, Printer& printer, int pass) {
+void IRMethod::print(Printer& printer, int pass) {
     
     if (pass == 0) {
         printer.printf("%s(", curPod->names[method->name].c_str());
@@ -85,13 +85,16 @@ void IRMethod::print(PodLoader *podManager, Printer& printer, int pass) {
         
         for(int i=method->paramCount; i<locals.size(); ++i) {
             Var v = locals[i];
-            printer.printf("v%s%d, ", v.name.c_str(), v.index);
+            printer.printf("v__%s_%d, ", v.name.c_str(), v.index);
         }
         printer.newLine();
         
         
         for (Block *b : blocks) {
-            b->print(podManager, curPod, printer, pass);
+            b->print(this, printer, 0);
+        }
+        for (Block *b : blocks) {
+            b->print(this, printer, 1);
         }
         printer.unindent();
     }
@@ -152,8 +155,8 @@ void IRMethod::linkBlock() {
     
     for (int i=0; i<blocks.size(); ++i) {
         Block *b = blocks[i];
-        FOpObj &opObj = method->code.ops[b->endOp-1];
-        switch (opObj.opcode) {
+        FOpObj &lastOp = method->code.ops[b->endOp-1];
+        switch (lastOp.opcode) {
             case FOp::JumpTrue:
             case FOp::JumpFalse: {
                 if (i+1 < blocks.size()) {
@@ -161,19 +164,29 @@ void IRMethod::linkBlock() {
                     b->branchs.push_back(next);
                     next->incoming.push_back(b);
                 }
-                Block *target = posToBlock[opObj.i1];
-                b->branchs.push_back(target);
-                target->incoming.push_back(b);
-            }
-            case FOp::Jump:
-            case FOp::Leave:
-            case FOp::JumpFinally: {
-                Block *target = posToBlock[opObj.i1];
+                Block *target = posToBlock[lastOp.i1];
                 b->branchs.push_back(target);
                 target->incoming.push_back(b);
             }
                 break;
-            default:
+            case FOp::Jump:
+            case FOp::Leave:
+            case FOp::JumpFinally: {
+                Block *target = posToBlock[lastOp.i1];
+                b->branchs.push_back(target);
+                target->incoming.push_back(b);
+            }
+                break;
+            case FOp::Return:
+            case FOp::Throw:
+                break;
+            default: {
+                if (i+1 < blocks.size()) {
+                    Block *next = blocks[i+1];
+                    b->branchs.push_back(next);
+                    next->incoming.push_back(b);
+                }
+            }
                 break;
         }
 //        Stmt *stmt = b->stmts.back();
@@ -244,7 +257,7 @@ void IRMethod::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic) 
 void IRMethod::parseBlock(Block *block, Block *previous) {
     
     if (previous != nullptr && previous->stack.size() > 0) {
-        if (block->incoming.size() > 0) {
+        if (block->incoming.size() > 1) {
             /*分支合并的时候如果操作数栈中还有值，
              那么我们需要把里面的临时变量赋给下一块的变量，这样就能将不同路径的值合并。
              这相当于变换SSA中的PHI结点的过程
@@ -253,10 +266,18 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 Expr &expr = previous->stack[i];
                 Var newVar;
                 if (block->isVisited) {
-                    newVar = block->locals[i];
+                    if (i < block->locals.size()) {
+                        newVar = block->locals[i];
+                    }
                 } else {
                     newVar = block->newVar();
                     newVar.isExport = true;
+                    
+                    Expr newExpr;
+                    newExpr.type = ExprType::tempVar;
+                    newExpr.varRef.index = newVar.index;
+                    newExpr.varRef.block = newVar.block;
+                    block->push(newExpr);
                 }
                 
                 StoreStmt *stmt = new StoreStmt();
@@ -269,16 +290,8 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                     previous->stmts.push_back(stmt);
                 } else {
                     auto insertPoint = previous->stmts.begin()
-                    + previous->stmts.size()-1;
+                        + previous->stmts.size()-1;
                     previous->stmts.insert(insertPoint, stmt);
-                }
-                
-                if (!block->isVisited) {
-                    Expr newExpr;
-                    newExpr.type = ExprType::tempVar;
-                    newExpr.varRef.index = newVar.index;
-                    newExpr.varRef.block = newVar.block;
-                    block->push(newExpr);
                 }
             }
         } else if (!block->isVisited) {
@@ -421,6 +434,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 value.varRef.block = var.block;
                 block->push(value);
                 call(block, opObj, false, false);
+                block->push(value);
                 break;
             }
             case FOp::CallStatic:
@@ -571,10 +585,21 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 //newBlock();
                 break;
                 
-            case FOp::CatchErrStart:
-                //newBlock();
+            case FOp::CatchErrStart: {
+                Var var = block->newVar();
+                Expr value;
+                value.type = ExprType::tempVar;
+                value.varRef.index = var.index;
+                value.varRef.block = var.block;
+                /*
+                StoreStmt *stmt = new StoreStmt();
+                stmt->src = block->pop();
+                stmt->dst = value;
+                block->stmts.push_back(stmt);
+                */
+                block->push(value);
+            }
                 break;
-                
             case FOp::CatchEnd:
                 //newBlock();
                 break;

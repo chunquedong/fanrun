@@ -13,7 +13,7 @@
 #include "common.h"
 #include "Printer.h"
 
-class PodLoader;
+class IRMethod;
 
 enum class ExprType {
     constant,
@@ -28,10 +28,14 @@ struct Var {
     bool isExport;
     
     std::string name;
-    fr_ValueType type;
+    //fr_ValueType type;
     FTypeRef *typeRef;
     FMethodVar *methodVar;
     bool isRef;
+    
+    Var() : index(-1), newIndex(-1), block(-1), isExport(false),
+        typeRef(nullptr), methodVar(nullptr), isRef(false) {
+    }
 };
 
 class Expr {
@@ -45,7 +49,7 @@ public:
         FOpObj opObj;
         VarRef varRef;
     };
-    void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass);
+    void print(IRMethod *method, Printer& printer, int pass);
 };
 
 enum class StmtType {
@@ -60,7 +64,7 @@ enum class StmtType {
 class Stmt {
 public:
     FPod *curPod;
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) = 0;
+    virtual void print(IRMethod *method, Printer& printer, int pass) = 0;
     virtual StmtType getType() = 0;
 };
 
@@ -69,7 +73,7 @@ public:
     Expr src;
     Expr dst;
     
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) override;
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::store; }
 };
@@ -82,7 +86,7 @@ public:
     FFieldRef *fieldRef;
     Expr value;
     
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) override;
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::field; }
 };
@@ -97,7 +101,7 @@ public:
     bool isStatic;
     bool isVirtual;
     
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) override;
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::call; }
 };
@@ -109,7 +113,7 @@ public:
     Expr result;
     FOpObj opObj;
     
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) override;
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::cmp; }
 };
@@ -119,7 +123,7 @@ public:
     Expr retValue;
     bool isVoid;
     
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) override;
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::ret; }
 };
@@ -140,7 +144,7 @@ public:
     
     Block *targetBlock;
     
-    virtual void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) override;
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::cmp; }
 };
@@ -163,7 +167,10 @@ public:
     
     bool isVisited;
     
-    void print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass);
+    Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false) {
+    }
+    
+    void print(IRMethod *method, Printer& printer, int pass);
     
     Var &newVar() {
         Var var;
@@ -183,7 +190,7 @@ public:
     }
     Expr pop() {
         if (stack.size() == 0) {
-            printf("ERROR");
+            printf("ERROR: statck is empty\n");
             //abort();
             Expr var;
             var.type = ExprType::tempVar;

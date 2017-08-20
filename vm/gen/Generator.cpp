@@ -48,7 +48,7 @@ void GType::genImple(Printer *printer) {
         GMethod gmethod;
         gmethod.method = method;
         gmethod.parent = this;
-        gmethod.genPrototype(printer);
+        gmethod.genPrototype(printer, false);
         printer->printf(" {");
         printer->newLine();
         gmethod.genCode(printer);
@@ -59,13 +59,40 @@ void GType::genImple(Printer *printer) {
     }
 }
 
+void GType::genVTable(Printer *printer) {
+    
+    printer->println("struct %s_vtable {", name.c_str());
+    
+    printer->indent();
+    
+    std::string baseName = typeRefName(type->meta.base);
+    printer->println("%s_vtable super;", baseName.c_str());
+    
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod *method = &type->methods[i];
+        if ((method->flags & FFlags::Virtual) == 0) {
+            continue;
+        }
+        GMethod gmethod;
+        gmethod.method = method;
+        gmethod.parent = this;
+        gmethod.genPrototype(printer, true);
+        printer->printf(";");
+        printer->newLine();
+    }
+    
+    printer->unindent();
+    
+    printer->println("};");
+}
+
 void GType::genMethodDeclare(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         GMethod gmethod;
         gmethod.method = method;
         gmethod.parent = this;
-        gmethod.genPrototype(printer);
+        gmethod.genPrototype(printer, false);
         printer->printf(";");
         printer->newLine();
     }
@@ -111,10 +138,15 @@ bool GType::isValType() {
     return false;
 }
 
-void GMethod::genPrototype(Printer *printer) {
+void GMethod::genPrototype(Printer *printer, bool funcPtr) {
     name = parent->getName(method->name);
     auto typeName = parent->typeRefName(method->returnType);
-    printer->printf("%s %s_%s(", typeName.c_str(), parent->name.c_str(), name.c_str());
+    
+    if (funcPtr) {
+        printer->printf("%s (*%s_%s)(", typeName.c_str(), parent->name.c_str(), name.c_str());
+    } else {
+        printer->printf("%s %s_%s(", typeName.c_str(), parent->name.c_str(), name.c_str());
+    }
     
     printer->printf("fr_Env __env");
     
@@ -136,7 +168,7 @@ void GMethod::genPrototype(Printer *printer) {
 void GMethod::genCode(Printer *printer) {
     IRMethod irMethod(parent->pod, method);
     irMethod.compile();
-    irMethod.print(parent->podMgr, *printer, 1);
+    irMethod.print(*printer, 1);
 }
 
 
@@ -194,6 +226,14 @@ void Generator::genHeader(FPod *pod, Printer *printer) {
         FType *type = &pod->types[i];
         GType gtype(podMgr, pod, type);
         gtype.genMethodDeclare(printer);
+        printer->newLine();
+    }
+    
+    horizontalLine(printer, "virtual table");
+    for (int i=0; i<pod->types.size(); ++i) {
+        FType *type = &pod->types[i];
+        GType gtype(podMgr, pod, type);
+        gtype.genVTable(printer);
         printer->newLine();
     }
 }

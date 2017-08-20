@@ -20,13 +20,15 @@ public:
     int primLocalsCount;
     int refLocalsCount;
     
+    //std::string name;
+    
     //Env *context;
     FPod *curPod;
     
     IRMethod(FPod *curPod, FMethod *method);
     
     void compile();
-    void print(PodLoader *podManager, Printer& printer, int pass);
+    void print(Printer& printer, int pass);
 private:
     
     Var &newVar() {

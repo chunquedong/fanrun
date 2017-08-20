@@ -11,7 +11,7 @@
 int main(int argc, const char * argv[]) {
     
     std::string libPath = "/Users/yangjiandong/workspace/soft/fantom-1.0.68";
-    std::string pod = "sys";
+    std::string pod = "testlib";
     std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/temp/";
   
     PodLoader podMgr;
@@ -21,7 +21,7 @@ int main(int argc, const char * argv[]) {
     Generator gen;
     gen.path = outPath;
     gen.podMgr = &podMgr;
-    gen.gen("sys");
+    gen.gen("testlib");
     
     puts("DONE!");
     return 0;

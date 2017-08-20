@@ -6,6 +6,7 @@
 //
 
 #include "Stmt.hpp"
+#include "IRMethod.h"
 
 void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
     fr_TagValue val;
@@ -88,34 +89,39 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
     }
 }
 
-void Expr::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
+void Expr::print(IRMethod *method, Printer& printer, int pass) {
     switch (type) {
         case ExprType::constant: {
-            printValue(printer, curPod, opObj);
+            printValue(printer, method->curPod, opObj);
             break;
         }
         case ExprType::localVar: {
-            printer.printf("v%d_%d", varRef.block, varRef.index);
+            if (varRef.block == -1) {
+                Var var = method->locals[varRef.index];
+                printer.printf("v__%s_%d", var.name.c_str(), varRef.index);
+            } else {
+                printf("ERROR: block is %d\n", varRef.block);
+            }
             break;
         }
         case ExprType::tempVar:
-            printer.printf("t%d_%d", varRef.block, varRef.index);
+            printer.printf("t__%d_%d", varRef.block, varRef.index);
             break;
         default:
             break;
     }
 }
 
-void StoreStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
-    dst.print(podManager, curPod, printer, pass);
+void StoreStmt::print(IRMethod *method, Printer& printer, int pass) {
+    dst.print(method, printer, pass);
     printer.printf("=");
-    src.print(podManager, curPod, printer, pass);
+    src.print(method, printer, pass);
     printer.printf(";");
 }
 
-void CallStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
+void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
     if (!isVoid) {
-        retValue.print(podManager, curPod, printer, pass);
+        retValue.print(method, printer, pass);
         printer.printf("=");
     }
     
@@ -123,7 +129,7 @@ void CallStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int 
     if (isStatic) {
         printer.printf("%s::", curPod->names[methodRef->parent].c_str());
     } else {
-        params[0].print(podManager, curPod, printer, pass);
+        params[0].print(method, printer, pass);
         printer.printf("->");
         s = 1;
     }
@@ -134,20 +140,20 @@ void CallStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int 
         if (i != s) {
             printer.printf(",");
         }
-        params[i].print(podManager, curPod, printer, pass);
+        params[i].print(method, printer, pass);
     }
     printer.printf(");");
 }
 
-void FieldStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
+void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
     if (isLoad) {
-        value.print(podManager, curPod, printer, pass);
+        value.print(method, printer, pass);
     } else {
         if (isStatic) {
             printer.printf("%s::%s", curPod->names[fieldRef->parent].c_str()
                            , curPod->names[fieldRef->name].c_str());
         } else {
-            instance.print(podManager, curPod, printer, pass);
+            instance.print(method, printer, pass);
             printer.printf("->%s", curPod->names[fieldRef->name].c_str());
         }
     }
@@ -157,56 +163,68 @@ void FieldStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int
             printer.printf("%s::%s", curPod->names[fieldRef->parent].c_str()
                            , curPod->names[fieldRef->name].c_str());
         } else {
-            instance.print(podManager, curPod, printer, pass);
+            instance.print(method, printer, pass);
             printer.printf("->%s", curPod->names[fieldRef->name].c_str());
         }
     } else {
-        value.print(podManager, curPod, printer, pass);
+        value.print(method, printer, pass);
     }
     printer.printf(";");
 }
 
-void JmpStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
+void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
     if (jmpType == allJmp) {
         printer.printf("goto ");
     }
     else if (jmpType == trueJmp) {
         printer.printf("if (");
-        expr.print(podManager, curPod, printer, pass);
+        expr.print(method, printer, pass);
         printer.printf(") goto ");
     }
     else if (jmpType == falseJmp) {
         printer.printf("if (!");
-        expr.print(podManager, curPod, printer, pass);
+        expr.print(method, printer, pass);
         printer.printf(") goto ");
     }
-    printer.printf("l%d;", targetBlock->pos);
+    printer.printf("l__%d;", targetBlock->pos);
 }
 
-void CmpStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
-    result.print(podManager, curPod, printer, pass);
+void CmpStmt::print(IRMethod *method, Printer& printer, int pass) {
+    result.print(method, printer, pass);
     printer.printf("=");
-    param1.print(podManager, curPod, printer, pass);
+    param1.print(method, printer, pass);
     printer.printf("<=>");
-    param2.print(podManager, curPod, printer, pass);
+    param2.print(method, printer, pass);
     printer.printf(";");
 }
 
-void RetStmt::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
+void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
     if (isVoid) {
         printer.printf("return;");
     } else {
         printer.printf("return ");
-        retValue.print(podManager, curPod, printer, pass);
+        retValue.print(method, printer, pass);
         printer.printf(";");
     }
 }
 
-void Block::print(PodLoader *podManager, FPod *curPod, Printer& printer, int pass) {
-    char *s = printer.format("l%d:\n", pos);
-    printer._print(s);
-    for (Stmt *stmt : stmts) {
-        stmt->print(podManager, curPod, printer, pass);
-        printer.newLine();
+void Block::print(IRMethod *method, Printer& printer, int pass) {
+    if (pass == 0) {
+        for (int i=0; i<locals.size(); ++i) {
+            Var &v = locals[i];
+            printer.printf("t__%d_%d; ", index, v.index);
+        }
+        if (locals.size() > 0) {
+            printer.newLine();
+        }
+        return;
+    }
+    else {
+        char *s = printer.format("l__%d:\n", pos);
+        printer._print(s);
+        for (Stmt *stmt : stmts) {
+            stmt->print(method, printer, pass);
+            printer.newLine();
+        }
     }
 }

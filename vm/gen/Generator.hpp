@@ -25,6 +25,7 @@ public:
     
     void genTypeDeclare(Printer *printer);
     void genStruct(Printer *printer);
+    void genVTable(Printer *printer);
     void genMethodDeclare(Printer *printer);
     void genInline(Printer *printer);
     void genImple(Printer *printer);
@@ -42,7 +43,7 @@ struct GMethod {
     FMethod *method;
     std::string name;
     
-    void genPrototype(Printer *printer);
+    void genPrototype(Printer *printer, bool funcPtr);
     void genCode(Printer *printer);
 };
 
