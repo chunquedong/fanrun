@@ -1,0 +1,102 @@
+//
+// Copyright (c) 2017, chunquedong
+// Licensed under the Apache Licene 2.0
+//
+//  Created by chunquedong on 15/6/26.
+//
+
+#ifndef __zip__FTypeBody__
+#define __zip__FTypeBody__
+
+#include <stdio.h>
+#include "Buffer.h"
+#include "Code.h"
+#include "FAttr.h"
+#include <unordered_map>
+
+class FType;
+
+struct FSlot {
+    uint16_t name;
+    uint32_t flags;
+    uint16_t attrCount;
+    std::vector<FAttr*> attrs;
+};
+
+struct FField : public FSlot {
+    uint16_t type;
+    
+    //app
+    uint16_t c_offset;
+    FType *c_parent;
+};
+
+struct FMethodVar : public FSlot {
+    uint16_t type;
+};
+
+class Code;
+
+struct FMethod : public FSlot {
+    uint16_t returnType;
+    uint16_t inheritReturenType;
+    uint8_t maxStack;
+    uint8_t paramCount;
+    uint8_t localCount;
+    std::vector<FMethodVar> vars;
+    Code code;
+    
+    //cache
+    FType *c_parent;
+    void (*c_native)(void *env, void *param, void *ret);
+    void *c_wrappedMethod;
+    void (*c_jit)(void *env);
+    uint16_t c_jitLocalCount;
+};
+
+struct FTypeMeta {
+    uint16_t self;//typeRefs.def
+    uint16_t base;//  (typeRefs.def or 0xFFFF)
+    uint16_t mixinCount;
+    std::vector<uint16_t> mixin;// (typeRefs.def)
+    uint32_t flags;
+};
+
+class FMethodRef;
+
+class FType {
+public:
+    //uint16_t fieldCount;
+    std::vector<FField> fields;
+    //uint16_t methodCount;
+    std::vector<FMethod> methods;
+    //uint16_t attrCount;
+    std::vector<FAttr*> attrs;
+    
+    FTypeMeta meta;
+    FPod *c_pod;
+    
+    //cache
+    std::string c_name;
+    std::string c_fullName;
+    int c_sortFlag;
+    std::unordered_map<std::string, FMethod*> c_methodMap;
+    std::unordered_map<std::string, FField*> c_fieldMap;
+    int c_allocSize;
+    int c_allocStaticSize;
+    char *c_staticData;
+    std::unordered_map<std::string, FMethod*> c_virtualMethodMapByName;
+    std::unordered_map<uint16_t, FMethodRef*> c_virtualMethodMap;
+    std::unordered_map<FMethod*, FMethod*> c_virtualMethodMapByMethod;
+    void *c_wrappedType;
+    
+public:
+    void read(FPod *pod, FTypeMeta &meta, Buffer &buffer);
+    
+    ~FType();
+  
+private:
+    void readMethod(FMethod &method, Buffer &buffer);
+};
+
+#endif /* defined(__zip__FTypeBody__) */

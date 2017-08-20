@@ -1,0 +1,206 @@
+//
+//  vm.h
+//  vm
+//
+//  Created by yangjiandong on 15/9/27.
+//  Copyright (c) 2015, yangjiandong. All rights reserved.
+//
+
+#ifndef __vm__fni__
+#define __vm__fni__
+
+#include <stdio.h>
+#include "miss.h"
+#include "common.h"
+
+CF_BEGIN
+
+/**
+ * fr_Env is a API per thread
+ */
+typedef void *fr_Env;
+
+/**
+ * Fantom VM
+ */
+typedef void *fr_Fvm;
+
+/**
+ * native method prototype
+ */
+typedef void (*fr_NativeFunc)(fr_Env env, void *param, void *ret);
+
+////////////////////////////
+// VM
+////////////////////////////
+
+fr_Env fr_getEnv(fr_Fvm vm);
+void fr_releaseEnv(fr_Fvm vm, fr_Env env);
+
+void fr_registerMethod(fr_Fvm vm, const char *name, fr_NativeFunc func);
+
+////////////////////////////
+// Param
+////////////////////////////
+
+bool fr_getParam(fr_Env env, void *param, fr_Value *val, int pos);
+
+////////////////////////////
+// GC
+////////////////////////////
+
+/**
+ * stop the world and yield gc to run
+ */
+void fr_yieldGc(fr_Env self);
+
+/**
+ * allow gc to run in backgroud.
+ * must only insert at before of IO blocking.
+ */
+void fr_currentGc(fr_Env self);
+
+/**
+ * fatch pointer from handle
+ */
+FObj *fr_getPtr(fr_Env self, fr_Obj obj);
+
+/**
+ * convert the pointer to handle
+ * the pointer may be relocate by gc
+ */
+fr_Obj fr_toHandle(fr_Env self, FObj *obj);
+
+/**
+ * add local ref. it will be auto releae when method finished.
+ */
+fr_Obj fr_newLocalRef(fr_Env self, fr_Obj obj);
+void fr_deleteLocalRef(fr_Env self, fr_Obj obj);
+
+/**
+ * add global ref.
+ */
+fr_Obj fr_newGlobalRef(fr_Env self, fr_Obj obj);
+void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
+
+/**
+ * alloc obj without init
+ */
+fr_Obj fr_allocObj(fr_Env self, fr_Type type, int size);
+
+////////////////////////////
+// Type
+////////////////////////////
+
+fr_Type fr_findType(fr_Env self, const char *pod, const char *type);
+fr_Type fr_getSysType(fr_Env self, fr_ValueType vt);
+
+bool fr_fitType(fr_Env self, fr_Type a, fr_Type b);
+fr_Type fr_getInstanceType(fr_Env self, fr_Value *obj, fr_ValueType vtype);
+fr_Type fr_getObjType(fr_Env self, fr_Obj obj);
+bool fr_isInstanceOf(fr_Env self, fr_Obj obj, fr_Type type);
+
+fr_Obj fr_getTypeObj(fr_Env self, fr_Type type);
+
+////////////////////////////
+// Method
+////////////////////////////
+
+fr_Method fr_findMethod(fr_Env self, fr_Type type, const char *name);
+void fr_callNonVirtualM(fr_Env self, fr_Method method
+                       , int argCount, fr_Value *arg, fr_Value *ret);
+void fr_newObjM(fr_Env self, fr_Type type, fr_Method method
+               , int argCount, fr_Value *arg, fr_Value *ret);
+void fr_callVirtualM(fr_Env self, fr_Method method
+                    , int argCount, fr_Value *arg, fr_Value *ret);
+
+void fr_newObj(fr_Env self, const char *pod, const char *type, const char *name
+               , int argCount, fr_Value *arg, fr_Value *ret);
+
+void fr_callVirtual(fr_Env self, const char *pod, const char *type, const char *name
+                          , int argCount, fr_Value *arg, fr_Value *ret);
+
+void fr_callVirtualOnObj(fr_Env self, const char *name
+                    , int argCount, fr_Value *arg, fr_Value *ret);
+
+void fr_callNonVirtual(fr_Env self, const char *pod, const char *type, const char *name
+             , int argCount, fr_Value *arg, fr_Value *ret);
+
+////////////////////////////
+// Field
+////////////////////////////
+
+fr_Field fr_findField(fr_Env self, fr_Type type, const char *name);
+
+void fr_setStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *val);
+bool fr_getStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *val);
+void fr_setInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val);
+bool fr_getInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val);
+
+void fr_setStaticField(fr_Env self, const char *pod, const char *type, const char *name, fr_Value *val);
+bool fr_getStaticField(fr_Env self, const char *pod, const char *type, const char *name, fr_Value *val);
+
+void fr_setField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val);
+bool fr_getField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val);
+
+/////////////////////////////////////////////////////////////////////////////////
+// exception
+////////////////////////////////////////////////////////////////////
+
+fr_Obj fr_getError(fr_Env self);
+
+bool fr_errorOccurred(fr_Env self);
+
+void fr_printError(fr_Env self, fr_Obj err);
+
+void fr_throw(fr_Env self, fr_Obj err);
+
+void fr_throwNPE(fr_Env self);
+
+void fr_throwUnsupported(fr_Env self);
+
+void fr_throwNew(fr_Env self, const char *pod, const char *type, const char *msg);
+
+void fr_clearError(fr_Env self);
+
+////////////////////////////////////////////////////////////////////
+// box
+////////////////////////////////////////////////////////////////////
+
+/**
+ * box primitive type to obj
+ */
+fr_Obj fr_box(fr_Env self, fr_Value *value, fr_ValueType vtype);
+
+/**
+ * fatch primitive type from obj
+ */
+bool fr_unbox(fr_Env self, fr_Obj obj, fr_Value *value);
+
+////////////////////////////////////////////////////////////////////
+// Str
+////////////////////////////////////////////////////////////////////
+
+/**
+ * new create Str obj from utf8
+ */
+fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
+
+/**
+ * get utf8 from Str obj.
+ */
+const char *fr_getStrUtf8(fr_Env self, fr_Obj str, bool *isCopy);
+
+/**
+ * release utf8 and the local ref of Str
+ */
+void fr_releaseStrUtf8(fr_Env self, fr_Obj str, const char *bytes);
+
+/**
+ * call obj.toStr and return result
+ */
+fr_Obj fr_objToStr(fr_Env env, fr_Value obj, fr_ValueType vtype);
+
+CF_END
+
+#endif /* defined(__vm__fni__) */
