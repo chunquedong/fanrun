@@ -166,8 +166,9 @@ public:
     std::vector<Var> locals;
     
     bool isVisited;
+    bool isForward;
     
-    Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false) {
+    Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false) {
     }
     
     void print(IRMethod *method, Printer& printer, int pass);

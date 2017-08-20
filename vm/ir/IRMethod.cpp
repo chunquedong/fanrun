@@ -185,6 +185,7 @@ void IRMethod::linkBlock() {
                     Block *next = blocks[i+1];
                     b->branchs.push_back(next);
                     next->incoming.push_back(b);
+                    b->isForward = true;
                 }
             }
                 break;
@@ -286,7 +287,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->dst.varRef.index = newVar.index;
                 stmt->dst.varRef.block = newVar.block;
                 
-                if (previous->stmts.size() == 0) {
+                if (previous->stmts.size() == 0 || previous->isForward) {
                     previous->stmts.push_back(stmt);
                 } else {
                     auto insertPoint = previous->stmts.begin()
