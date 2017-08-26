@@ -65,6 +65,7 @@ void IRMethod::compile() {
         parseBlock(b, nullptr);
     }
     
+    initException();
     initLocals();
 }
 
@@ -145,10 +146,24 @@ void IRMethod::initJumpTarget() {
                 break;
         }
     }
+    
+    //find block in error table
+    for (FAttr *itr : method->attrs) {
+        FErrTable *et = dynamic_cast<FErrTable*>(itr);
+        if (et == nullptr) continue;
+        for (FTrap &trap : et->traps) {
+            FOpObj *opObj = posToOp[trap.start];
+            opObj->blockBegin = true;
+            FOpObj *eObj = posToOp[trap.end];
+            eObj->blockBegin = true;
+            FOpObj *op = posToOp[trap.handler];
+            op->blockBegin = true;
+        }
+    }
 }
 
 void IRMethod::linkBlock() {
-    std::unordered_map<int16_t, Block*> posToBlock;
+    //std::unordered_map<int16_t, Block*> posToBlock;
     for (auto *b : blocks) {
         posToBlock[b->pos] = b;
     }
@@ -170,7 +185,12 @@ void IRMethod::linkBlock() {
             }
                 break;
             case FOp::Jump:
-            case FOp::Leave:
+            case FOp::Leave:{
+                Block *target = posToBlock[lastOp.i1];
+                b->branchs.push_back(target);
+                target->incoming.push_back(b);
+            }
+                break;
             case FOp::JumpFinally: {
                 Block *target = posToBlock[lastOp.i1];
                 b->branchs.push_back(target);
@@ -190,14 +210,45 @@ void IRMethod::linkBlock() {
             }
                 break;
         }
-//        Stmt *stmt = b->stmts.back();
-//        JmpStmt *jmpStmt = dynamic_cast<JmpStmt*>(stmt);
-//        if (jmpStmt) {
-//            jmpStmt->targetBlock = posToBlock[jmpStmt->pos];
-//            if (!jmpStmt->targetBlock) {
-//                printf("ERROR");
-//            }
-//        }
+    }
+}
+
+void IRMethod::initException() {
+    uint16_t start = -1;
+    uint16_t end = -1;
+    
+    for (FAttr *itr : method->attrs) {
+        FErrTable *et = dynamic_cast<FErrTable*>(itr);
+        if (et == nullptr) continue;
+        for (FTrap &trap : et->traps) {
+            if (trap.start != start || trap.end != end) {
+                ExceptionStmt *tryStart = new ExceptionStmt();
+                tryStart->etype = ExceptionStmt::TryStart;
+            
+                Block *b = posToBlock[trap.start];
+                b->stmts.insert(b->stmts.begin(), tryStart);
+ 
+                start = trap.start;
+                end = trap.end;
+            }
+            
+            ExceptionStmt *tryEnd = new ExceptionStmt();
+            tryEnd->etype = ExceptionStmt::TryEnd;
+            tryEnd->catchType = trap.type;
+            tryEnd->handler = trap.handler;
+            Block *eb = posToBlock[trap.end];
+            eb->stmts.push_back(tryEnd);
+            
+            Block *cb = posToBlock[trap.handler];
+            for (Stmt *s : cb->stmts) {
+                ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);
+                if (!catchStart) continue;
+                if (catchStart->pos == trap.handler) {
+                    tryEnd->catchVar = catchStart->catchVar;
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -461,7 +512,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->jmpType = JmpStmt::allJmp;
                 stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
-                stmt->targetBlock = block->branchs.back();
+                stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
                 break;
@@ -472,7 +523,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->expr = block->pop();
                 stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
-                stmt->targetBlock = block->branchs.back();
+                stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
                 break;
@@ -483,7 +534,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->expr = block->pop();
                 stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
-                stmt->targetBlock = block->branchs.back();
+                stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
                 break;
@@ -575,15 +626,30 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Leave: {
-                //newBlock();
+                JmpStmt *stmt = new JmpStmt();
+                stmt->jmpType = JmpStmt::leaveJmp;
+                stmt->opObj = opObj;
+                stmt->pos = opObj.i1;
+                stmt->targetBlock = posToBlock[opObj.i1];
+                
+                block->stmts.push_back(stmt);
                 break;
             }
             case FOp::JumpFinally:{
-                //newBlock();
+                JmpStmt *stmt = new JmpStmt();
+                stmt->jmpType = JmpStmt::allJmp;
+                stmt->opObj = opObj;
+                stmt->pos = opObj.i1;
+                stmt->targetBlock = posToBlock[opObj.i1];
+                
+                block->stmts.push_back(stmt);
                 break;
             }
-            case FOp::CatchAllStart:
-                //newBlock();
+            case FOp::CatchAllStart: {
+                ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->etype = ExceptionStmt::CatchStart;
+                block->stmts.push_back(stmt);
+            }
                 break;
                 
             case FOp::CatchErrStart: {
@@ -592,28 +658,43 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;
                 value.varRef.block = var.block;
-                /*
-                StoreStmt *stmt = new StoreStmt();
-                stmt->src = block->pop();
-                stmt->dst = value;
-                block->stmts.push_back(stmt);
-                */
+                
+//                StoreStmt *stmt = new StoreStmt();
+//                stmt->src = block->pop();
+//                stmt->dst = value;
+//                block->stmts.push_back(stmt);
                 block->push(value);
+
+                ExceptionStmt *estmt = new ExceptionStmt();
+                estmt->etype = ExceptionStmt::CatchStart;
+                estmt->catchVar = value;
+                estmt->pos = opObj.pos;
+                block->stmts.push_back(estmt);
             }
                 break;
-            case FOp::CatchEnd:
-                //newBlock();
+            case FOp::CatchEnd: {
+                ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->etype = ExceptionStmt::CatchEnd;
+                block->stmts.push_back(stmt);
+            }
                 break;
                 
-            case FOp::FinallyStart:
-                //newBlock();
+            case FOp::FinallyStart: {
+                ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->etype = ExceptionStmt::FinallyStart;
+                block->stmts.push_back(stmt);
+            }
                 break;
                 
-            case FOp::FinallyEnd:
-                //newBlock();
+            case FOp::FinallyEnd: {
+                ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->etype = ExceptionStmt::FinallyEnd;
+                block->stmts.push_back(stmt);
+            }
                 break;
                 
             default:
+                printf("ERROR: unkonw opcode\n");
                 break;
         }
 

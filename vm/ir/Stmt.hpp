@@ -59,6 +59,7 @@ enum class StmtType {
     cmp,
     ret,
     jmp,
+    error,
 };
 
 class Stmt {
@@ -135,6 +136,7 @@ public:
         allJmp,
         trueJmp,
         falseJmp,
+        leaveJmp,
     };
     
     JmpType jmpType;
@@ -149,24 +151,42 @@ public:
     StmtType getType() override { return StmtType::cmp; }
 };
 
+class ExceptionStmt : public Stmt {
+public:
+    enum EType { TryStart, TryEnd, CatchStart, CatchEnd, FinallyStart, FinallyEnd };
+    EType etype;
+    int32_t catchType;//err type to catch
+    Expr catchVar;
+    int32_t handler;
+    int pos;
+    
+    ExceptionStmt() : catchType(-1), handler(-1), pos(-1) {}
+    
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
+    
+    StmtType getType() override { return StmtType::error; }
+};
 
+//Basic Block is min linear code
 class Block {
 public:
-    int index;
-    uint16_t pos;
+    int index;//id in method
+    uint16_t pos;//position in buffer
     
-    uint16_t beginOp;
-    uint16_t endOp;
+    uint16_t beginOp;//begin postion in ops
+    uint16_t endOp;//next ops position of last of pos
     
     std::vector<Stmt*> stmts;
+    
     std::vector<Block*> branchs;
     std::vector<Block*> incoming;
     
-    std::vector<Expr> stack;
+    std::vector<Expr> stack;//temp stack
+    
     std::vector<Var> locals;
     
-    bool isVisited;
-    bool isForward;
+    bool isVisited;//flag for builder
+    bool isForward;//flag if no jump stmt at last
     
     Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false) {
     }

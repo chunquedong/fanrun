@@ -173,7 +173,7 @@ void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
-    if (jmpType == allJmp) {
+    if (jmpType == allJmp || jmpType == leaveJmp) {
         printer.printf("goto ");
     }
     else if (jmpType == trueJmp) {
@@ -205,6 +205,33 @@ void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
         printer.printf("return ");
         retValue.print(method, printer, pass);
         printer.printf(";");
+    }
+}
+
+void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
+    switch (etype) {
+        case TryStart:
+            printer.printf("try {");
+            break;
+        case TryEnd:
+            printer.printf("} catch(%d ", catchType);
+            catchVar.print(method, printer, 0);
+            printer.printf(") { goto l__%d; }", handler);
+            break;
+        case CatchStart:
+            //printer.printf("} catch(%d) {", catchType);
+            break;
+        case CatchEnd:
+            //printer.printf("}//end catch");
+            break;
+        case FinallyStart:
+            //printer.printf("finally {");
+            break;
+        case FinallyEnd:
+            //printer.printf("}");
+            break;
+        default:
+            break;
     }
 }
 

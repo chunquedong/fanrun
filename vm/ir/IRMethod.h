@@ -12,6 +12,7 @@
 
 
 class IRMethod {
+    std::unordered_map<int16_t, Block*> posToBlock;
 public:
     FMethod *method;
     std::vector<Block *> blocks;
@@ -27,7 +28,9 @@ public:
     
     IRMethod(FPod *curPod, FMethod *method);
     
+    //parse code to basic block graph, and flat temp var to stack for gc
     void compile();
+    
     void print(Printer& printer, int pass);
 private:
     
@@ -57,6 +60,8 @@ private:
     void parseBlock(Block *block, Block *previous);
     
     bool isVoidTypeRef(uint16_t typeRef);
+    
+    void initException();
 };
 
 #endif /* defined(____IRMethod__) */
