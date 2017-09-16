@@ -9,31 +9,36 @@
 #ifndef Gc_hpp
 #define Gc_hpp
 
+#include "gcobj.h"
+
 #include <stdio.h>
-#include "vm.h"
+//#include "vm.h"
 #include <list>
 #include <vector>
 #include <set>
 #include "tinycthread.h"
 
+
 class Gc;
 
 class GcSupport {
 public:
-    virtual void walkNodeChildren(Gc *gc, FObj* obj) = 0;
+    virtual void walkNodeChildren(Gc *gc, GcObj *obj) = 0;
     virtual void walkRoot(Gc *gc) = 0;
     
-    virtual void finalizeObj(FObj* obj) = 0;
+    virtual void finalizeObj(GcObj *obj) = 0;
     virtual void puaseWorld() = 0;
     virtual void resumeWorld() = 0;
+    virtual void printObj(GcObj *obj) = 0;
+    virtual int allocSize(void *type) = 0;
 };
 
 class Gc {
-    std::list<FObj*> pinObjs;
-    std::vector<FObj*> newAllocRef;
+    std::list<GcObj*> pinObjs;
+    std::vector<GcObj*> newAllocRef;
     
-    std::vector<FObj*> gcRoot;
-    std::set<FObj*> allRef;
+    std::vector<GcObj*> gcRoot;
+    std::set<GcObj*> allRef;
     
     mtx_t lock;
     bool isStopWorld;
@@ -48,13 +53,13 @@ public:
     Gc();
     ~Gc();
     
-    FObj* alloc(fr_Env env, FType *type, int size);
+    GcObj* alloc(void *type);
     
-    void pinObj(FObj* obj);
-    void unpinObj(FObj* obj);
+    void pinObj(GcObj* obj);
+    void unpinObj(GcObj* obj);
     
-    void onRoot(FObj* obj);
-    void onChild(FObj* obj) {
+    void onRoot(GcObj* obj);
+    void onChild(GcObj* obj) {
         markNode(obj);
     }
  
@@ -76,9 +81,9 @@ private:
     void getRoot();
     void sweep();
     bool remark();
-    void remove(FObj* obj, std::set<FObj*>::iterator &it);
+    void remove(GcObj* obj, std::set<GcObj*>::iterator &it);
     
-    void markNode(FObj* obj);
+    void markNode(GcObj* obj);
 };
 
 #endif /* Gc_hpp */

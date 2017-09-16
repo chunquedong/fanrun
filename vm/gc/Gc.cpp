@@ -9,7 +9,7 @@
 #include "Gc.h"
 #include <atomic>
 #include <stdlib.h>
-#include "FType.h"
+//#include "FType.h"
 #include <assert.h>
 
 Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr) {
@@ -21,17 +21,17 @@ Gc::~Gc() {
     mtx_destroy(&lock);
 }
 
-void Gc::pinObj(FObj* obj) {
+void Gc::pinObj(GcObj* obj) {
     mtx_lock(&lock);
     pinObjs.push_back(obj);
     mtx_unlock(&lock);
 }
-void Gc::unpinObj(FObj* obj) {
+void Gc::unpinObj(GcObj* obj) {
     mtx_lock(&lock);
     pinObjs.remove(obj);
     mtx_unlock(&lock);
 }
-void Gc::onRoot(FObj* obj) {
+void Gc::onRoot(GcObj* obj) {
     if (obj == nullptr) {
         return;
     }
@@ -45,32 +45,31 @@ void Gc::mergeNewAlloc() {
     newAllocRef.clear();
 }
 
-FObj* Gc::alloc(fr_Env env, FType *type, int size) {
-    
+GcObj* Gc::alloc(void *type) {
+    int size = gcSupport->allocSize(type);
     if (allocSize + size > lastAllocSize * 1.5) {
         collect();
     } else {
         lastAllocSize -= 8;
     }
     
-    FObj* obj = (FObj*)calloc(1, size);
+    GcObj* obj = (GcObj*)calloc(1, size);
     if (obj == NULL) {
         collect();
-        obj = (FObj*)calloc(1, size);
+        obj = (GcObj*)calloc(1, size);
     }
     
     assert(obj);
-    
-    obj->dirty = false;
-    obj->mark = marker;
-    obj->type = type;
+    obj->header = type;
+    gc_setMark(obj, marker);
+    gc_setDirty(obj, 0);
     
     mtx_lock(&lock);
     newAllocRef.push_back(obj);
     mtx_unlock(&lock);
     
     if (trace) {
-        printf("malloc %s %p\n", type->c_name.c_str(), obj);
+        printf("malloc %p %p\n", type, obj);
     }
     return obj;
 }
@@ -106,8 +105,6 @@ void Gc::collect() {
     }
 }
 
-void printValue(fr_TagValue *val);
-
 void Gc::getRoot() {
     gcRoot.clear();
     
@@ -124,10 +121,7 @@ void Gc::getRoot() {
     if (trace) {
         printf("ROOT:\n");
         for (auto it = gcRoot.begin(); it != gcRoot.end(); ++it) {
-            fr_TagValue val;
-            val.type = fr_vtObj;
-            val.any.o = *it;
-            printValue(&val);
+            gcSupport->printObj(*it);
             printf(", ");
         }
         printf("\n");
@@ -144,8 +138,8 @@ void Gc::mark() {
 bool Gc::remark() {
     bool has = false;
     for (auto it = allRef.begin(); it != allRef.end(); ++it) {
-        FObj* obj = *it;
-        if (obj->dirty) {
+        GcObj* obj = *it;
+        if (gc_isDirty(obj)) {
             has = true;
             markNode(obj);
         }
@@ -155,8 +149,8 @@ bool Gc::remark() {
 
 void Gc::sweep() {
     for (auto it = allRef.begin(); it != allRef.end();) {
-        FObj* obj = *it;
-        if (obj->mark != marker) {
+        GcObj* obj = *it;
+        if (gc_getMark(obj) != marker) {
             remove(obj, it);
         } else {
             ++it;
@@ -164,30 +158,32 @@ void Gc::sweep() {
     }
 }
 
-void Gc::remove(FObj* obj, std::set<FObj*>::iterator &it) {
+void Gc::remove(GcObj* obj, std::set<GcObj*>::iterator &it) {
     
-    int size = obj->type->c_allocSize;
+    int size = gcSupport->allocSize(gc_getType(obj));
     allocSize -= size;
     
     it = allRef.erase(it);
     gcSupport->finalizeObj(obj);
     
     if (trace) {
-        printf("free %s %p\n", obj->type->c_name.c_str(), obj);
+        printf("free ");
+        gcSupport->printObj(obj);
+        printf("\n");
     }
     
-    obj->type = nullptr;
+    obj->header = nullptr;
     free(obj);
 }
 
-void Gc::markNode(FObj* obj) {
+void Gc::markNode(GcObj* obj) {
     if (obj == nullptr) {
         return;
     }
-    if (!obj->dirty && obj->mark == marker) {
+    if (!gc_isDirty(obj) && gc_getMark(obj) == marker) {
         return;
     }
-    obj->dirty = false;
-    obj->mark = marker;
+    gc_setMark(obj, marker);
+    gc_setDirty(obj, 0);
     gcSupport->walkNodeChildren(this, obj);
 }

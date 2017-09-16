@@ -10,7 +10,7 @@
 
 #include "Code.h"
 #include "FPod.h"
-#include "common.h"
+//#include "common.h"
 #include "Printer.h"
 
 class IRMethod;
@@ -28,13 +28,15 @@ struct Var {
     bool isExport;
     
     std::string name;
+    std::string typeName;
+    
     //fr_ValueType type;
-    FTypeRef *typeRef;
+    uint16_t typeRef;
     FMethodVar *methodVar;
     bool isRef;
     
     Var() : index(-1), newIndex(-1), block(-1), isExport(false),
-        typeRef(nullptr), methodVar(nullptr), isRef(false) {
+        typeRef(0), methodVar(nullptr), isRef(false) {
     }
 };
 
@@ -159,6 +161,8 @@ public:
     Expr catchVar;
     int32_t handler;
     int pos;
+    
+    std::vector<ExceptionStmt *> catchs;
     
     ExceptionStmt() : catchType(-1), handler(-1), pos(-1) {}
     

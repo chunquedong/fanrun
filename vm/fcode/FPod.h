@@ -93,9 +93,10 @@ public:
     std::vector<FType> types;
     
     //cache
-    std::vector<FType*> c_sortedTypes;
+    //std::vector<FType*> c_sortedTypes;
     std::unordered_map<std::string, FType*> c_typeMap;
     void *c_wrappedPod;
+    std::vector< std::string > c_dependPods;
     
     void load(ZipFile &zip, bool isSpecial);
     

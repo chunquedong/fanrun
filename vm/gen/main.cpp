@@ -6,22 +6,23 @@
 //
 
 #include "PodLoader.h"
-#include "Generator.hpp"
+#include "PodGen.hpp"
 
 int main(int argc, const char * argv[]) {
     
     std::string libPath = "/Users/yangjiandong/workspace/soft/fantom-1.0.68";
     std::string pod = "testlib";
-    std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/temp/";
+    std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/vm/temp/";
   
     PodLoader podMgr;
     libPath += "/lib/fan/";
     podMgr.load(libPath, pod);
     
-    Generator gen;
-    gen.path = outPath;
-    gen.podMgr = &podMgr;
-    gen.gen("testlib");
+    PodGen gen(&podMgr, "sys");
+    gen.gen(outPath);
+    
+    PodGen gen2(&podMgr, "testlib");
+    gen2.gen(outPath);
     
     puts("DONE!");
     return 0;

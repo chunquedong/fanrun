@@ -269,7 +269,6 @@
 		3243441E1BDE0D2D0029661A /* DefaultParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultParam.cpp; sourceTree = "<group>"; };
 		3243441F1BDE0D2D0029661A /* DefaultParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultParam.h; sourceTree = "<group>"; };
 		325231111DAC88940044DBF8 /* ExeEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExeEngine.h; sourceTree = "<group>"; };
-		327845E31F49630A00481704 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		327845E51F49630A00481704 /* IRMethod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IRMethod.cpp; sourceTree = "<group>"; };
 		327845E61F49630A00481704 /* IRMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRMethod.h; sourceTree = "<group>"; };
 		327845E71F49630A00481704 /* Stmt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stmt.cpp; sourceTree = "<group>"; };
@@ -703,7 +702,6 @@
 		327845E21F49630A00481704 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				327845E31F49630A00481704 /* common.h */,
 			);
 			path = common;
 			sourceTree = "<group>";

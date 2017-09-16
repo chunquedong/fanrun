@@ -81,8 +81,9 @@ bool PodLoader::load(std::string path, std::string name) {
         std::string depend = dependList[i];
         std::string::size_type pos = depend.find(" ");
         if (pos != std::string::npos) {
-            depend = depend.substr(0, pos);
-            load(path, depend);
+            std::string dependPod = depend.substr(0, pos);
+            fpod->c_dependPods.push_back(dependPod);
+            load(path, dependPod);
         }
     }
     

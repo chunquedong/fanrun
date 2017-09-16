@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:vm/run.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:vm/gen.xcodeproj">
    </FileRef>
    <FileRef

@@ -25,6 +25,9 @@ void IRMethod::initLocals() {
             var.newIndex = primLocalsCount;
             ++primLocalsCount;
         }
+        if (var.typeName.size() == 0 && var.typeRef != 0) {
+            var.typeName = curPod->names[curPod->typeRefs[var.typeRef].typeName];
+        }
     }
     
     for (auto *b : blocks) {
@@ -37,6 +40,9 @@ void IRMethod::initLocals() {
                 var.newIndex = primLocalsCount;
                 ++primLocalsCount;
             }
+            if (var.typeName.size() == 0 && var.typeRef != 0) {
+                var.typeName = curPod->names[curPod->typeRefs[var.typeRef].typeName];
+            }
         }
     }
 }
@@ -47,13 +53,14 @@ void IRMethod::compile() {
     bool isStatic = (method->flags & FFlags::Static) != 0;
     if (!isStatic) {
         Var &var = newVar();
-        //var.typeRef = curPod-
+        var.typeRef = method->c_parent->meta.self;
         var.name = "__self";
     }
     for(int i=0; i<method->vars.size(); ++i) {
         FMethodVar *fvar = &method->vars[i];
         Var &var = newVar();
         var.methodVar = fvar;
+        var.typeRef = fvar->type;
         var.name = curPod->names[fvar->name];
     }
     
@@ -217,12 +224,15 @@ void IRMethod::initException() {
     uint16_t start = -1;
     uint16_t end = -1;
     
+    ExceptionStmt *tryStart = nullptr;
+    ExceptionStmt *tryEnd = nullptr;
+    
     for (FAttr *itr : method->attrs) {
         FErrTable *et = dynamic_cast<FErrTable*>(itr);
         if (et == nullptr) continue;
         for (FTrap &trap : et->traps) {
             if (trap.start != start || trap.end != end) {
-                ExceptionStmt *tryStart = new ExceptionStmt();
+                tryStart = new ExceptionStmt();
                 tryStart->etype = ExceptionStmt::TryStart;
             
                 Block *b = posToBlock[trap.start];
@@ -230,21 +240,21 @@ void IRMethod::initException() {
  
                 start = trap.start;
                 end = trap.end;
+                
+                tryEnd = new ExceptionStmt();
+                tryEnd->etype = ExceptionStmt::TryEnd;
+                tryEnd->catchType = trap.type;
+                tryEnd->handler = trap.handler;
+                Block *eb = posToBlock[trap.end];
+                eb->stmts.push_back(tryEnd);
             }
-            
-            ExceptionStmt *tryEnd = new ExceptionStmt();
-            tryEnd->etype = ExceptionStmt::TryEnd;
-            tryEnd->catchType = trap.type;
-            tryEnd->handler = trap.handler;
-            Block *eb = posToBlock[trap.end];
-            eb->stmts.push_back(tryEnd);
             
             Block *cb = posToBlock[trap.handler];
             for (Stmt *s : cb->stmts) {
                 ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);
                 if (!catchStart) continue;
                 if (catchStart->pos == trap.handler) {
-                    tryEnd->catchVar = catchStart->catchVar;
+                    tryEnd->catchs.push_back(catchStart);
                     break;
                 }
             }
@@ -298,6 +308,7 @@ void IRMethod::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic) 
     stmt->isVoid = isVoid;
     if (!isVoid) {
         Var var = block->newVar();
+        var.typeRef = stmt->methodRef->retType;
         stmt->retValue.type = ExprType::tempVar;
         stmt->retValue.varRef.index = var.index;
         stmt->retValue.varRef.block = var.block;
@@ -386,6 +397,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 StoreStmt *stmt = new StoreStmt();
                 
                 Var var = block->newVar();
+                var.typeRef = opObj.i1;
                 stmt->src = tvar;
                 stmt->dst.type = ExprType::tempVar;
                 stmt->dst.varRef.index = var.index;
@@ -422,6 +434,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
                 Var var = block->newVar();
+                var.typeRef = stmt->fieldRef->type;
                 stmt->value.type = ExprType::tempVar;
                 stmt->value.varRef.index = var.index;
                 stmt->value.varRef.block = var.block;
@@ -454,6 +467,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
                 Var var = block->newVar();
+                var.typeRef = stmt->fieldRef->type;
                 stmt->value.type = ExprType::tempVar;
                 stmt->value.varRef.index = var.index;
                 stmt->value.varRef.block = var.block;
@@ -480,6 +494,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 // route method calls to FMethodRef
             case FOp::CallNew: {
                 Var var = block->newVar();
+                var.typeRef = curPod->methodRefs[opObj.i1].parent;
                 Expr value;
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;
@@ -553,6 +568,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
                 Var var = block->newVar();
+                var.typeName = "sys_Bool";
                 stmt->result.type = ExprType::tempVar;
                 stmt->result.varRef.index = var.index;
                 stmt->result.varRef.block = var.block;
@@ -570,6 +586,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
                 Var var = block->newVar();
+                var.typeName = "sys_Bool";
                 stmt->result.type = ExprType::tempVar;
                 stmt->result.varRef.index = var.index;
                 stmt->result.varRef.block = var.block;
@@ -646,14 +663,17 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::CatchAllStart: {
-                ExceptionStmt *stmt = new ExceptionStmt();
-                stmt->etype = ExceptionStmt::CatchStart;
-                block->stmts.push_back(stmt);
+                ExceptionStmt *estmt = new ExceptionStmt();
+                estmt->etype = ExceptionStmt::CatchStart;
+                estmt->catchType = -1;
+                estmt->pos = opObj.pos;
+                block->stmts.push_back(estmt);
             }
                 break;
                 
             case FOp::CatchErrStart: {
                 Var var = block->newVar();
+                var.typeRef = opObj.i1;
                 Expr value;
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;
@@ -668,6 +688,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 ExceptionStmt *estmt = new ExceptionStmt();
                 estmt->etype = ExceptionStmt::CatchStart;
                 estmt->catchVar = value;
+                estmt->catchType = opObj.i1;
                 estmt->pos = opObj.pos;
                 block->stmts.push_back(estmt);
             }

@@ -42,7 +42,7 @@ native final const class FanPod
   ** closed.  The pod cannot have resources.  The pod name as defined
   ** by '/pod.def' must be uniquely named or Err is thrown.
   **
-  static Pod load(InStream in)
+  //static Pod load(InStream in)
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -65,17 +65,17 @@ native final const class FanPod
   **
   ** Version number for this pod.
   **
-  Version version()
+  //Version version()
 
   **
   ** Get the declared list of dependencies for this pod.
   **
-  Depend[] depends()
+  //Depend[] depends()
 
   **
   ** Uri for this pod which is always "fan://{name}".
   **
-  Uri uri()
+  //Uri uri()
 
   **
   ** Always return name().
@@ -113,7 +113,7 @@ native final const class FanPod
   ** files.  The URI of these files is rooted by `uri`.  Use `file`
   ** or `Uri.get` to lookup a resource file.
   **
-  File[] files()
+  //File[] files()
 
   **
   ** Look up a resource file in this pod.  The URI must start
@@ -126,7 +126,7 @@ native final const class FanPod
   **   Pod.find("icons").file(`fan://icons/x16/cut.png`)
   **   `fan://icons/x16/cut.png`.get
   **
-  File? file(Uri uri, Bool checked := true)
+  //File? file(Uri uri, Bool checked := true)
 
 //////////////////////////////////////////////////////////////////////////
 // Doc
@@ -147,12 +147,12 @@ native final const class FanPod
   ** Return the log for this pod's name.  This is a
   ** convenience for 'Log.get(name)'.
   **
-  Log log()
+  //Log log()
 
   **
   ** Convenience for `Env.props`.
   **
-  Str:Str props(Uri uri, Duration maxAge)
+  //Str:Str props(Uri uri, Duration maxAge)
 
   **
   ** Convenience for `Env.config`.

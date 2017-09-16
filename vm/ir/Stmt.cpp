@@ -7,6 +7,7 @@
 
 #include "Stmt.hpp"
 #include "IRMethod.h"
+#include "common.h"
 
 void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
     fr_TagValue val;
@@ -211,12 +212,35 @@ void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
 void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
     switch (etype) {
         case TryStart:
-            printer.printf("try {");
+            printer.printf("FR_TRY {");
             break;
-        case TryEnd:
-            printer.printf("} catch(%d ", catchType);
-            catchVar.print(method, printer, 0);
-            printer.printf(") { goto l__%d; }", handler);
+        case TryEnd: {
+            printer.println("} FR_CATCH {");
+            printer.indent();
+            bool hasCatchAll = false;
+            for (int i=0; i<catchs.size(); ++i) {
+                ExceptionStmt *itr = catchs[i];
+                if (itr->catchType == -1) {
+                    printer.println("goto l__%d;//catch all", handler);
+                    hasCatchAll = true;
+                    break;
+                }
+                
+                if (i > 0) {
+                    printer.printf("else ");
+                }
+                printer.println("if (fr_getErr(__env) is %d) {", itr->catchType);
+                printer.printf("  Type ");
+                itr->catchVar.print(method, printer, 0);
+                printer.printf(" = getErr();");
+                printer.println(" goto l__%d; }", handler);
+            }
+            if (!hasCatchAll) {
+                printer.println("FR_THROW(fr_getErr(__env));");
+            }
+            printer.unindent();
+            printer.println("}//end catch");
+        }
             break;
         case CatchStart:
             //printer.printf("} catch(%d) {", catchType);
@@ -239,7 +263,7 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
     if (pass == 0) {
         for (int i=0; i<locals.size(); ++i) {
             Var &v = locals[i];
-            printer.printf("t__%d_%d; ", index, v.index);
+            printer.printf("%s t__%d_%d; ", v.typeName.c_str(), index, v.index);
         }
         if (locals.size() > 0) {
             printer.newLine();

@@ -78,8 +78,8 @@ public:
     
     //cache
     std::string c_name;
-    std::string c_fullName;
-    int c_sortFlag;
+    //std::string c_fullName;
+    //int c_sortFlag;
     std::unordered_map<std::string, FMethod*> c_methodMap;
     std::unordered_map<std::string, FField*> c_fieldMap;
     int c_allocSize;
