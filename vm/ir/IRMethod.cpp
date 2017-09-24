@@ -6,43 +6,50 @@
 //
 
 #include "IRMethod.h"
+#include "escape.h"
 
 IRMethod::IRMethod(FPod *curPod, FMethod *method) :
     curPod(curPod),
     method(method) {
 }
 
+std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable) {
+    FTypeRef &typeRef = pod->typeRefs[tid];
+    std::string &podName = pod->names[typeRef.podName];
+    std::string &typeName = pod->names[typeRef.typeName];
+    std::string &sig = typeRef.signature;
+    
+    std::string res = podName + "_" + typeName;
+    if (checkNullable && sig.size() > 0 && sig[sig.size()-1] == '?') {
+        res += "_null";
+    }
+    
+    escape(res);
+    return res;
+}
+
 void IRMethod::initLocals() {
-    primLocalsCount = 0;
-    refLocalsCount = 0;
+    allLocalsCount = 0;
     
     for (Var &var : locals) {
-        bool isRef = var.isRef;
-        if (isRef) {
-            var.newIndex = refLocalsCount;
-            ++refLocalsCount;
-        } else {
-            var.newIndex = primLocalsCount;
-            ++primLocalsCount;
-        }
+        //bool isRef = var.isRef;
+        var.newIndex = allLocalsCount;
+        ++allLocalsCount;
         if (var.typeName.size() == 0 && var.typeRef != 0) {
-            var.typeName = curPod->names[curPod->typeRefs[var.typeRef].typeName];
+            var.typeName = getTypeRefName(curPod, var.typeRef, true);
         }
+        var.name = var.name + "_" + std::to_string(var.index);
+        escape(var.name);
     }
     
     for (auto *b : blocks) {
         for (Var &var : b->locals) {
-            bool isRef = var.isRef;
-            if (isRef) {
-                var.newIndex = refLocalsCount;
-                ++refLocalsCount;
-            } else {
-                var.newIndex = primLocalsCount;
-                ++primLocalsCount;
-            }
+            var.newIndex = allLocalsCount;
+            ++allLocalsCount;
             if (var.typeName.size() == 0 && var.typeRef != 0) {
-                var.typeName = curPod->names[curPod->typeRefs[var.typeRef].typeName];
+                var.typeName = getTypeRefName(curPod, var.typeRef, true);
             }
+            var.name = "_t_" + std::to_string(var.block) +"_"+ std::to_string(var.index);
         }
     }
 }
@@ -52,15 +59,15 @@ void IRMethod::compile() {
     
     bool isStatic = (method->flags & FFlags::Static) != 0;
     if (!isStatic) {
-        Var &var = newVar();
-        var.typeRef = method->c_parent->meta.self;
+        Var &var = newVar(method->c_parent->meta.self);
+        //var.typeRef = method->c_parent->meta.self;
         var.name = "__self";
     }
     for(int i=0; i<method->vars.size(); ++i) {
         FMethodVar *fvar = &method->vars[i];
-        Var &var = newVar();
+        Var &var = newVar(fvar->type);
         var.methodVar = fvar;
-        var.typeRef = fvar->type;
+        //var.typeRef = fvar->type;
         var.name = curPod->names[fvar->name];
     }
     
@@ -89,11 +96,10 @@ void IRMethod::print(Printer& printer, int pass) {
         printer.println(")");
     }
     else if (pass == 1) {
-        printer.indent();
         
         for(int i=method->paramCount; i<locals.size(); ++i) {
-            Var v = locals[i];
-            printer.printf("v__%s_%d, ", v.name.c_str(), v.index);
+            Var &v = locals[i];
+            printer.printf("%s %s; ", v.typeName.c_str(), v.name.c_str());
         }
         printer.newLine();
         
@@ -104,7 +110,6 @@ void IRMethod::print(Printer& printer, int pass) {
         for (Block *b : blocks) {
             b->print(this, printer, 1);
         }
-        printer.unindent();
     }
 }
 
@@ -287,10 +292,11 @@ void IRMethod::initBlock() {
     }
 }
 
-void IRMethod::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic) {
+void IRMethod::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, bool isMixin) {
     CallStmt *stmt = new CallStmt();
     stmt->isStatic = isStatic;
     stmt->isVirtual = isVirtual;
+    stmt->isMixin = isMixin;
     stmt->curPod = curPod;
     stmt->methodRefId = opObj.i1;
     stmt->methodRef = &curPod->methodRefs[opObj.i1];
@@ -307,8 +313,8 @@ void IRMethod::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic) 
     bool isVoid = isVoidTypeRef(stmt->methodRef->retType);
     stmt->isVoid = isVoid;
     if (!isVoid) {
-        Var var = block->newVar();
-        var.typeRef = stmt->methodRef->retType;
+        Var &var = block->newVar(stmt->methodRef->retType);
+        //var.typeRef = stmt->methodRef->retType;
         stmt->retValue.type = ExprType::tempVar;
         stmt->retValue.varRef.index = var.index;
         stmt->retValue.varRef.block = var.block;
@@ -333,8 +339,24 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                         newVar = block->locals[i];
                     }
                 } else {
-                    newVar = block->newVar();
-                    newVar.isExport = true;
+                    Var &tVar = block->newVar(0);
+                    if (expr.type == ExprType::constant) {
+                        tVar.typeName = expr.getConstantType();
+                    } else if (expr.type == ExprType::localVar) {
+                        Var &pvar = this->locals[expr.varRef.index];
+                        tVar.typeRef = pvar.typeRef;
+                        tVar.typeName = pvar.typeName;
+                    } else if (expr.type == ExprType::tempVar) {
+                        Block *pblock = this->blocks[expr.varRef.block];
+                        Var &pvar = pblock->locals[expr.varRef.index];
+                        tVar.typeRef = pvar.typeRef;
+                        tVar.typeName = pvar.typeName;
+                    } else {
+                        throw "err";
+                    }
+                    
+                    //tVar.isExport = true;
+                    newVar = tVar;
                     
                     Expr newExpr;
                     newExpr.type = ExprType::tempVar;
@@ -396,8 +418,9 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 //block->push(tvar);
                 StoreStmt *stmt = new StoreStmt();
                 
-                Var var = block->newVar();
-                var.typeRef = opObj.i1;
+                Var &var = block->newVar(0);
+                var.typeName = tvar.getConstantType();
+                //var.typeRef = opObj.i1;
                 stmt->src = tvar;
                 stmt->dst.type = ExprType::tempVar;
                 stmt->dst.varRef.index = var.index;
@@ -433,8 +456,8 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->instance = block->pop();
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
-                Var var = block->newVar();
-                var.typeRef = stmt->fieldRef->type;
+                Var &var = block->newVar(stmt->fieldRef->type);
+                //var.typeRef = stmt->fieldRef->type;
                 stmt->value.type = ExprType::tempVar;
                 stmt->value.varRef.index = var.index;
                 stmt->value.varRef.block = var.block;
@@ -466,8 +489,8 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->isStatic = true;
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
-                Var var = block->newVar();
-                var.typeRef = stmt->fieldRef->type;
+                Var &var = block->newVar(stmt->fieldRef->type);
+                //var.typeRef = stmt->fieldRef->type;
                 stmt->value.type = ExprType::tempVar;
                 stmt->value.varRef.index = var.index;
                 stmt->value.varRef.block = var.block;
@@ -493,39 +516,45 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
             }
                 // route method calls to FMethodRef
             case FOp::CallNew: {
-                Var var = block->newVar();
-                var.typeRef = curPod->methodRefs[opObj.i1].parent;
+                Var &var = block->newVar(curPod->methodRefs[opObj.i1].parent);
+                //var.typeRef = curPod->methodRefs[opObj.i1].parent;
                 Expr value;
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;
                 value.varRef.block = var.block;
                 block->push(value);
-                call(block, opObj, false, false);
+                call(block, opObj, false, false, false);
                 block->push(value);
                 break;
             }
             case FOp::CallStatic:
             case FOp::CallMixinStatic: {
-                call(block, opObj, false, true);
+                call(block, opObj, false, true, false);
                 break;
             }
-            case FOp::CallVirtual:
+            case FOp::CallVirtual: {
+                call(block, opObj, true, false, false);
+                break;
+            }
             case FOp::CallMixinVirtual: {
-                call(block, opObj, true, false);
+                call(block, opObj, true, false, true);
                 break;
             }
                 
             case FOp::CallCtor:
-            case FOp::CallNonVirtual:
+            case FOp::CallNonVirtual: {
+                call(block, opObj, false, false, false);
+                break;
+            }
             case FOp::CallMixinNonVirtual: {
-                call(block, opObj, false, false);
+                call(block, opObj, false, false, true);
                 break;
             }
                 
             case FOp::Jump: {
                 JmpStmt *stmt = new JmpStmt();
                 stmt->jmpType = JmpStmt::allJmp;
-                stmt->opObj = opObj;
+                //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
@@ -536,7 +565,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 JmpStmt *stmt = new JmpStmt();
                 stmt->jmpType = JmpStmt::trueJmp;
                 stmt->expr = block->pop();
-                stmt->opObj = opObj;
+                //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
@@ -547,7 +576,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 JmpStmt *stmt = new JmpStmt();
                 stmt->jmpType = JmpStmt::falseJmp;
                 stmt->expr = block->pop();
-                stmt->opObj = opObj;
+                //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
@@ -567,7 +596,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                Var var = block->newVar();
+                Var &var = block->newVar(0);
                 var.typeName = "sys_Bool";
                 stmt->result.type = ExprType::tempVar;
                 stmt->result.varRef.index = var.index;
@@ -585,7 +614,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 stmt->param2.varRef.index = 0;
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                Var var = block->newVar();
+                Var &var = block->newVar(0);
                 var.typeName = "sys_Bool";
                 stmt->result.type = ExprType::tempVar;
                 stmt->result.varRef.index = var.index;
@@ -645,7 +674,7 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
             case FOp::Leave: {
                 JmpStmt *stmt = new JmpStmt();
                 stmt->jmpType = JmpStmt::leaveJmp;
-                stmt->opObj = opObj;
+                //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
@@ -654,8 +683,8 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
             }
             case FOp::JumpFinally:{
                 JmpStmt *stmt = new JmpStmt();
-                stmt->jmpType = JmpStmt::allJmp;
-                stmt->opObj = opObj;
+                stmt->jmpType = JmpStmt::finallyJmp;
+                //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
@@ -672,8 +701,8 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 break;
                 
             case FOp::CatchErrStart: {
-                Var var = block->newVar();
-                var.typeRef = opObj.i1;
+                Var &var = block->newVar(opObj.i1);
+                //var.typeRef = opObj.i1;
                 Expr value;
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;

@@ -18,9 +18,7 @@ public:
     std::vector<Block *> blocks;
     std::vector<Var> locals;
     
-    int primLocalsCount;
-    int refLocalsCount;
-    
+    int allLocalsCount;
     //std::string name;
     
     //Env *context;
@@ -34,15 +32,11 @@ public:
     void print(Printer& printer, int pass);
 private:
     
-    Var &newVar() {
+    Var &newVar(uint16_t typeRef) {
         Var var;
         var.index = (int)locals.size();
-        var.newIndex = -1;
         var.block = -1;
-        var.isExport = true;
-        var.methodVar = nullptr;
-        var.isRef = true;
-        
+        var.typeRef = typeRef;        
         locals.push_back(var);
         return locals.back();
     }
@@ -55,7 +49,7 @@ private:
     
     void initLocals();
     
-    void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic);
+    void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, bool isMixin);
     
     void parseBlock(Block *block, Block *previous);
     

@@ -44,9 +44,9 @@ void MethodGen::genPrototype(Printer *printer, bool funcPtr) {
 void MethodGen::genCode(Printer *printer) {
     IRMethod irMethod(parent->podGen->pod, method);
     irMethod.compile();
-
-    printer->indent();
     
+    printer->indent();
+    /*
     for(int i=irMethod.method->paramCount; i<irMethod.locals.size(); ++i) {
         Var v = irMethod.locals[i];
         printer->printf("%s v__%s_%d, ", v.typeName.c_str(), v.name.c_str(), v.index);
@@ -59,6 +59,7 @@ void MethodGen::genCode(Printer *printer) {
     }
     for (Block *b : irMethod.blocks) {
         b->print(&irMethod, *printer, 1);
-    }
+    }*/
+    irMethod.print(*printer, 1);
     printer->unindent();
 }

@@ -7,43 +7,41 @@
 
 #include "Stmt.hpp"
 #include "IRMethod.h"
-#include "common.h"
+#include "escape.h"
+
+
+std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable);
 
 void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
-    fr_TagValue val;
     switch (opObj.opcode) {
         case FOp::LoadNull: {
-            val.type = fr_vtObj;
-            val.any.o = nullptr;
+            printer.printf("null");
             break;
         }
         case FOp::LoadFalse: {
-            val.type = fr_vtBool;
-            val.any.b = false;
+            printer.printf("false");
             break;
         }
         case FOp::LoadTrue: {
-            val.type = fr_vtBool;
-            val.any.b = true;
+            printer.printf("true");
             break;
         }
         case FOp::LoadInt: {
-            fr_Int i = curPod->constantas.ints[opObj.i1];
-            val.type = fr_vtInt;
-            val.any.i = i;
+            int64_t i = curPod->constantas.ints[opObj.i1];
+            printer.printf("%lld", i);
             break;
         }
         case FOp::LoadFloat: {
             double i = curPod->constantas.reals[opObj.i1];
-            val.type = fr_vtFloat;
-            val.any.f = i;
+            printer.printf("%g", i);
             break;
         }
         case FOp::LoadDecimal: {
             break;
         }
         case FOp::LoadStr: {
-            //TODO
+            std::string &i = curPod->constantas.strings[opObj.i1];
+            printer.printf("\"%s\"", i.c_str());
             break;
         }
         case FOp::LoadDuration: {
@@ -51,43 +49,69 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadUri: {
-            //TODO
+            std::string &i = curPod->constantas.uris[opObj.i1];
+            printer.printf("\"%s\"", i.c_str());
             break;
         }
         case FOp::LoadType: {
             break;
         }
         default: {
-            //compare null
-            val.type = fr_vtObj;
-            val.any.o = nullptr;
+            printer.printf("other");
+            break;
         }
-            break;
     }
-    
-    switch (val.type) {
-        case fr_vtBool:
-            printer.printf(val.any.b ? "true" : "false");
+}
+
+std::string Expr::getConstantType() {
+    std::string res;
+    switch (opObj.opcode) {
+        case FOp::LoadNull: {
+            res = "sys_Obj";
             break;
-        case fr_vtInt:
-            printer.printf("%lld", val.any.i);
+        }
+        case FOp::LoadFalse: {
+            res = "sys_Bool";
             break;
-        case fr_vtFloat:
-            printer.printf("%g", val.any.f);
+        }
+        case FOp::LoadTrue: {
+            res = "sys_Bool";
             break;
-        case fr_vtObj:
-            if (val.any.o) {
-                //TODO
-                //printer.printf("%s(%p)", ((FObj*)val.any.o)->type->c_name.c_str()
-                //               , val.any.o);
-            } else {
-                printer.printf("null");
-            }
+        }
+        case FOp::LoadInt: {
+            res = "sys_Int";
             break;
-        default:
-            printer.printf("other:%p", val.any.o);
+        }
+        case FOp::LoadFloat: {
+            res = "sys_Float";
             break;
+        }
+        case FOp::LoadDecimal: {
+            res = "sys_Decimal";
+            break;
+        }
+        case FOp::LoadStr: {
+            res = "sys_Str";
+            break;
+        }
+        case FOp::LoadDuration: {
+            res = "sys_Duration";
+            break;
+        }
+        case FOp::LoadUri: {
+            res = "sys_Uri";
+            break;
+        }
+        case FOp::LoadType: {
+            res = "sys_Type";
+            break;
+        }
+        default: {
+            res = "sys_Obj";
+            break;
+        }
     }
+    return res;
 }
 
 void Expr::print(IRMethod *method, Printer& printer, int pass) {
@@ -98,16 +122,19 @@ void Expr::print(IRMethod *method, Printer& printer, int pass) {
         }
         case ExprType::localVar: {
             if (varRef.block == -1) {
-                Var var = method->locals[varRef.index];
-                printer.printf("v__%s_%d", var.name.c_str(), varRef.index);
+                Var &var = method->locals[varRef.index];
+                printer.printf("%s", var.name.c_str());
             } else {
                 printf("ERROR: block is %d\n", varRef.block);
             }
             break;
         }
-        case ExprType::tempVar:
-            printer.printf("t__%d_%d", varRef.block, varRef.index);
+        case ExprType::tempVar: {
+            Block *block = method->blocks[varRef.block];
+            Var &var = block->locals[varRef.index];
+            printer.printf("%s", var.name.c_str());
             break;
+        }
         default:
             break;
     }
@@ -115,7 +142,7 @@ void Expr::print(IRMethod *method, Printer& printer, int pass) {
 
 void StoreStmt::print(IRMethod *method, Printer& printer, int pass) {
     dst.print(method, printer, pass);
-    printer.printf("=");
+    printer.printf(" = ");
     src.print(method, printer, pass);
     printer.printf(";");
 }
@@ -123,24 +150,23 @@ void StoreStmt::print(IRMethod *method, Printer& printer, int pass) {
 void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
     if (!isVoid) {
         retValue.print(method, printer, pass);
-        printer.printf("=");
+        printer.printf(" = ");
     }
     
-    int s = 0;
-    if (isStatic) {
-        printer.printf("%s::", curPod->names[methodRef->parent].c_str());
+    std::string typeName = getTypeRefName(curPod, methodRef->parent, false);
+    std::string mthName = curPod->names[methodRef->name];
+    escape(mthName);
+    if (!isVirtual) {
+        std::string tname = getTypeRefName(curPod, methodRef->parent, false);
+        printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
+    } else if (isMixin) {
+        printer.printf("FR_ICALL(%s, %s", typeName.c_str(), mthName.c_str());
     } else {
-        params[0].print(method, printer, pass);
-        printer.printf("->");
-        s = 1;
+        printer.printf("FR_VCALL(%s, %s", typeName.c_str(), mthName.c_str());
     }
     
-    printer.printf("%s(", curPod->names[methodRef->name].c_str());
-    
-    for (int i=s; i<params.size(); ++i) {
-        if (i != s) {
-            printer.printf(",");
-        }
+    for (int i=0; i<params.size(); ++i) {
+        printer.printf(",");
         params[i].print(method, printer, pass);
     }
     printer.printf(");");
@@ -158,7 +184,7 @@ void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
             printer.printf("->%s", curPod->names[fieldRef->name].c_str());
         }
     }
-    printer.printf("=");
+    printer.printf(" = ");
     if (isLoad) {
         if (isStatic) {
             printer.printf("%s::%s", curPod->names[fieldRef->parent].c_str()
@@ -174,10 +200,7 @@ void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
-    if (jmpType == allJmp || jmpType == leaveJmp) {
-        printer.printf("goto ");
-    }
-    else if (jmpType == trueJmp) {
+    if (jmpType == trueJmp) {
         printer.printf("if (");
         expr.print(method, printer, pass);
         printer.printf(") goto ");
@@ -186,6 +209,8 @@ void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
         printer.printf("if (!");
         expr.print(method, printer, pass);
         printer.printf(") goto ");
+    } else {
+        printer.printf("goto ");
     }
     printer.printf("l__%d;", targetBlock->pos);
 }
@@ -263,7 +288,7 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
     if (pass == 0) {
         for (int i=0; i<locals.size(); ++i) {
             Var &v = locals[i];
-            printer.printf("%s t__%d_%d; ", v.typeName.c_str(), index, v.index);
+            printer.printf("%s %s; ", v.typeName.c_str(), v.name.c_str());
         }
         if (locals.size() > 0) {
             printer.newLine();

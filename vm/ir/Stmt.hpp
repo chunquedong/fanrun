@@ -25,7 +25,7 @@ struct Var {
     int index;
     int newIndex;
     int block;
-    bool isExport;
+    //bool isExport;
     
     std::string name;
     std::string typeName;
@@ -33,10 +33,10 @@ struct Var {
     //fr_ValueType type;
     uint16_t typeRef;
     FMethodVar *methodVar;
-    bool isRef;
+    //bool isRef;
     
-    Var() : index(-1), newIndex(-1), block(-1), isExport(false),
-        typeRef(0), methodVar(nullptr), isRef(false) {
+    Var() : index(-1), newIndex(-1), block(-1),
+        typeRef(0), methodVar(nullptr) {
     }
 };
 
@@ -51,6 +51,7 @@ public:
         FOpObj opObj;
         VarRef varRef;
     };
+    std::string getConstantType();
     void print(IRMethod *method, Printer& printer, int pass);
 };
 
@@ -103,6 +104,7 @@ public:
     bool isVoid;
     bool isStatic;
     bool isVirtual;
+    bool isMixin;
     
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
@@ -139,11 +141,11 @@ public:
         trueJmp,
         falseJmp,
         leaveJmp,
+        finallyJmp,
     };
     
     JmpType jmpType;
     Expr expr;
-    FOpObj opObj;
     uint16_t pos;
     
     Block *targetBlock;
@@ -197,15 +199,11 @@ public:
     
     void print(IRMethod *method, Printer& printer, int pass);
     
-    Var &newVar() {
+    Var &newVar(uint16_t typeRef) {
         Var var;
         var.index = (int)locals.size();
-        var.newIndex = -1;
-        var.methodVar = nullptr;
         var.block = this->index;
-        var.isExport = false;
-        var.isRef = true;
-        
+        var.typeRef = typeRef;        
         locals.push_back(var);
         return locals.back();
     }

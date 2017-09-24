@@ -18,6 +18,8 @@ PodGen::PodGen(PodLoader *podMgr, const std::string& podName) : podMgr(podMgr), 
         FType *type = &pod->types[i];
         TypeGen gtype(this, type);
         gtype.c_sortFlag = 0;
+        
+        //if (gtype.name != "testlib_Main") continue;
         allTypes.push_back(gtype);
     }
     
