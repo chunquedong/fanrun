@@ -19,9 +19,12 @@ struct MethodGen {
     FMethod *method;
     std::string name;
     
+    int beginDefaultParam;
+    
     MethodGen(TypeGen *parent, FMethod *method);
     
-    void genPrototype(Printer *printer, bool funcPtr);
+    bool genPrototype(Printer *printer, bool funcPtr, int i);
+    void genDeclares(Printer *printer, bool funcPtr);
     void genCode(Printer *printer);
 };
 

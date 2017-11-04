@@ -65,7 +65,12 @@ void TypeGen::genImple(Printer *printer) {
         }
         
         MethodGen gmethod(this, method);
-        gmethod.genPrototype(printer, false);
+        //if (name == "testlib_ClosureTest"  && gmethod.name == "make") {
+        //    printf("");
+        //}
+        
+        //TODO
+        gmethod.genPrototype(printer, false, -1);
         printer->printf(" {");
         printer->newLine();
         gmethod.genCode(printer);
@@ -87,7 +92,7 @@ void TypeGen::genVTable(Printer *printer) {
     std::string baseName = podGen->getTypeRefName(type->meta.base);
     
     if (name == "sys_Obj") {
-        printer->println("fr_Type supper__;");
+        printer->println("fr_Type super__;");
     } else {
         printer->println("struct %s_vtable super__;", baseName.c_str());
     }
@@ -100,14 +105,14 @@ void TypeGen::genVTable(Printer *printer) {
     
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Virtual) == 0) {
+        if ((method->flags & FFlags::Ctor) != 0 || (method->flags & FFlags::Static) != 0) {
             //TODO: why call novirtual function by callVirutal instruct?
-            //continue;
+            continue;
         }
         MethodGen gmethod(this, method);
-        gmethod.genPrototype(printer, true);
-        printer->printf(";");
-        printer->newLine();
+        gmethod.genDeclares(printer, true);
+        //printer->printf(";");
+        //printer->newLine();
     }
     
     printer->unindent();
@@ -122,8 +127,10 @@ void TypeGen::genVTableInit(Printer *printer) {
     
     std::string baseName = podGen->getTypeRefName(type->meta.base);
     
+    bool isRootType = false;
     if (name == "sys_Obj") {
-        printer->println("VTable_init(&vtable->supper__);");
+        isRootType = true;
+        printer->println("VTable_init(&vtable->super__);");
     } else {
         printer->println("%s_initVTable(&vtable->super__);", baseName.c_str());
     }
@@ -134,35 +141,47 @@ void TypeGen::genVTableInit(Printer *printer) {
         printer->println("%s_initVTable(&vtable->%s_super__);", base.c_str(), base.c_str());
     }
     
+    //set self virutal func
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Virtual) == 0) {
-            //continue;
+        if ((method->flags & FFlags::Ctor) != 0 || (method->flags & FFlags::Static) != 0) {
+            continue;
         }
         MethodGen gmethod(this, method);
-        printer->println("vtable->%s = %s_%s;", gmethod.name.c_str(), baseName.c_str(), gmethod.name.c_str());
+        for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
+            printer->println("vtable->%s%d = %s_%s%d;", gmethod.name.c_str(),
+                             j, name.c_str(), gmethod.name.c_str(), j);
+        }
     }
     
-    for (int i=0; i<type->methods.size(); ++i) {
-        FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Virtual) == 0) {
-            //continue;
-        }
-        std::string raw_name = podGen->pod->names[method->name];
-        
-        if (isOverrideFrom(type->meta.base, raw_name)) {
-            MethodGen gmethod(this, method);
-            printer->println("vtable->supper__->%s = %s_%s;", gmethod.name.c_str(), baseName.c_str(), gmethod.name.c_str());
-        }
-        for (int i=0; i<type->meta.mixin.size(); ++i) {
-            if (isOverrideFrom(type->meta.mixin[i], raw_name)) {
+    //override base and mixin
+    if (!isRootType) {
+        for (int i=0; i<type->methods.size(); ++i) {
+            FMethod *method = &type->methods[i];
+            if ((method->flags & FFlags::Ctor) != 0 || (method->flags & FFlags::Static) != 0) {
+                continue;
+            }
+            std::string raw_name = podGen->pod->names[method->name];
+            
+            if (isOverrideFrom(type->meta.base, raw_name)) {
                 MethodGen gmethod(this, method);
-                std::string base = podGen->getTypeRefName(type->meta.mixin[i]);
-                printer->println("vtable->%s_supper__->%s = %s_%s;", base.c_str(), gmethod.name.c_str(), baseName.c_str(), gmethod.name.c_str());
+                for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
+                    printer->println("vtable->super__.%s%d = %s_%s%d;", gmethod.name.c_str(),
+                                     j, name.c_str(), gmethod.name.c_str(), j);
+                }
+            }
+            for (int i=0; i<type->meta.mixin.size(); ++i) {
+                if (isOverrideFrom(type->meta.mixin[i], raw_name)) {
+                    MethodGen gmethod(this, method);
+                    std::string base = podGen->getTypeRefName(type->meta.mixin[i]);
+                    for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
+                        printer->println("vtable->%s_super__.%s%d = %s_%s%d;", base.c_str(), gmethod.name.c_str(),
+                                    j, name.c_str(), gmethod.name.c_str(), j);
+                    }
+                }
             }
         }
     }
-    
     printer->unindent();
     printer->println("};");
 }
@@ -180,9 +199,9 @@ void TypeGen::genMethodDeclare(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         MethodGen gmethod(this, method);
-        gmethod.genPrototype(printer, false);
-        printer->printf(";");
-        printer->newLine();
+        gmethod.genDeclares(printer, false);
+        //printer->printf(";");
+        //printer->newLine();
     }
 }
 

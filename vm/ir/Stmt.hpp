@@ -180,8 +180,10 @@ public:
     CType coerceType;
     Expr from;
     Expr to;
+    uint16_t fromType;
+    uint16_t toType;
     
-    CoerceStmt() : coerceType(cast) {}
+    CoerceStmt() : coerceType(cast), fromType(0), toType(0) {}
     
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     

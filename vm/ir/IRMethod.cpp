@@ -31,6 +31,10 @@ std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable) {
 void IRMethod::initLocals() {
     allLocalsCount = 0;
     
+    int tparamCount = method->paramCount;
+    bool isStatic = (method->flags & FFlags::Static) != 0;
+    if (!isStatic) ++tparamCount;
+    
     for (int i=0; i<locals.size(); ++i) {
         Var &var = locals[i];
         //bool isRef = var.isRef;
@@ -40,7 +44,7 @@ void IRMethod::initLocals() {
             var.typeName = getTypeRefName(curPod, var.typeRef, true);
         }
         
-        if (i >= method->paramCount) {
+        if (i >= tparamCount) {
             var.name = var.name + "_" + std::to_string(var.index);
         }
         escape(var.name);
@@ -101,8 +105,11 @@ void IRMethod::print(Printer& printer, int pass) {
         printer.println(")");
     }
     else if (pass == 1) {
+        int tparamCount = method->paramCount;
+        bool isStatic = (method->flags & FFlags::Static) != 0;
+        if (!isStatic) ++tparamCount;
         
-        for(int i=method->paramCount; i<locals.size(); ++i) {
+        for(int i=tparamCount; i<locals.size(); ++i) {
             Var &v = locals[i];
             printer.printf("%s %s; ", v.typeName.c_str(), v.name.c_str());
         }
@@ -154,14 +161,14 @@ CoerceStmt::CType IRMethod::typeCoerce(uint16_t from, uint16_t to) {
     bool isVal1, isVal2, isNullable1, isNullable2;
     getTypeInfo(curPod, typeRef1, isVal1, isNullable1);
     getTypeInfo(curPod, typeRef2, isVal2, isNullable2);
-    if (isVal1 && isNullable1 == false && isNullable2) {
-        //boxing
+    
+    if ((isVal1 && !isNullable1) && (!isVal2 || isNullable2)) {
         return CoerceStmt::boxing;
     }
-    else if (isVal2 && isNullable1 && !isNullable2) {
-        //unboxing
+    if ((!isVal1 || isNullable1 )&& (isVal2 & !isNullable2)) {
         return CoerceStmt::unboxing;
     }
+    
     return CoerceStmt::cast;
 }
 
@@ -703,10 +710,13 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
             }
             case FOp::Coerce: {
                 CoerceStmt *stmt = new CoerceStmt();
+                stmt->curPod = curPod;
                 stmt->from = block->pop();
                 
                 CoerceStmt::CType i = typeCoerce(opObj.i1, opObj.i2);
                 stmt->coerceType = i;
+                stmt->fromType = opObj.i1;
+                stmt->toType = opObj.i2;
                 Var &var = block->newVar(opObj.i2);
                 
                 Expr value;

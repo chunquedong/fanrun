@@ -288,31 +288,28 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
+    std::string typeName1 = getTypeRefName(curPod, fromType, true);
+    std::string typeName2 = getTypeRefName(curPod, toType, true);
+    to.print(method, printer, pass);
     switch (coerceType) {
         case cast: {
-            to.print(method, printer, pass);
             printer.printf(" = FR_CAST(");
-            from.print(method, printer, pass);
-            printer.printf(");");
             break;
         }
         case boxing: {
-            to.print(method, printer, pass);
             printer.printf(" = FR_BOX(");
-            from.print(method, printer, pass);
-            printer.printf(");");
             break;
         }
         case unboxing: {
-            to.print(method, printer, pass);
             printer.printf(" = FR_UNBOX(");
-            from.print(method, printer, pass);
-            printer.printf(");");
             break;
         }
         default:
             break;
     }
+    from.print(method, printer, pass);
+    printer.printf(",%s,%s", typeName1.c_str(), typeName2.c_str());
+    printer.printf(");");
 }
 
 void Block::print(IRMethod *method, Printer& printer, int pass) {

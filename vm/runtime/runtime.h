@@ -26,7 +26,8 @@ typedef bool sys_Bool;
 #define FR_VCALL(type, method, self, ...) FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
 #define FR_ICALL(type, method, self, ...) FR_VTABLE(type, self)->method(__env, ((self) + FR_VTABLE(type, self)->offset), ## __VA_ARGS__)
 
-#define FR_BOX(val) (sys_Obj)val
-#define FR_UNBOX(obj, type) (type)obj
+#define FR_BOX(val, fromType, toType) ((toType)val)
+#define FR_UNBOX(obj, fromType, toType) ((toType)obj)
+#define FR_CAST(obj, fromType, toType) ((toType)obj)
 
 #endif /* runtime_h */
