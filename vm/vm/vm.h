@@ -18,7 +18,7 @@ CF_BEGIN
  * internal type
  */
 struct FType;
-struct fr_ObjHeader { struct FType * type; bool dirty; int mark;  };
+//struct fr_ObjHeader { struct FType * type; bool dirty; int mark;  };
 
 /**
  * internal alloc obj

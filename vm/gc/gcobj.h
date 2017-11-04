@@ -17,9 +17,9 @@ typedef struct GcObj_ {
 static const uint64_t headerTypeMask = ~((uint64_t)(3));
 static const uint64_t headerMarkMask = ((uint64_t)(1));
 static const uint64_t headerDirtyMask = ((uint64_t)(2));
-#define gc_getType(obj) ((void*)(((uint64_t)(obj->header)) & headerTypeMask))
-#define gc_getMark(obj) (((uint64_t)(obj->header)) & headerMarkMask)
-#define gc_isDirty(obj) (((uint64_t)(obj->header)) & headerDirtyMask)
+#define gc_getType(obj) ((void*)(((uint64_t)((obj)->header)) & headerTypeMask))
+#define gc_getMark(obj) (((uint64_t)((obj)->header)) & headerMarkMask)
+#define gc_isDirty(obj) (((uint64_t)((obj)->header)) & headerDirtyMask)
 
 inline void setBitField(uint64_t *target, int pos, int val) {
     if (val) {

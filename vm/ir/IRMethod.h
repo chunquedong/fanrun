@@ -55,6 +55,8 @@ private:
     
     bool isVoidTypeRef(uint16_t typeRef);
     
+    CoerceStmt::CType typeCoerce(uint16_t from, uint16_t to);
+    
     void initException();
 };
 

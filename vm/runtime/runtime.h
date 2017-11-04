@@ -16,14 +16,17 @@
 typedef int64_t sys_Int;
 typedef double sys_Float;
 typedef bool sys_Bool;
+//typedef void sys_Void;
 
 #define FR_TRY if(setjmp(fr_pushJmpBuf(__env)))
 #define FR_CATCH else
 #define FR_THROW(err) { fr_setErr(__env, err); longjmp(fr_popJmpBuf(__env), 1);}
 
-#define FR_VTABLE(typeName, self) ((typeName##_VTable_)(((Obj)(self))->type))
-#define FR_VCALL(type, method, self, ...) FR_VTABLE(type, self)->method(env__, self, ## __VA_ARGS__)
-#define FR_ICALL(type, method, self, ...) FR_VTABLE(type, self)->method(env__, ((self) + FR_VTABLE(type, self)->offset), ## __VA_ARGS__)
+#define FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)(gc_getType( ((GcObj*)self) )) )
+#define FR_VCALL(type, method, self, ...) FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
+#define FR_ICALL(type, method, self, ...) FR_VTABLE(type, self)->method(__env, ((self) + FR_VTABLE(type, self)->offset), ## __VA_ARGS__)
 
+#define FR_BOX(val) (sys_Obj)val
+#define FR_UNBOX(obj, type) (type)obj
 
 #endif /* runtime_h */

@@ -30,8 +30,8 @@ typedef enum fr_ValueType_ {
 /**
  * internal type
  */
-struct fr_ObjHeader;
-typedef struct fr_ObjHeader FObj;
+struct GcObj_;
+typedef struct GcObj_ FObj;
 
 /**
  * typedef for Fantom

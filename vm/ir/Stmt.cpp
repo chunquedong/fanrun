@@ -156,6 +156,9 @@ void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
     std::string typeName = getTypeRefName(curPod, methodRef->parent, false);
     std::string mthName = curPod->names[methodRef->name];
     escape(mthName);
+    
+    mthName += std::to_string(methodRef->paramCount);
+    
     if (!isVirtual) {
         std::string tname = getTypeRefName(curPod, methodRef->parent, false);
         printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
@@ -279,6 +282,34 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
         case FinallyEnd:
             //printer.printf("}");
             break;
+        default:
+            break;
+    }
+}
+
+void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
+    switch (coerceType) {
+        case cast: {
+            to.print(method, printer, pass);
+            printer.printf(" = FR_CAST(");
+            from.print(method, printer, pass);
+            printer.printf(");");
+            break;
+        }
+        case boxing: {
+            to.print(method, printer, pass);
+            printer.printf(" = FR_BOX(");
+            from.print(method, printer, pass);
+            printer.printf(");");
+            break;
+        }
+        case unboxing: {
+            to.print(method, printer, pass);
+            printer.printf(" = FR_UNBOX(");
+            from.print(method, printer, pass);
+            printer.printf(");");
+            break;
+        }
         default:
             break;
     }

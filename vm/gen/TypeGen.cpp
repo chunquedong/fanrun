@@ -58,6 +58,12 @@ void TypeGen::genInline(Printer *printer) {
 void TypeGen::genImple(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
+        
+        if ((type->meta.flags & FFlags::Native) != 0
+            || (method->flags & FFlags::Native) != 0) {
+            continue;
+        }
+        
         MethodGen gmethod(this, method);
         gmethod.genPrototype(printer, false);
         printer->printf(" {");
@@ -95,7 +101,8 @@ void TypeGen::genVTable(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         if ((method->flags & FFlags::Virtual) == 0) {
-            continue;
+            //TODO: why call novirtual function by callVirutal instruct?
+            //continue;
         }
         MethodGen gmethod(this, method);
         gmethod.genPrototype(printer, true);
@@ -109,7 +116,7 @@ void TypeGen::genVTable(Printer *printer) {
 }
 
 void TypeGen::genVTableInit(Printer *printer) {
-    printer->println("void %s_initVTable(struct %s_vtable vtable*) {", name.c_str(), name.c_str());
+    printer->println("void %s_initVTable(struct %s_vtable *vtable) {", name.c_str(), name.c_str());
     
     printer->indent();
     
@@ -130,7 +137,7 @@ void TypeGen::genVTableInit(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         if ((method->flags & FFlags::Virtual) == 0) {
-            continue;
+            //continue;
         }
         MethodGen gmethod(this, method);
         printer->println("vtable->%s = %s_%s;", gmethod.name.c_str(), baseName.c_str(), gmethod.name.c_str());
@@ -139,7 +146,7 @@ void TypeGen::genVTableInit(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         if ((method->flags & FFlags::Virtual) == 0) {
-            continue;
+            //continue;
         }
         std::string raw_name = podGen->pod->names[method->name];
         

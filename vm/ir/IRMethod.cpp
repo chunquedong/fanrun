@@ -31,15 +31,20 @@ std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable) {
 void IRMethod::initLocals() {
     allLocalsCount = 0;
     
-    for (Var &var : locals) {
+    for (int i=0; i<locals.size(); ++i) {
+        Var &var = locals[i];
         //bool isRef = var.isRef;
         var.newIndex = allLocalsCount;
         ++allLocalsCount;
         if (var.typeName.size() == 0 && var.typeRef != 0) {
             var.typeName = getTypeRefName(curPod, var.typeRef, true);
         }
-        var.name = var.name + "_" + std::to_string(var.index);
+        
+        if (i >= method->paramCount) {
+            var.name = var.name + "_" + std::to_string(var.index);
+        }
         escape(var.name);
+        escapeKeyword(var.name);
     }
     
     for (auto *b : blocks) {
@@ -120,6 +125,44 @@ bool IRMethod::isVoidTypeRef(uint16_t typeRefId) {
         return true;
     }
     return false;
+}
+
+void getTypeInfo(FPod *curPod, FTypeRef &typeRef, bool &isVal, bool &isNullable) {
+    std::string &podName = curPod->names[typeRef.podName];
+    std::string &typeName = curPod->names[typeRef.typeName];
+    std::string &signature = typeRef.signature;
+    if (podName == "sys" &&
+        (typeName == "Int" || typeName == "Float" || typeName == "Bool")) {
+        isVal = true;
+    } else {
+        isVal = false;
+    }
+    if (signature.size() > 0 && signature[0] == '?') {
+        isNullable = true;
+    } else {
+        isNullable = false;
+    }
+    
+}
+
+CoerceStmt::CType IRMethod::typeCoerce(uint16_t from, uint16_t to) {
+    FTypeRef &typeRef1 = curPod->typeRefs[from];
+    FTypeRef &typeRef2 = curPod->typeRefs[to];
+    
+    //TODO: type fif
+    
+    bool isVal1, isVal2, isNullable1, isNullable2;
+    getTypeInfo(curPod, typeRef1, isVal1, isNullable1);
+    getTypeInfo(curPod, typeRef2, isVal2, isNullable2);
+    if (isVal1 && isNullable1 == false && isNullable2) {
+        //boxing
+        return CoerceStmt::boxing;
+    }
+    else if (isVal2 && isNullable1 && !isNullable2) {
+        //unboxing
+        return CoerceStmt::unboxing;
+    }
+    return CoerceStmt::cast;
 }
 
 void IRMethod::initJumpTarget() {
@@ -659,8 +702,21 @@ void IRMethod::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Coerce: {
-                //newBlock();
-                //box unbox
+                CoerceStmt *stmt = new CoerceStmt();
+                stmt->from = block->pop();
+                
+                CoerceStmt::CType i = typeCoerce(opObj.i1, opObj.i2);
+                stmt->coerceType = i;
+                Var &var = block->newVar(opObj.i2);
+                
+                Expr value;
+                value.type = ExprType::tempVar;
+                value.varRef.index = var.index;
+                value.varRef.block = var.block;
+                block->push(value);
+                stmt->to = value;
+                
+                block->stmts.push_back(stmt);
                 break;
             }
             case FOp::Switch: {

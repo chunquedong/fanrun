@@ -18,6 +18,10 @@ MethodGen::MethodGen(TypeGen *parent, FMethod *method) : parent(parent), method(
 void MethodGen::genPrototype(Printer *printer, bool funcPtr) {
     auto typeName = parent->podGen->getTypeRefName(method->returnType);
     
+    if (typeName == "sys_Void") {
+        typeName = "void";
+    }
+    
     if (funcPtr) {
         printer->printf("%s (*%s)(", typeName.c_str(), name.c_str());
     } else {

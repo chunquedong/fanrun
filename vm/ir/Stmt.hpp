@@ -63,6 +63,7 @@ enum class StmtType {
     ret,
     jmp,
     error,
+    coerce,
 };
 
 class Stmt {
@@ -171,6 +172,20 @@ public:
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::error; }
+};
+
+class CoerceStmt : public Stmt {
+public:
+    enum CType { cast, boxing, unboxing, other };
+    CType coerceType;
+    Expr from;
+    Expr to;
+    
+    CoerceStmt() : coerceType(cast) {}
+    
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
+    
+    StmtType getType() override { return StmtType::coerce; }
 };
 
 //Basic Block is min linear code
