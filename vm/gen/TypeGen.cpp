@@ -63,7 +63,8 @@ void TypeGen::genImple(Printer *printer) {
         FMethod *method = &type->methods[i];
         
         if ((type->meta.flags & FFlags::Native) != 0
-            || (method->flags & FFlags::Native) != 0) {
+            || (method->flags & FFlags::Native) != 0
+            || (method->flags & FFlags::Abstract) != 0) {
             continue;
         }
         
@@ -141,8 +142,13 @@ void TypeGen::genVTableInit(Printer *printer) {
         }
         MethodGen gmethod(this, method);
         for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
-            printer->println("vtable->%s%d = %s_%s%d;", gmethod.name.c_str(),
-                             j, name.c_str(), gmethod.name.c_str(), j);
+            
+            if ((method->flags & FFlags::Abstract) != 0) {
+                printer->println("vtable->%s%d = NULL;", gmethod.name.c_str(),j);
+            } else {
+                printer->println("vtable->%s%d = %s_%s%d;", gmethod.name.c_str(),
+                                 j, name.c_str(), gmethod.name.c_str(), j);
+            }
         }
     }
     

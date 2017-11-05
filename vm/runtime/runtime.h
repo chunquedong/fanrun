@@ -18,9 +18,15 @@ typedef double sys_Float;
 typedef bool sys_Bool;
 //typedef void sys_Void;
 
-#define FR_TRY if(setjmp(fr_pushJmpBuf(__env)))
+#define FR_TYPE(type) (type)(0)
+#define FR_TYPE_IS(obj, type) (true)
+#define FR_TYPE_AS(obj, type) (obj)
+#define FR_ALLOC(type) (type)(0)
+
+#define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)))
 #define FR_CATCH else
-#define FR_THROW(err) { fr_setErr(__env, err); longjmp(fr_popJmpBuf(__env), 1);}
+#define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
+#define FR_THROW(err) { fr_setErr(__env, err); longjmp(*fr_popJmpBuf(__env), 1);}
 
 #define FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)(gc_getType( ((GcObj*)self) )) )
 #define FR_VCALL(type, method, self, ...) FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)

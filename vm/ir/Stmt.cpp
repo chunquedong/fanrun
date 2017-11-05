@@ -12,7 +12,7 @@
 void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
     switch (opObj.opcode) {
         case FOp::LoadNull: {
-            printer.printf("null");
+            printer.printf("NULL");
             break;
         }
         case FOp::LoadFalse: {
@@ -34,6 +34,8 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadDecimal: {
+            double i = curPod->constantas.reals[opObj.i1];
+            printer.printf("%g", i);
             break;
         }
         case FOp::LoadStr: {
@@ -42,7 +44,9 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadDuration: {
-            //TODO
+            int64_t i = curPod->constantas.ints[opObj.i1];
+            printer.printf("%lld", i);
+            break;
             break;
         }
         case FOp::LoadUri: {
@@ -51,6 +55,9 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadType: {
+            std::string typeName = FCodeUtil::getTypeRefName(curPod
+                                                             , opObj.i1, false);
+            printer.printf("FR_TYPE(%s)", typeName.c_str());
             break;
         }
         default: {
@@ -194,28 +201,203 @@ void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
-    if (jmpType == trueJmp) {
-        printer.printf("if (");
-        expr.print(method, printer, pass);
-        printer.printf(") goto ");
-    }
-    else if (jmpType == falseJmp) {
-        printer.printf("if (!");
-        expr.print(method, printer, pass);
-        printer.printf(") goto ");
-    } else {
-        printer.printf("goto ");
+    switch (jmpType) {
+        case trueJmp:{
+            printer.printf("if (");
+            expr.print(method, printer, pass);
+            printer.printf(") goto ");
+        }
+            break;
+        case falseJmp: {
+            printer.printf("if (!");
+            expr.print(method, printer, pass);
+            printer.printf(") goto ");
+        }
+            break;
+        case finallyJmp:
+        case leaveJmp : {
+            printer.println("fr_clearErr(__env);");
+            printer.printf("goto ");
+        }
+            break;
+        default:
+            printer.printf("goto ");
+            break;
     }
     printer.printf("l__%d;", targetBlock->pos);
 }
 
+void AllocStmt::print(IRMethod *method, Printer& printer, int pass) {
+    obj.print(method, printer, pass);
+    printer.printf(" = FR_ALLOC(");
+    std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+    printer.printf("%s);", typeName.c_str());
+}
+
 void CmpStmt::print(IRMethod *method, Printer& printer, int pass) {
+    FTypeRef &typeRef1 = curPod->typeRefs[opObj.i1];
+    FTypeRef &typeRef2 = curPod->typeRefs[opObj.i2];
+    bool isVal1, isVal2, isNullable1, isNullable2;
+    FCodeUtil::getTypeInfo(curPod, typeRef1, isVal1, isNullable1);
+    FCodeUtil::getTypeInfo(curPod, typeRef2, isVal2, isNullable2);
+    
+    bool direct = false;
+    if (isVal1 && !isNullable1 && isVal2 && !isNullable2) {
+        direct = true;
+    }
+    
     result.print(method, printer, pass);
     printer.printf("=");
-    param1.print(method, printer, pass);
-    printer.printf("<=>");
-    param2.print(method, printer, pass);
-    printer.printf(";");
+    
+    if (direct) {
+        switch (opObj.opcode) {
+            case FOp::CompareEQ: {
+                param1.print(method, printer, pass);
+                printer.printf(" == ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareNE: {
+                param1.print(method, printer, pass);
+                printer.printf(" != ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareLT: {
+                param1.print(method, printer, pass);
+                printer.printf(" < ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareLE: {
+                param1.print(method, printer, pass);
+                printer.printf(" <= ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareGE: {
+                param1.print(method, printer, pass);
+                printer.printf(" >= ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareGT: {
+                param1.print(method, printer, pass);
+                printer.printf(" > ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareSame: {
+                param1.print(method, printer, pass);
+                printer.printf(" == ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareNotSame: {
+                param1.print(method, printer, pass);
+                printer.printf(" != ");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareNull: {
+                param1.print(method, printer, pass);
+                printer.printf(" == NULL;");
+                break;
+            }
+            case FOp::CompareNotNull: {
+                param1.print(method, printer, pass);
+                printer.printf(" != NULL;");
+                break;
+            }
+            default:
+                printf("ERROR:unknow cmp opcode:%d", opObj.opcode);
+        }
+    } else {
+        switch (opObj.opcode) {
+            case FOp::CompareEQ: {
+                printer.printf("FR_VCALL(sys_Obj, equals1, ");
+                param1.print(method, printer, pass);
+                printer.printf(",");
+                param2.print(method, printer, pass);
+                printer.printf(");");
+                break;
+            }
+            case FOp::CompareNE: {
+                printer.printf("!(FR_VCALL(sys_Obj, equals1, ");
+                param1.print(method, printer, pass);
+                printer.printf(",");
+                param2.print(method, printer, pass);
+                printer.printf("));");
+                break;
+            }
+            case FOp::CompareLT: {
+                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                param1.print(method, printer, pass);
+                printer.printf(",");
+                param2.print(method, printer, pass);
+                printer.printf(")) < 0;");
+                break;
+            }
+            case FOp::CompareLE: {
+                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                param1.print(method, printer, pass);
+                printer.printf(",");
+                param2.print(method, printer, pass);
+                printer.printf(")) <= 0;");
+                break;
+            }
+            case FOp::CompareGE: {
+                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                param1.print(method, printer, pass);
+                printer.printf(",");
+                param2.print(method, printer, pass);
+                printer.printf(")) >= 0;");
+                break;
+            }
+            case FOp::CompareGT: {
+                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                param1.print(method, printer, pass);
+                printer.printf(",");
+                param2.print(method, printer, pass);
+                printer.printf(")) > 0;");
+                break;
+            }
+            case FOp::CompareSame: {
+                param1.print(method, printer, pass);
+                printer.printf("==");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareNotSame: {
+                param1.print(method, printer, pass);
+                printer.printf("!=");
+                param2.print(method, printer, pass);
+                printer.printf(";");
+                break;
+            }
+            case FOp::CompareNull: {
+                param1.print(method, printer, pass);
+                printer.printf("== NULL;");
+                break;
+            }
+            case FOp::CompareNotNull: {
+                param1.print(method, printer, pass);
+                printer.printf("!= NULL;");
+                break;
+            }
+            default:
+                printf("ERROR:unknow cmp opcode:%d", opObj.opcode);
+        }
+    }
 }
 
 void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
@@ -228,12 +410,20 @@ void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
     }
 }
 
+void ThrowStmt::print(IRMethod *method, Printer& printer, int pass) {
+    printer.printf("FR_THROW(");
+    var.print(method, printer, pass);
+    printer.printf(");");
+}
+
 void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
     switch (etype) {
         case TryStart:
             printer.printf("FR_TRY {");
             break;
         case TryEnd: {
+            printer.println(";");//print NOP(no operation)
+            
             printer.println("} FR_CATCH {");
             printer.indent();
             bool hasCatchAll = false;
@@ -248,10 +438,10 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
                 if (i > 0) {
                     printer.printf("else ");
                 }
-                printer.println("if (fr_getErr(__env) is %d) {", itr->catchType);
-                printer.printf("  Type ");
+                std::string typeName = FCodeUtil::getTypeRefName(curPod, itr->catchType, false);
+                printer.println("if (FR_ERR_TYPE(%s)) {", typeName.c_str());
                 itr->catchVar.print(method, printer, 0);
-                printer.printf(" = getErr();");
+                printer.printf(" = (%s)fr_getErr(__env);", typeName.c_str());
                 printer.println(" goto l__%d; }", handler);
             }
             if (!hasCatchAll) {
@@ -303,3 +493,14 @@ void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
     printer.printf(");");
 }
 
+void TypeCheckStmt::print(IRMethod *method, Printer& printer, int pass) {
+    result.print(method, printer, pass);
+    if (isOrAs) {
+        printer.printf(" = FR_TYPE_IS(");
+    } else {
+        printer.printf(" = FR_TYPE_AS(");
+    }
+    obj.print(method, printer, pass);
+    std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+    printer.printf(", %s);", typeName.c_str());
+}

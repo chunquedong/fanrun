@@ -56,7 +56,8 @@ private:
     
     void rewriteLocals();
     
-    void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, bool isMixin);
+    void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
+              , bool isMixin, bool isAlloc = false);
     
     void parseBlock(Block *block, Block *previous);
     

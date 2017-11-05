@@ -309,6 +309,7 @@ void MBuilder::insertException() {
         for (FTrap &trap : et->traps) {
             if (trap.start != start || trap.end != end) {
                 tryStart = new ExceptionStmt();
+                tryStart->curPod = curPod;
                 tryStart->etype = ExceptionStmt::TryStart;
                 
                 Block *b = posToBlock[trap.start];
@@ -318,6 +319,7 @@ void MBuilder::insertException() {
                 end = trap.end;
                 
                 tryEnd = new ExceptionStmt();
+                tryEnd->curPod = curPod;
                 tryEnd->etype = ExceptionStmt::TryEnd;
                 tryEnd->catchType = trap.type;
                 tryEnd->handler = trap.handler;
@@ -363,7 +365,8 @@ void MBuilder::initBlock() {
     }
 }
 
-void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, bool isMixin) {
+void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
+                    , bool isMixin, bool isAlloc) {
     CallStmt *stmt = new CallStmt();
     stmt->isStatic = isStatic;
     stmt->isVirtual = isVirtual;
@@ -376,13 +379,22 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, 
     stmt->mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
     stmt->mthName += std::to_string(methodRef->paramCount);
     
+    Expr selfExpr;
+    if (isAlloc) {
+        //When callNew I put the self on top of stack
+        selfExpr = block->pop();
+    }
+    
     for (int i=0; i<methodRef->paramCount; ++i) {
         stmt->params.insert(stmt->params.begin(), block->pop());
     }
     
+    if (!isAlloc && !isStatic) {
+        selfExpr = block->pop();
+    }
+    
     if (!isStatic) {
-        Expr expr = block->pop();
-        stmt->params.insert(stmt->params.begin(), expr);
+        stmt->params.insert(stmt->params.begin(), selfExpr);
     }
     
     bool isVoid = FCodeUtil::isVoidTypeRef(curPod, methodRef->retType);
@@ -441,6 +453,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 }
                 
                 StoreStmt *stmt = new StoreStmt();
+                stmt->curPod = curPod;
                 stmt->src = expr;
                 stmt->dst.type = ExprType::tempVar;
                 stmt->dst.varRef.index = newVar.index;
@@ -492,6 +505,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 tvar.type = ExprType::constant;
                 //block->push(tvar);
                 StoreStmt *stmt = new StoreStmt();
+                stmt->curPod = curPod;
                 
                 Var &var = block->newVar(0);
                 var.typeName = tvar.getConstantType();
@@ -516,6 +530,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
             case FOp::StoreVar: {
                 StoreStmt *stmt = new StoreStmt();
+                stmt->curPod = curPod;
                 stmt->src = block->pop();
                 stmt->dst.type = ExprType::localVar;
                 stmt->dst.varRef.index = opObj.i1;
@@ -591,14 +606,22 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
                 // route method calls to FMethodRef
             case FOp::CallNew: {
-                Var &var = block->newVar(curPod->methodRefs[opObj.i1].parent);
-                //var.typeRef = curPod->methodRefs[opObj.i1].parent;
+                uint16_t typeId = curPod->methodRefs[opObj.i1].parent;
+                Var &var = block->newVar(typeId);
                 Expr value;
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;
                 value.varRef.block = var.block;
-                block->push(value);
-                call(block, opObj, false, false, false);
+                
+                AllocStmt *stmt = new AllocStmt();
+                stmt->curPod = curPod;
+                stmt->type = typeId;
+                stmt->obj = value;
+                block->stmts.push_back(stmt);
+                
+                block->push(value);//put on stack top
+                call(block, opObj, false, false, false, true);
+                //ctor is void, so push again
                 block->push(value);
                 break;
             }
@@ -628,6 +651,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
             case FOp::Jump: {
                 JmpStmt *stmt = new JmpStmt();
+                stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::allJmp;
                 //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
@@ -638,6 +662,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
             case FOp::JumpTrue:{
                 JmpStmt *stmt = new JmpStmt();
+                stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::trueJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
@@ -649,6 +674,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
             case FOp::JumpFalse:{
                 JmpStmt *stmt = new JmpStmt();
+                stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::falseJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
@@ -658,9 +684,29 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 block->stmts.push_back(stmt);
                 break;
             }
+            case FOp::Compare: {
+                CallStmt *stmt = new CallStmt();
+                stmt->curPod = curPod;
+                stmt->isStatic = false;
+                stmt->isVirtual = true;
+                stmt->isMixin = false;
+                stmt->isVoid = false;
+                stmt->typeName = "sys_Obj";
+                stmt->mthName = "compare1";
+                stmt->params.push_back(block->pop());
+                stmt->params.push_back(block->pop());
+                Var &var = block->newVar(0);
+                var.typeName = "sys_Int";
+                stmt->retValue.type = ExprType::tempVar;
+                stmt->retValue.varRef.index = var.index;
+                stmt->retValue.varRef.block = var.block;
+                block->stmts.push_back(stmt);
+                
+                block->push(stmt->retValue);
+                break;
+            }
             case FOp::CompareEQ:
             case FOp::CompareNE:
-            case FOp::Compare:
             case FOp::CompareLT:
             case FOp::CompareLE:
             case FOp::CompareGE:
@@ -668,6 +714,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::CompareSame:
             case FOp::CompareNotSame: {
                 CmpStmt *stmt = new CmpStmt();
+                stmt->curPod = curPod;
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
@@ -684,6 +731,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::CompareNull:
             case FOp::CompareNotNull:{
                 CmpStmt *stmt = new CmpStmt();
+                stmt->curPod = curPod;
                 stmt->param2.type = ExprType::constant;
                 stmt->param2.opObj = opObj;
                 stmt->param2.varRef.index = 0;
@@ -702,7 +750,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
             case FOp::Return: {
                 RetStmt *stmt = new RetStmt();
-                
+                stmt->curPod = curPod;
                 bool isVoid = FCodeUtil::isVoidTypeRef(curPod, irMethod.returnType);
                 stmt->isVoid = isVoid;
                 if (!isVoid) {
@@ -723,14 +771,41 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Is: {
+                TypeCheckStmt *stmt = new TypeCheckStmt();
+                stmt->curPod = curPod;
+                stmt->isOrAs = false;
+                stmt->type = opObj.i1;
+                stmt->obj = block->pop();
                 
+                Var &var = block->newVar(0);
+                var.typeName = "sys_Bool";
+                Expr value;
+                value.type = ExprType::tempVar;
+                value.varRef.index = var.index;
+                value.varRef.block = var.block;
+                block->push(value);
+                stmt->result = value;
+                
+                block->stmts.push_back(stmt);
                 break;
             }
             case FOp::As: {
-                //call
-                //jmp block2
-                //cast
-                //block2->load null
+                TypeCheckStmt *stmt = new TypeCheckStmt();
+                stmt->curPod = curPod;
+                stmt->isOrAs = false;
+                stmt->type = opObj.i1;
+                stmt->obj = block->pop();
+                
+                Var &var = block->newVar(opObj.i1);
+                var.typeName = "sys_Bool";
+                Expr value;
+                value.type = ExprType::tempVar;
+                value.varRef.index = var.index;
+                value.varRef.block = var.block;
+                block->push(value);
+                stmt->result = value;
+                
+                block->stmts.push_back(stmt);
                 break;
             }
             case FOp::Coerce: {
@@ -759,11 +834,16 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Throw: {
-                //newBlock();
+                ThrowStmt *stmt = new ThrowStmt();
+                stmt->curPod = curPod;
+                stmt->var = block->pop();
+                
+                block->stmts.push_back(stmt);
                 break;
             }
             case FOp::Leave: {
                 JmpStmt *stmt = new JmpStmt();
+                stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::leaveJmp;
                 //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
@@ -774,6 +854,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
             case FOp::JumpFinally:{
                 JmpStmt *stmt = new JmpStmt();
+                stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::finallyJmp;
                 //stmt->opObj = opObj;
                 stmt->pos = opObj.i1;
@@ -784,6 +865,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
             case FOp::CatchAllStart: {
                 ExceptionStmt *estmt = new ExceptionStmt();
+                estmt->curPod = curPod;
                 estmt->etype = ExceptionStmt::CatchStart;
                 estmt->catchType = -1;
                 estmt->pos = opObj.pos;
@@ -806,6 +888,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 block->push(value);
                 
                 ExceptionStmt *estmt = new ExceptionStmt();
+                estmt->curPod = curPod;
                 estmt->etype = ExceptionStmt::CatchStart;
                 estmt->catchVar = value;
                 estmt->catchType = opObj.i1;
@@ -815,6 +898,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             case FOp::CatchEnd: {
                 ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->curPod = curPod;
                 stmt->etype = ExceptionStmt::CatchEnd;
                 block->stmts.push_back(stmt);
             }
@@ -822,6 +906,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
             case FOp::FinallyStart: {
                 ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->curPod = curPod;
                 stmt->etype = ExceptionStmt::FinallyStart;
                 block->stmts.push_back(stmt);
             }
@@ -829,6 +914,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
             case FOp::FinallyEnd: {
                 ExceptionStmt *stmt = new ExceptionStmt();
+                stmt->curPod = curPod;
                 stmt->etype = ExceptionStmt::FinallyEnd;
                 block->stmts.push_back(stmt);
             }

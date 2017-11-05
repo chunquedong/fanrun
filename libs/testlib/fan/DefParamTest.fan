@@ -11,9 +11,9 @@ class DefParamTest
   }
 
   static Void main() {
-    p1 := DefParamTest()
-    p2 := DefParamTest()
-    echo(p1 <=> p2)
+    Int? p1 := 0
+    Int p2 := 1
+    echo(p1 < p2)
     echo(defParam(0))
   }
 }

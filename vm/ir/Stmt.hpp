@@ -58,12 +58,15 @@ public:
 enum class StmtType {
     store,
     field,
+    alloc,
     call,
     cmp,
     ret,
     jmp,
     error,
     coerce,
+    throws,
+    typeCheck,
 };
 
 class Stmt {
@@ -71,6 +74,8 @@ public:
     FPod *curPod;
     virtual void print(IRMethod *method, Printer& printer, int pass) = 0;
     virtual StmtType getType() = 0;
+    
+    Stmt() : curPod(nullptr) {}
 };
 
 class StoreStmt : public Stmt {
@@ -114,6 +119,16 @@ public:
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::call; }
+};
+
+class AllocStmt : public Stmt {
+public:
+    uint16_t type;
+    Expr obj;
+    
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
+    
+    StmtType getType() override { return StmtType::alloc; }
 };
 
 class CmpStmt : public Stmt {
@@ -160,6 +175,15 @@ public:
     StmtType getType() override { return StmtType::cmp; }
 };
 
+class ThrowStmt : public Stmt {
+public:
+    Expr var;
+    
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
+    
+    StmtType getType() override { return StmtType::throws; }
+};
+
 class ExceptionStmt : public Stmt {
 public:
     enum EType { TryStart, TryEnd, CatchStart, CatchEnd, FinallyStart, FinallyEnd };
@@ -192,6 +216,18 @@ public:
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     
     StmtType getType() override { return StmtType::coerce; }
+};
+
+class TypeCheckStmt : public Stmt {
+public:
+    bool isOrAs;
+    Expr obj;
+    uint16_t type;
+    Expr result;
+    
+    virtual void print(IRMethod *method, Printer& printer, int pass) override;
+    
+    StmtType getType() override { return StmtType::typeCheck; }
 };
 
 
