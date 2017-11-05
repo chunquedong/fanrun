@@ -3,15 +3,18 @@ class DefParamTest
 {
   static const Int i := 1
 
-  static Int defParam(Int s := 0) { s }
+  static Int defParam(Int a, Int s := i) { s }
 
   static Int testIR3(Int s) {
-    a := 2 * (s > 1 ? defParam : defParam(3))
+    a := 2 * (s > 1 ? defParam(0) : defParam(0, 3))
     return a
   }
 
   static Void main() {
-    echo(defParam)
+    p1 := DefParamTest()
+    p2 := DefParamTest()
+    echo(p1 <=> p2)
+    echo(defParam(0))
   }
 }
 

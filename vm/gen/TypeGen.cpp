@@ -57,6 +57,8 @@ void TypeGen::genInline(Printer *printer) {
 }
 
 void TypeGen::genImple(Printer *printer) {
+    genStaticField(printer, false);
+    printer->newLine();
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         
@@ -66,18 +68,7 @@ void TypeGen::genImple(Printer *printer) {
         }
         
         MethodGen gmethod(this, method);
-        //if (name == "testlib_ClosureTest"  && gmethod.name == "make") {
-        //    printf("");
-        //}
-        
-        //TODO
-        gmethod.genPrototype(printer, false, -1);
-        printer->printf(" {");
-        printer->newLine();
-        gmethod.genCode(printer);
-        printer->newLine();
-        printer->printf("}");
-        printer->newLine();
+        gmethod.genImples(printer, false);
         printer->newLine();
     }
     genVTableInit(printer);
@@ -209,11 +200,27 @@ void TypeGen::genMethodDeclare(Printer *printer) {
 void TypeGen::genField(Printer *printer) {
     for (int i=0; i<type->fields.size(); ++i) {
         FField *field = &type->fields[i];
+        if ((field->flags & FFlags::Static) != 0) {
+            continue;
+        }
         auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
         auto typeName = podGen->getTypeRefName(field->type);
         printer->println("%s %s;", typeName.c_str(), name.c_str());
     }
 }
 
-
+void TypeGen::genStaticField(Printer *printer, bool isExtern) {
+    for (int i=0; i<type->fields.size(); ++i) {
+        FField *field = &type->fields[i];
+        if ((field->flags & FFlags::Static) == 0) {
+            continue;
+        }
+        auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
+        auto typeName = podGen->getTypeRefName(field->type);
+        if (isExtern) {
+            printer->printf("extern ");
+        }
+        printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());
+    }
+}
 

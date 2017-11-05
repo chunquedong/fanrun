@@ -1,9 +1,8 @@
 //
-//  IRBuilder.hpp
-//  gen
+// Copyright (c) 2017, chunquedong
+// Licensed under the Apache Licene 2.0
 //
-//  Created by yangjiandong on 2017/11/5.
-//  Copyright © 2017年 yangjiandong. All rights reserved.
+//  Created by yangjiandong on 16/9/10.
 //
 
 #ifndef IRBuilder_hpp
@@ -32,9 +31,13 @@ public:
     MBuilder(Code &code, IRMethod &irMethod);
     
     //parse code to basic block graph, and flat temp var to stack for gc
-    bool build(FMethod *method);
+    bool buildMethod(FMethod *method);
+    
+    bool buildDefParam(FMethod *method, int paramNum);
     
 private:
+    
+    void doBuild();
     
     Var &newVar(uint16_t typeRef) {
         Var var;

@@ -98,8 +98,12 @@ public:
 
 class CallStmt : public Stmt {
 public:
-    uint16_t methodRefId;
-    FMethodRef *methodRef;
+    //FMethodRef *methodRef;
+    //FMethod *method;
+    
+    std::string typeName;
+    std::string mthName;
+    
     std::vector<Expr> params;
     Expr retValue;
     bool isVoid;

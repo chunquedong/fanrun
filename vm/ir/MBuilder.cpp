@@ -1,9 +1,8 @@
 //
-//  MBuilder.cpp
-//  gen
+// Copyright (c) 2017, chunquedong
+// Licensed under the Apache Licene 2.0
 //
-//  Created by yangjiandong on 2017/11/5.
-//  Copyright © 2017年 yangjiandong. All rights reserved.
+//  Created by yangjiandong on 16/9/10.
 //
 
 #include "MBuilder.hpp"
@@ -44,15 +43,101 @@ void MBuilder::rewriteLocals() {
     }
 }
 
-bool MBuilder::build(FMethod *method) {
+bool MBuilder::buildDefParam(FMethod *method, int paramNum) {
+    if (paramNum < 0 || paramNum >= method->paramCount) {
+        printf("ERROR paramNum out of index\n");
+        return false;
+    }
+    
+    irMethod.paramCount = paramNum;
+    bool isStatic = (method->flags & FFlags::Static) != 0;
+    if (!isStatic) {
+        Var &var = newVar(irMethod.selfType);
+        var.name = "__self";
+        irMethod.paramCount++;
+    }
+    
+    for(int i=0; i<paramNum+1; ++i) {
+        FMethodVar *fvar = &method->vars[i];
+        Var &var = newVar(fvar->type);
+        var.methodVar = fvar;
+        //var.typeRef = fvar->type;
+        var.name = curPod->names[fvar->name];
+    }
+    
+    doBuild();
+    
+    for (Block *b : blocks) {
+        if (b->stack.size() > 0) {
+            //-----------------------------------
+            //store default param value
+            StoreStmt *storeStmt = new StoreStmt();
+            storeStmt->src = b->pop();
+            storeStmt->dst.type = ExprType::localVar;
+            storeStmt->dst.varRef.index = paramNum;
+            storeStmt->dst.varRef.block = -1;
+            b->stmts.push_back(storeStmt);
+            
+            //-----------------------------------
+            //call self
+            CallStmt *stmt = new CallStmt();
+            stmt->isStatic = isStatic;
+            stmt->isVirtual = (method->flags & FFlags::Virtual) != 0;
+            stmt->isMixin = (method->c_parent->meta.flags & FFlags::Mixin) != 0;
+            stmt->curPod = curPod;
+            //stmt->methodRefId = -1;
+            //stmt->methodRef = nullptr;
+            //stmt->method = method;
+        
+            stmt->typeName = FCodeUtil::getTypeRefName(curPod
+                                                       , method->c_parent->meta.self, false);
+            stmt->mthName = FCodeUtil::getIdentifierName(curPod, method->name);
+            stmt->mthName += std::to_string(paramNum+1);
+            
+            for (int i=0; i<paramNum+1; ++i) {
+                Expr expr;
+                expr.type = ExprType::localVar;
+                expr.varRef.index = i;
+                expr.varRef.block = -1;
+                stmt->params.push_back(expr);
+            }
+            
+            bool isVoid = FCodeUtil::isVoidTypeRef(curPod, method->returnType);
+            stmt->isVoid = isVoid;
+            if (!isVoid) {
+                Var &var = b->newVar(method->returnType);
+                //var.typeRef = stmt->methodRef->retType;
+                stmt->retValue.type = ExprType::tempVar;
+                stmt->retValue.varRef.index = var.index;
+                stmt->retValue.varRef.block = var.block;
+                b->push(stmt->retValue);
+            }
+            b->stmts.push_back(stmt);
+            
+            //-----------------------------------
+            //add return
+            RetStmt *retStmt = new RetStmt();
+            retStmt->isVoid = isVoid;
+            if (!isVoid) {
+                retStmt->retValue = b->pop();
+            }
+            b->stmts.push_back(retStmt);
+        }
+    }
+    
+    rewriteLocals();
+    irMethod.locals.swap(this->locals);
+    irMethod.blocks.swap(this->blocks);
+    return true;
+}
+
+bool MBuilder::buildMethod(FMethod *method) {
     for (FAttr *itr : method->attrs) {
         FErrTable *et = dynamic_cast<FErrTable*>(itr);
         if (et != nullptr) {
             this->attrs.push_back(et);
         }
     }
-    
-    code.initOps();
     
     irMethod.paramCount = method->paramCount;
     bool isStatic = (method->flags & FFlags::Static) != 0;
@@ -71,6 +156,16 @@ bool MBuilder::build(FMethod *method) {
         var.name = curPod->names[fvar->name];
     }
     
+    doBuild();
+    rewriteLocals();
+    irMethod.locals.swap(this->locals);
+    irMethod.blocks.swap(this->blocks);
+    return true;
+}
+
+void MBuilder::doBuild() {
+    code.initOps();
+    
     initJumpTarget();
     initBlock();
     linkBlock();
@@ -80,11 +175,6 @@ bool MBuilder::build(FMethod *method) {
     }
     
     insertException();
-    rewriteLocals();
-    
-    irMethod.locals.swap(this->locals);
-    irMethod.blocks.swap(this->blocks);
-    return true;
 }
 
 CoerceStmt::CType MBuilder::typeCoerce(uint16_t from, uint16_t to) {
@@ -279,10 +369,14 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, 
     stmt->isVirtual = isVirtual;
     stmt->isMixin = isMixin;
     stmt->curPod = curPod;
-    stmt->methodRefId = opObj.i1;
-    stmt->methodRef = &curPod->methodRefs[opObj.i1];
+    //stmt->methodRefId = opObj.i1;
+    FMethodRef *methodRef = &curPod->methodRefs[opObj.i1];
     
-    for (int i=0; i<stmt->methodRef->paramCount; ++i) {
+    stmt->typeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
+    stmt->mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
+    stmt->mthName += std::to_string(methodRef->paramCount);
+    
+    for (int i=0; i<methodRef->paramCount; ++i) {
         stmt->params.insert(stmt->params.begin(), block->pop());
     }
     
@@ -291,10 +385,10 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, 
         stmt->params.insert(stmt->params.begin(), expr);
     }
     
-    bool isVoid = FCodeUtil::isVoidTypeRef(curPod, stmt->methodRef->retType);
+    bool isVoid = FCodeUtil::isVoidTypeRef(curPod, methodRef->retType);
     stmt->isVoid = isVoid;
     if (!isVoid) {
-        Var &var = block->newVar(stmt->methodRef->retType);
+        Var &var = block->newVar(methodRef->retType);
         //var.typeRef = stmt->methodRef->retType;
         stmt->retValue.type = ExprType::tempVar;
         stmt->retValue.varRef.index = var.index;

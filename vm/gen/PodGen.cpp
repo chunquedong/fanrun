@@ -77,6 +77,8 @@ void PodGen::genHeader(Printer *printer) {
         TypeGen *gtype = sortedTypes[i];
         gtype->genStruct(printer);
         printer->newLine();
+        gtype->genStaticField(printer, true);
+        printer->newLine();
     }
     
     horizontalLine(printer, "method declare");

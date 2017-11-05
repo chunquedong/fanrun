@@ -31,6 +31,17 @@ MethodGen::MethodGen(TypeGen *parent, FMethod *method) : parent(parent), method(
     }
 }
 
+FParamDefault *MethodGen::getParamDefault(int i) {
+    FMethodVar &var = method->vars[i];
+    for (FAttr *attr : var.attrs) {
+        FParamDefault *res = dynamic_cast<FParamDefault*>(attr);
+        if (res) {
+            return res;
+        }
+    }
+    return nullptr;
+}
+
 bool MethodGen::genPrototype(Printer *printer, bool funcPtr, int i) {
     int paramNum = i;
     if (i == -1) {
@@ -81,13 +92,35 @@ void MethodGen::genDeclares(Printer *printer, bool funcPtr) {
     }
 }
 
-void MethodGen::genCode(Printer *printer) {
-    IRMethod irMethod(parent->podGen->pod, method);
-    irMethod.name = this->name;
-    MBuilder builder(method->code, irMethod);
-    builder.build(method);
-    
-    printer->indent();
-    irMethod.print(*printer, 1);
-    printer->unindent();
+void MethodGen::genImples(Printer *printer, bool funcPtr) {
+    for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
+        genPrototype(printer, funcPtr, i);
+        printer->println(" {");
+        if (i == method->paramCount) {
+            IRMethod irMethod(parent->podGen->pod, method);
+            irMethod.name = this->name;
+            MBuilder builder(method->code, irMethod);
+            builder.buildMethod(method);
+            
+            printer->indent();
+            irMethod.print(*printer, 1);
+            printer->unindent();
+        } else {
+            FParamDefault *def = getParamDefault(i);
+            if (def == nullptr) {
+                printf("ERROR: get param default fail\n");
+                return;
+            }
+            IRMethod irMethod(parent->podGen->pod, method);
+            irMethod.name = this->name;
+            MBuilder builder(def->opcodes, irMethod);
+            builder.buildDefParam(method, i);
+            
+            printer->indent();
+            irMethod.print(*printer, 1);
+            printer->unindent();
+        }
+        printer->println("}");
+    }
 }
+

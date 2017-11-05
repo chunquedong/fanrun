@@ -150,13 +150,7 @@ void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
         printer.printf(" = ");
     }
     
-    std::string typeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
-    std::string mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
-    
-    mthName += std::to_string(methodRef->paramCount);
-    
     if (!isVirtual) {
-        std::string tname = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
         printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
     } else if (isMixin) {
         printer.printf("FR_ICALL(%s, %s", typeName.c_str(), mthName.c_str());
@@ -172,25 +166,26 @@ void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
+    std::string typeName = FCodeUtil::getTypeRefName(curPod, fieldRef->parent, false);
+    std::string name = FCodeUtil::getIdentifierName(curPod, fieldRef->name);
+    
     if (isLoad) {
         value.print(method, printer, pass);
     } else {
         if (isStatic) {
-            printer.printf("%s::%s", curPod->names[fieldRef->parent].c_str()
-                           , curPod->names[fieldRef->name].c_str());
+            printer.printf("%s_%s", typeName.c_str(), name.c_str());
         } else {
             instance.print(method, printer, pass);
-            printer.printf("->%s", curPod->names[fieldRef->name].c_str());
+            printer.printf("->%s", name.c_str());
         }
     }
     printer.printf(" = ");
     if (isLoad) {
         if (isStatic) {
-            printer.printf("%s::%s", curPod->names[fieldRef->parent].c_str()
-                           , curPod->names[fieldRef->name].c_str());
+            printer.printf("%s_%s", typeName.c_str(), name.c_str());
         } else {
             instance.print(method, printer, pass);
-            printer.printf("->%s", curPod->names[fieldRef->name].c_str());
+            printer.printf("->%s", name.c_str());
         }
     } else {
         value.print(method, printer, pass);
