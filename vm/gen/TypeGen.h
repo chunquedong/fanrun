@@ -36,8 +36,6 @@ private:
     void genField(Printer *printer);
     bool isOverrideFrom(uint16_t tid, std::string &name);
     
-public:
-    bool isValType();
 };
 
 

@@ -11,53 +11,78 @@
 #include "Stmt.hpp"
 
 
-class IRMethod {
-    std::unordered_map<int16_t, Block*> posToBlock;
+//Basic Block is min linear code
+class Block {
 public:
-    FMethod *method;
-    std::vector<Block *> blocks;
+    int index;//id in method
+    uint16_t pos;//position in buffer
+    
+    uint16_t beginOp;//begin postion in ops
+    uint16_t endOp;//next ops position of last of pos
+    
+    std::vector<Stmt*> stmts;
+    
+    std::vector<Block*> branchs;
+    std::vector<Block*> incoming;
+    
+    std::vector<Expr> stack;//temp stack
+    
     std::vector<Var> locals;
     
-    int allLocalsCount;
-    //std::string name;
+    bool isVisited;//flag for builder
+    bool isForward;//flag if no jump stmt at last
     
-    //Env *context;
-    FPod *curPod;
+    Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false) {
+    }
     
-    IRMethod(FPod *curPod, FMethod *method);
-    
-    //parse code to basic block graph, and flat temp var to stack for gc
-    void compile();
-    
-    void print(Printer& printer, int pass);
-private:
+    void print(IRMethod *method, Printer& printer, int pass);
     
     Var &newVar(uint16_t typeRef) {
         Var var;
         var.index = (int)locals.size();
-        var.block = -1;
-        var.typeRef = typeRef;        
+        var.block = this->index;
+        var.typeRef = typeRef;
         locals.push_back(var);
         return locals.back();
     }
+    
+    void push(Expr &var) {
+        stack.push_back(var);
+    }
+    Expr pop() {
+        if (stack.size() == 0) {
+            printf("ERROR: statck is empty\n");
+            //abort();
+            Expr var;
+            var.type = ExprType::tempVar;
+            var.varRef.block = 0;
+            var.varRef.index = 0;
+            
+            return var;
+        }
+        Expr var = stack.back();
+        stack.pop_back();
+        return var;
+    }
+};
 
-    void initJumpTarget();
+
+class IRMethod {
+    FMethod *method;
+public:
+    std::vector<Block *> blocks;
+    std::vector<Var> locals;//include paramCount args
     
-    void initBlock();
+    uint16_t returnType;
+    uint16_t selfType;
+    uint8_t paramCount;//param count with self
     
-    void linkBlock();
+    FPod *curPod;
+    std::string name;
     
-    void initLocals();
+    IRMethod(FPod *curPod, FMethod *method);
     
-    void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic, bool isMixin);
-    
-    void parseBlock(Block *block, Block *previous);
-    
-    bool isVoidTypeRef(uint16_t typeRef);
-    
-    CoerceStmt::CType typeCoerce(uint16_t from, uint16_t to);
-    
-    void initException();
+    void print(Printer& printer, int pass);
 };
 
 #endif /* defined(____IRMethod__) */

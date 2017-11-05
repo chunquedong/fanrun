@@ -10,6 +10,7 @@
 #include "escape.h"
 #include "PodGen.hpp"
 #include "MethodGen.h"
+#include "FCodeUtil.hpp"
 
 TypeGen::TypeGen(PodGen *podGen, FType *type)
 : podGen(podGen), type(type) {
@@ -19,7 +20,7 @@ TypeGen::TypeGen(PodGen *podGen, FType *type)
 void TypeGen::genTypeDeclare(Printer *printer) {
     printer->println("struct %s_struct;", name.c_str());
     printer->println("typedef struct %s_struct *%s_null;", name.c_str(), name.c_str());
-    if (isValType()) {
+    if (FCodeUtil::isValType(name)) {
         //printer->println("typedef %s_struct %s;", name.c_str(), name.c_str());
     } else {
         printer->println("typedef struct %s_struct *%s;", name.c_str(), name.c_str());
@@ -208,19 +209,11 @@ void TypeGen::genMethodDeclare(Printer *printer) {
 void TypeGen::genField(Printer *printer) {
     for (int i=0; i<type->fields.size(); ++i) {
         FField *field = &type->fields[i];
-        auto name = podGen->getIdentifierName(field->name);
+        auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
         auto typeName = podGen->getTypeRefName(field->type);
         printer->println("%s %s;", typeName.c_str(), name.c_str());
     }
 }
 
-bool TypeGen::isValType() {
-    if (name == "sys_Int"
-        || name == "sys_Float"
-        || name == "sys_Bool") {
-        return true;
-    }
-    return false;
-}
 
 

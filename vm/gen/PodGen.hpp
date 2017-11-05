@@ -36,7 +36,6 @@ public:
     void horizontalLine(Printer *printer, const char *name);
     
     std::string getTypeRefName(uint16_t tid);
-    std::string getIdentifierName(uint16_t nid);
     
     TypeGen* findType(std::string &name);
 private:

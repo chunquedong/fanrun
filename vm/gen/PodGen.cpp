@@ -6,7 +6,7 @@
 //
 
 #include "PodGen.hpp"
-#include "escape.h"
+#include "FCodeUtil.hpp"
 
 
 PodGen::PodGen(PodLoader *podMgr, const std::string& podName) : podMgr(podMgr), podName(podName) {
@@ -108,26 +108,9 @@ void PodGen::genImple(Printer *printer) {
 }
 
 std::string PodGen::getTypeRefName(uint16_t tid) {
-    FTypeRef &typeRef = pod->typeRefs[tid];
-    std::string &podName = pod->names[typeRef.podName];
-    std::string &typeName = pod->names[typeRef.typeName];
-    std::string &sig = typeRef.signature;
-    
-    std::string res = podName + "_" + typeName;
-    if (sig.size() > 0 && sig[sig.size()-1] == '?') {
-        res += "_null";
-    }
-    
-    escape(res);
-    return res;
+    return FCodeUtil::getTypeRefName(pod, tid, true);
 }
 
-std::string PodGen::getIdentifierName(uint16_t nid) {
-    std::string name = pod->names[nid];
-    escape(name);
-    escapeKeyword(name);
-    return name;
-}
 
 //////////////////////////////////////////////////
 // sort

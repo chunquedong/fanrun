@@ -47,6 +47,8 @@
 		327846DA1F49648300481704 /* PodLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 327846D81F49648300481704 /* PodLoader.cpp */; };
 		3291F9941F6D5F4F00F12438 /* MethodGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9921F6D5F4F00F12438 /* MethodGen.cpp */; };
 		32CE89F11F6560200029A071 /* TypeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32CE89EF1F6560200029A071 /* TypeGen.cpp */; };
+		32F764291FAEE5D500D8CE8D /* MBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32F764271FAEE5D500D8CE8D /* MBuilder.cpp */; };
+		32F7642C1FAEFA9400D8CE8D /* FCodeUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32F7642A1FAEFA9400D8CE8D /* FCodeUtil.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -151,6 +153,10 @@
 		3291F9931F6D5F4F00F12438 /* MethodGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MethodGen.h; sourceTree = "<group>"; };
 		32CE89EF1F6560200029A071 /* TypeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TypeGen.cpp; sourceTree = "<group>"; };
 		32CE89F01F6560200029A071 /* TypeGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypeGen.h; sourceTree = "<group>"; };
+		32F764271FAEE5D500D8CE8D /* MBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MBuilder.cpp; sourceTree = "<group>"; };
+		32F764281FAEE5D500D8CE8D /* MBuilder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MBuilder.hpp; sourceTree = "<group>"; };
+		32F7642A1FAEFA9400D8CE8D /* FCodeUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FCodeUtil.cpp; sourceTree = "<group>"; };
+		32F7642B1FAEFA9400D8CE8D /* FCodeUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FCodeUtil.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -239,6 +245,10 @@
 				3278466E1F49633000481704 /* IRMethod.h */,
 				3278466F1F49633000481704 /* Stmt.cpp */,
 				327846701F49633000481704 /* Stmt.hpp */,
+				32F764271FAEE5D500D8CE8D /* MBuilder.cpp */,
+				32F764281FAEE5D500D8CE8D /* MBuilder.hpp */,
+				32F7642A1FAEFA9400D8CE8D /* FCodeUtil.cpp */,
+				32F7642B1FAEFA9400D8CE8D /* FCodeUtil.hpp */,
 			);
 			path = ir;
 			sourceTree = "<group>";
@@ -410,6 +420,7 @@
 				327846CB1F49633000481704 /* inffast.c in Sources */,
 				327846D21F49633000481704 /* system.c in Sources */,
 				327846CA1F49633000481704 /* infback.c in Sources */,
+				32F764291FAEE5D500D8CE8D /* MBuilder.cpp in Sources */,
 				327846C91F49633000481704 /* deflate.c in Sources */,
 				327846B61F49633000481704 /* FAttr.cpp in Sources */,
 				327846DA1F49648300481704 /* PodLoader.cpp in Sources */,
@@ -424,6 +435,7 @@
 				327846BF1F49633000481704 /* iowin32.c in Sources */,
 				327846CE1F49633000481704 /* trees.c in Sources */,
 				327846B01F49633000481704 /* PodGen.cpp in Sources */,
+				32F7642C1FAEFA9400D8CE8D /* FCodeUtil.cpp in Sources */,
 				327846D01F49633000481704 /* zutil.c in Sources */,
 				327846B11F49633000481704 /* main.cpp in Sources */,
 				327846C61F49633000481704 /* adler32.c in Sources */,

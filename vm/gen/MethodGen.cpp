@@ -7,16 +7,13 @@
 //
 
 #include "MethodGen.h"
-#include "IRMethod.h"
+#include "MBuilder.hpp"
 #include "PodGen.hpp"
+#include "FCodeUtil.hpp"
+
 
 MethodGen::MethodGen(TypeGen *parent, FMethod *method) : parent(parent), method(method) {
-    name = parent->podGen->getIdentifierName(method->name);
-    //name += std::to_string(method->paramCount);
-    
-    if (parent->name == "sys_Func" && name == "call") {
-        printf("");
-    }
+    name = FCodeUtil::getIdentifierName(parent->podGen->pod, method->name);
     
     beginDefaultParam = -1;
     for (int j=0; j<method->paramCount; ++j) {
@@ -68,7 +65,7 @@ bool MethodGen::genPrototype(Printer *printer, bool funcPtr, int i) {
     
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
-        auto var_name = parent->podGen->getIdentifierName(var.name);
+        auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
         auto var_typeName = parent->podGen->getTypeRefName(var.type);
         
         printer->printf(", %s %s", var_typeName.c_str(), var_name.c_str());
@@ -86,23 +83,11 @@ void MethodGen::genDeclares(Printer *printer, bool funcPtr) {
 
 void MethodGen::genCode(Printer *printer) {
     IRMethod irMethod(parent->podGen->pod, method);
-    irMethod.compile();
+    irMethod.name = this->name;
+    MBuilder builder(method->code, irMethod);
+    builder.build(method);
     
     printer->indent();
-    /*
-    for(int i=irMethod.method->paramCount; i<irMethod.locals.size(); ++i) {
-        Var v = irMethod.locals[i];
-        printer->printf("%s v__%s_%d, ", v.typeName.c_str(), v.name.c_str(), v.index);
-    }
-    printer->newLine();
-    
-    
-    for (Block *b : irMethod.blocks) {
-        b->print(&irMethod, *printer, 0);
-    }
-    for (Block *b : irMethod.blocks) {
-        b->print(&irMethod, *printer, 1);
-    }*/
     irMethod.print(*printer, 1);
     printer->unindent();
 }

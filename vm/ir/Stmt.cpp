@@ -7,10 +7,7 @@
 
 #include "Stmt.hpp"
 #include "IRMethod.h"
-#include "escape.h"
-
-
-std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable);
+#include "FCodeUtil.hpp"
 
 void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
     switch (opObj.opcode) {
@@ -153,14 +150,13 @@ void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
         printer.printf(" = ");
     }
     
-    std::string typeName = getTypeRefName(curPod, methodRef->parent, false);
-    std::string mthName = curPod->names[methodRef->name];
-    escape(mthName);
+    std::string typeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
+    std::string mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
     
     mthName += std::to_string(methodRef->paramCount);
     
     if (!isVirtual) {
-        std::string tname = getTypeRefName(curPod, methodRef->parent, false);
+        std::string tname = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
         printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
     } else if (isMixin) {
         printer.printf("FR_ICALL(%s, %s", typeName.c_str(), mthName.c_str());
@@ -288,8 +284,8 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
-    std::string typeName1 = getTypeRefName(curPod, fromType, true);
-    std::string typeName2 = getTypeRefName(curPod, toType, true);
+    std::string typeName1 = FCodeUtil::getTypeRefName(curPod, fromType, true);
+    std::string typeName2 = FCodeUtil::getTypeRefName(curPod, toType, true);
     to.print(method, printer, pass);
     switch (coerceType) {
         case cast: {
@@ -312,23 +308,3 @@ void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
     printer.printf(");");
 }
 
-void Block::print(IRMethod *method, Printer& printer, int pass) {
-    if (pass == 0) {
-        for (int i=0; i<locals.size(); ++i) {
-            Var &v = locals[i];
-            printer.printf("%s %s; ", v.typeName.c_str(), v.name.c_str());
-        }
-        if (locals.size() > 0) {
-            printer.newLine();
-        }
-        return;
-    }
-    else {
-        char *s = printer.format("l__%d:\n", pos);
-        printer._print(s);
-        for (Stmt *stmt : stmts) {
-            stmt->print(method, printer, pass);
-            printer.newLine();
-        }
-    }
-}
