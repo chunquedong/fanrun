@@ -51,6 +51,11 @@ fr_Obj fr_clearErr(fr_Env self);
 void fr_addGlobalRef(fr_Env self, fr_Obj obj);
 fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable);
 void fr_gc(fr_Env self);
+    
+////////////////////////////
+// Util
+////////////////////////////
+fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
 
 #ifdef  __cplusplus
 }

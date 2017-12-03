@@ -74,7 +74,7 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum) {
             StoreStmt *storeStmt = new StoreStmt();
             storeStmt->src = b->pop();
             storeStmt->dst.type = ExprType::localVar;
-            storeStmt->dst.varRef.index = paramNum;
+            storeStmt->dst.varRef.index = irMethod.paramCount;
             storeStmt->dst.varRef.block = -1;
             b->stmts.push_back(storeStmt);
             
@@ -94,7 +94,7 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum) {
             stmt->mthName = FCodeUtil::getIdentifierName(curPod, method->name);
             stmt->mthName += std::to_string(paramNum+1);
             
-            for (int i=0; i<paramNum+1; ++i) {
+            for (int i=0; i<irMethod.paramCount+1; ++i) {
                 Expr expr;
                 expr.type = ExprType::localVar;
                 expr.varRef.index = i;

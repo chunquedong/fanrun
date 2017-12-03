@@ -39,8 +39,16 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadStr: {
-            std::string &i = curPod->constantas.strings[opObj.i1];
-            printer.printf("\"%s\"", i.c_str());
+            std::string str = curPod->constantas.strings[opObj.i1];
+            long pos = 0;
+            while (pos < str.length()) {
+                if (str[pos] == '"') {
+                    str.replace(pos, 2, "\\\"");
+                    ++pos;
+                }
+                ++pos;
+            }
+            printer.printf("(sys_Str)fr_newStrUtf8(__env, \"%s\")", str.c_str());
             break;
         }
         case FOp::LoadDuration: {

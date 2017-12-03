@@ -160,6 +160,9 @@ void TypeGen::genVTableInit(Printer *printer) {
                 continue;
             }
             std::string raw_name = podGen->pod->names[method->name];
+            if (name == "sys_Type" && raw_name == "make") {
+                continue;
+            }
             
             if (isOverrideFrom(type->meta.base, raw_name)) {
                 MethodGen gmethod(this, method);
