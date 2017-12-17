@@ -35,7 +35,7 @@ struct sys_Bool_struct {
 #define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)))
 #define FR_CATCH else
 #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
-#define FR_THROW(err) { fr_setErr(__env, err); longjmp(*fr_popJmpBuf(__env), 1);}
+#define FR_THROW(err) { fr_throwErr(__env, err); longjmp(*fr_popJmpBuf(__env), 1);}
 
 #define FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)(gc_getType( ((GcObj*)self) )) )
 #define FR_VCALL(type, method, self, ...) FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)

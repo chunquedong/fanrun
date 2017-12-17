@@ -34,15 +34,15 @@ void fr_releaseEnv(fr_Env env);
 // Exception
 ////////////////////////////
     
-void fr_pushFrame(const char*func);
-void fr_popFrame();
+void fr_pushFrame(fr_Env self, const char*func);
+void fr_popFrame(fr_Env self);
 
 jmp_buf *fr_pushJmpBuf(fr_Env self);
 jmp_buf *fr_popJmpBuf(fr_Env self);
 
 fr_Obj fr_getErr(fr_Env self);
 void fr_throwErr(fr_Env self, fr_Obj err);
-fr_Obj fr_clearErr(fr_Env self);
+void fr_clearErr(fr_Env self);
 
 ////////////////////////////
 // GC
@@ -56,6 +56,7 @@ void fr_gc(fr_Env self);
 // Util
 ////////////////////////////
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
+GcObj *fr_toGcObj(fr_Obj obj);
 
 #ifdef  __cplusplus
 }

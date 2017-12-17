@@ -11,3 +11,7 @@
 bool fr_Type_is(fr_Type self, fr_Obj obj) {
     return true;
 }
+
+void VTable_init(fr_Type type) {
+    type->name = "";
+}

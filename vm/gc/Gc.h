@@ -53,7 +53,7 @@ public:
     Gc();
     ~Gc();
     
-    GcObj* alloc(void *type);
+    GcObj* alloc(void *type, int size);
     
     void pinObj(GcObj* obj);
     void unpinObj(GcObj* obj);

@@ -71,6 +71,8 @@ typedef struct fr_Type_ {
     Function finalize;
 } *fr_Type;
 
+void VTable_init(fr_Type type);
+
 bool fr_Type_is(fr_Type self, fr_Obj obj);
 
 

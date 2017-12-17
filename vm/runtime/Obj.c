@@ -7,7 +7,11 @@
 //
 
 #include "Obj.h"
+#include "Env.h"
 
 fr_Type getType(fr_Obj obj) {
-    return obj->super.header;
+    GcObj *g = fr_toGcObj(obj);
+    //return obj->super.header;
+    fr_Type type = (fr_Type)gc_getType(g);
+    return type;
 }

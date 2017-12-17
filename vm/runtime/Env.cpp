@@ -9,8 +9,16 @@
 #include "Env.h"
 #include "Gc.h"
 #include <assert.h>
+#include <vector>
 
-class FVM_ : public GcSupport {
+struct FVM_ : public GcSupport {
+    Gc *gc;
+    std::vector<GcObj*> globalRef;
+    
+    FVM_() {
+        gc = new Gc();
+    }
+    
     virtual void walkNodeChildren(Gc *gc, GcObj *obj) override {
         
     }
@@ -35,41 +43,123 @@ class FVM_ : public GcSupport {
     }
 };
 
-class Env_ {
-    
+struct JmpBuf {
+    jmp_buf buf;
+};
+
+struct Env_ {
+    FVM_ *vm;
+    fr_Obj error;
+    std::vector<const char*> stackTrace;
+    std::vector<JmpBuf> exception;
 };
 
 ////////////////////////////
 // VM
 ////////////////////////////
 
-fr_FVM fr_startVm();
-void fr_stopVm(fr_FVM vm);
-fr_Env fr_getEnv(fr_FVM vm);
+FVM_ *fvm = nullptr;
 
-void fr_initEnv(fr_Env env);
-void fr_releaseEnv(fr_Env env);
+fr_FVM fr_startVm() {
+    if (fvm == nullptr) {
+        fvm = new FVM_();
+    }
+    return fvm;
+}
+
+void fr_stopVm(fr_FVM vm) {
+    FVM_ *fvm = (FVM_ *)vm;
+    delete fvm;
+    if (fvm == ::fvm) {
+        ::fvm = nullptr;
+    }
+}
+
+fr_Env fr_getEnv(fr_FVM vm) {
+    Env_ *env = new Env_();
+    FVM_ *fvm = (FVM_ *)vm;
+    env->vm = fvm;
+    return env;
+}
+
+void fr_initEnv(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    env->error = nullptr;
+    //env->vm =
+}
+
+void fr_releaseEnv(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    delete env;
+}
 
 ////////////////////////////
 // Exception
 ////////////////////////////
 
-void fr_pushFrame(const char*func);
-void fr_popFrame();
+void fr_pushFrame(fr_Env self, const char*func) {
+    Env_ *env = (Env_*)self;
+    env->stackTrace.push_back(func);
+}
+void fr_popFrame(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    env->stackTrace.pop_back();
+}
 
-jmp_buf *fr_pushJmpBuf(fr_Env self);
-jmp_buf *fr_popJmpBuf(fr_Env self);
+jmp_buf *fr_pushJmpBuf(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    JmpBuf buf;
+    env->exception.push_back(buf);
+    return &env->exception.back().buf;
+}
 
-fr_Obj fr_getErr();
-void fr_throwErr(fr_Obj err);
-fr_Obj fr_clearErr();
+jmp_buf *fr_popJmpBuf(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    JmpBuf &back = env->exception.back();
+    env->exception.pop_back();
+    return &back.buf;
+}
+
+fr_Obj fr_getErr(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    return env->error;
+}
+void fr_throwErr(fr_Env self, fr_Obj err) {
+    Env_ *env = (Env_*)self;
+    env->error = err;
+}
+void fr_clearErr(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    env->error = nullptr;
+}
 
 ////////////////////////////
 // GC
 ////////////////////////////
 
-void fr_addGlobalRef(fr_Env self, fr_Obj obj);
-fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable);
-void fr_gc(fr_Env self);
+GcObj *fr_toGcObj(fr_Obj obj) {
+    GcObj *g = (GcObj*)obj;
+    --g;
+    return g;
+}
 
+void fr_addGlobalRef(fr_Env self, fr_Obj obj) {
+    Env_ *env = (Env_*)self;
+    env->vm->globalRef.push_back(fr_toGcObj(obj));
+}
+fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable) {
+    Env_ *env = (Env_*)self;
+    GcObj *gcobj = env->vm->gc->alloc(vtable, size);
+    fr_Obj obj = (fr_Obj)(++gcobj);
+    return obj;
+}
 
+void fr_gc(fr_Env self) {
+    Env_ *env = (Env_*)self;
+    env->vm->gc->collect();
+}
+
+fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes) {
+    //TODO
+    return nullptr;
+}

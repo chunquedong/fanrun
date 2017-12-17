@@ -14,7 +14,7 @@
 #include "Type.h"
 
 typedef struct fr_Obj_ {
-    GcObj super;
+    //GcObj super;
 } *fr_Obj;
 
 fr_Type getType(fr_Obj obj);
