@@ -35,6 +35,11 @@ void TypeGen::genStruct(Printer *printer) {
     
     if (FCodeUtil::isValType(name) && podGen->podName == "sys") return;
     
+    if ((type->meta.flags & FFlags::Native) != 0) {
+        printer->println("//native struct %s_struct", name.c_str());
+        return;
+    }
+    
     std::string baseName = podGen->getTypeRefName(type->meta.base);
     
     printer->println("struct %s_struct {", name.c_str());
@@ -129,7 +134,7 @@ void TypeGen::genVTableInit(Printer *printer) {
     bool isRootType = false;
     if (name == "sys_Obj") {
         isRootType = true;
-        printer->println("VTable_init(&vtable->super__);");
+        printer->println("fr_VTable_init(&vtable->super__);");
     } else {
         printer->println("%s_initVTable(&vtable->super__);", baseName.c_str());
     }

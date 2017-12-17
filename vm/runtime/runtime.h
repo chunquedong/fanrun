@@ -27,6 +27,7 @@ struct sys_Bool_struct {
     bool val;
 };
 
+
 #define FR_TYPE(type) (type)(0)
 #define FR_TYPE_IS(obj, type) (true)
 #define FR_TYPE_AS(obj, type) (obj)

@@ -52,6 +52,9 @@ struct Env_ {
     fr_Obj error;
     std::vector<const char*> stackTrace;
     std::vector<JmpBuf> exception;
+    
+    Env_() : vm(nullptr), error(0) {
+    }
 };
 
 ////////////////////////////
@@ -84,8 +87,7 @@ fr_Env fr_getEnv(fr_FVM vm) {
 
 void fr_initEnv(fr_Env self) {
     Env_ *env = (Env_*)self;
-    env->error = nullptr;
-    //env->vm =
+    env->vm = fvm;
 }
 
 void fr_releaseEnv(fr_Env self) {

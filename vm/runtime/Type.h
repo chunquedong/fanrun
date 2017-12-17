@@ -12,11 +12,10 @@
 #include <inttypes.h>
 #include "miss.h"
 
-struct fr_Obj_;
-typedef struct fr_Obj_ *fr_Obj;
+typedef void *fr_Obj;
 typedef void *fr_Env;
 
-struct Field {
+struct fr_Field {
     const char *name;
     uint32_t flags;
     const char *type;
@@ -27,7 +26,7 @@ struct Field {
     //Obj facetList;
 };
 
-struct MethodVar {
+struct fr_MethodVar {
     const char *name;
     uint32_t flags;
     const char *type;
@@ -36,14 +35,14 @@ struct MethodVar {
     //Obj facetList;
 };
 
-typedef void (*Function)(fr_Env env__, void *self__, void *returnVar__, int varCount__, ...);
+typedef void (*fr_Function)(fr_Env env__, void *self__, void *returnVar__, int varCount__, ...);
 
-struct Method {
+struct fr_Method {
     const char *name;
     uint32_t flags;
     const char *retType;
     const char *inheritReturenType;
-    Function func;
+    fr_Function func;
     int varCount;
     struct MethodVar *varList;
     
@@ -68,12 +67,13 @@ typedef struct fr_Type_ {
     int facetCount;
     //Obj facetList;
   
-    Function finalize;
+    fr_Function finalize;
 } *fr_Type;
 
-void VTable_init(fr_Type type);
+void fr_VTable_init(fr_Type type);
 
 bool fr_Type_is(fr_Type self, fr_Obj obj);
 
+fr_Type fr_getType(fr_Obj obj);
 
 #endif /* defined(__fcode__Type__) */

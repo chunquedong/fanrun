@@ -73,6 +73,19 @@ void PodGen::genHeader(Printer *printer) {
     }
     
     horizontalLine(printer, "struct");
+    bool hasNative = false;
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        if ((gtype->type->meta.flags & FFlags::Native) != 0) {
+            hasNative = true;
+            break;
+        }
+    }
+    if (hasNative) {
+        printer->println("#include \"%s_native.h\"", podName.c_str());
+        printer->newLine();
+    }
+    
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
         gtype->genStruct(printer);

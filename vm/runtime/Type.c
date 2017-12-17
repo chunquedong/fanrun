@@ -7,11 +7,19 @@
 //
 
 #include "Type.h"
+#include "Env.h"
 
 bool fr_Type_is(fr_Type self, fr_Obj obj) {
     return true;
 }
 
-void VTable_init(fr_Type type) {
+void fr_VTable_init(fr_Type type) {
     type->name = "";
+}
+
+fr_Type fr_getType(fr_Obj obj) {
+    GcObj *g = fr_toGcObj(obj);
+    //return obj->super.header;
+    fr_Type type = (fr_Type)gc_getType(g);
+    return type;
 }

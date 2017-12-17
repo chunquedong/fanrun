@@ -13,8 +13,9 @@
 extern  "C" {
 #endif
 
-#include "Obj.h"
+#include "Type.h"
 #include <setjmp.h>
+#include "gcobj.h"
 
 typedef void *fr_FVM;
 typedef void *fr_Env;
