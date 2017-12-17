@@ -13,10 +13,19 @@
 #include "miss.h"
 #include "Env.h"
 
-typedef int64_t sys_Int;
-typedef double sys_Float;
-typedef bool sys_Bool;
-//typedef void sys_Void;
+typedef int64_t sys_Int_val;
+typedef double sys_Float_val;
+typedef bool sys_Bool_val;
+
+struct sys_Int_struct {
+    int64_t val;
+};
+struct sys_Float_struct {
+    double val;
+};
+struct sys_Bool_struct {
+    bool val;
+};
 
 #define FR_TYPE(type) (type)(0)
 #define FR_TYPE_IS(obj, type) (true)

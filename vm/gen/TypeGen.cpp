@@ -19,15 +19,21 @@ TypeGen::TypeGen(PodGen *podGen, FType *type)
 
 void TypeGen::genTypeDeclare(Printer *printer) {
     printer->println("struct %s_struct;", name.c_str());
-    printer->println("typedef struct %s_struct *%s_null;", name.c_str(), name.c_str());
+    printer->println("typedef struct %s_struct *%s_ref;", name.c_str(), name.c_str());
+    printer->println("typedef %s_ref %s_null;", name.c_str(), name.c_str());
     if (FCodeUtil::isValType(name)) {
-        //printer->println("typedef %s_struct %s;", name.c_str(), name.c_str());
+        if (podGen->podName != "sys") {
+            printer->println("typedef struct %s_struct %s_val;", name.c_str(), name.c_str());
+        }
+        printer->println("typedef %s_val %s;", name.c_str(), name.c_str());
     } else {
-        printer->println("typedef struct %s_struct *%s;", name.c_str(), name.c_str());
+        printer->println("typedef %s_ref %s;", name.c_str(), name.c_str());
     }
 }
 
 void TypeGen::genStruct(Printer *printer) {
+    
+    if (FCodeUtil::isValType(name) && podGen->podName == "sys") return;
     
     std::string baseName = podGen->getTypeRefName(type->meta.base);
     
@@ -35,7 +41,7 @@ void TypeGen::genStruct(Printer *printer) {
     
     printer->indent();
     if (name == "sys_Obj") {
-        printer->println("fr_Obj super__;");
+        //printer->println("fr_Obj super__;");
     } else {
         printer->println("struct %s_struct super__;", baseName.c_str());
     }
@@ -103,7 +109,7 @@ void TypeGen::genVTable(Printer *printer) {
             continue;
         }
         MethodGen gmethod(this, method);
-        gmethod.genDeclares(printer, true);
+        gmethod.genDeclares(printer, true, false);
         //printer->printf(";");
         //printer->newLine();
     }
@@ -200,8 +206,13 @@ void TypeGen::genMethodDeclare(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         MethodGen gmethod(this, method);
-        gmethod.genDeclares(printer, false);
-        //printer->printf(";");
+        gmethod.genDeclares(printer, false, false);
+        
+        bool isStatic = (method->flags & FFlags::Static);
+        if (!isStatic && FCodeUtil::isValType(name)) {
+            gmethod.genDeclares(printer, false, true);
+        }
+        
         //printer->newLine();
     }
 }

@@ -42,7 +42,7 @@ FParamDefault *MethodGen::getParamDefault(int i) {
     return nullptr;
 }
 
-bool MethodGen::genPrototype(Printer *printer, bool funcPtr, int i) {
+bool MethodGen::genPrototype(Printer *printer, bool funcPtr, bool isValType, int i) {
     int paramNum = i;
     if (i == -1) {
         paramNum = method->paramCount;
@@ -61,17 +61,24 @@ bool MethodGen::genPrototype(Printer *printer, bool funcPtr, int i) {
         typeName = "void";
     }
     
+    const char *valFlag = "";
+    if (isValType) valFlag = "_val";
+    
     if (funcPtr) {
-        printer->printf("%s (*%s%d)(", typeName.c_str(), name.c_str(), paramNum);
+        printer->printf("%s (*%s%d%s)(", typeName.c_str(), name.c_str(), paramNum, valFlag);
     } else {
-        printer->printf("%s %s_%s%d(", typeName.c_str(), parent->name.c_str(), name.c_str(), paramNum);
+        printer->printf("%s %s_%s%d%s(", typeName.c_str(), parent->name.c_str(), name.c_str(), paramNum, valFlag);
     }
     
     printer->printf("fr_Env __env");
     
     bool isStatic = (method->flags & FFlags::Static);
     if (!isStatic) {
-        printer->printf(", %s __self", parent->name.c_str());
+        if (isValType) {
+            printer->printf(", %s_val __self", parent->name.c_str());
+        } else {
+            printer->printf(", %s_ref __self", parent->name.c_str());
+        }
     }
     
     for (int j=0; j<paramNum; ++j) {
@@ -85,16 +92,16 @@ bool MethodGen::genPrototype(Printer *printer, bool funcPtr, int i) {
     return true;
 }
 
-void MethodGen::genDeclares(Printer *printer, bool funcPtr) {
+void MethodGen::genDeclares(Printer *printer, bool funcPtr, bool isValType) {
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
-        genPrototype(printer, funcPtr, i);
+        genPrototype(printer, funcPtr, isValType, i);
         printer->println(";");
     }
 }
 
 void MethodGen::genImples(Printer *printer, bool funcPtr) {
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
-        genPrototype(printer, funcPtr, i);
+        genPrototype(printer, funcPtr, false, i);
         printer->println(" {");
         if (i == method->paramCount) {
             IRMethod irMethod(parent->podGen->pod, method);
@@ -122,5 +129,43 @@ void MethodGen::genImples(Printer *printer, bool funcPtr) {
         }
         printer->println("}");
     }
+    
+    bool isStatic = (method->flags & FFlags::Static);
+    if (!isStatic && FCodeUtil::isValType(parent->name)) {
+        genImplesForVal(printer, funcPtr);
+    }
 }
 
+void MethodGen::genImplesForVal(Printer *printer, bool funcPtr) {
+    for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
+        genPrototype(printer, funcPtr, true, i);
+        printer->println(" {");
+        if (i == method->paramCount) {
+            IRMethod irMethod(parent->podGen->pod, method);
+            irMethod.name = this->name;
+            MBuilder builder(method->code, irMethod);
+            builder.buildMethod(method);
+            
+            printer->indent();
+            irMethod.print(*printer, 1);
+            printer->unindent();
+        } else {
+            /*
+            FParamDefault *def = getParamDefault(i);
+            if (def == nullptr) {
+                printf("ERROR: get param default fail\n");
+                return;
+            }
+            IRMethod irMethod(parent->podGen->pod, method);
+            irMethod.name = this->name;
+            MBuilder builder(def->opcodes, irMethod);
+            builder.buildDefParam(method, i);
+            
+            printer->indent();
+            irMethod.print(*printer, 1);
+            printer->unindent();
+             */
+        }
+        printer->println("}");
+    }
+}

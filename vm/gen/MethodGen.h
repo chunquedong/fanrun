@@ -23,12 +23,13 @@ struct MethodGen {
     
     MethodGen(TypeGen *parent, FMethod *method);
     
-    void genDeclares(Printer *printer, bool funcPtr);
+    void genDeclares(Printer *printer, bool funcPtr, bool isValType);
     void genImples(Printer *printer, bool funcPtr);
     
 private:
-    bool genPrototype(Printer *printer, bool funcPtr, int i);
+    bool genPrototype(Printer *printer, bool funcPtr, bool isValType, int i);
     FParamDefault *getParamDefault(int i);
+    void genImplesForVal(Printer *printer, bool funcPtr);
 };
 
 #endif /* MethodGen_h */
