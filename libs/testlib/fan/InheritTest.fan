@@ -24,7 +24,11 @@ class Sub : Base, Bar {
 
   static Void main() {
     m := Sub(1)
-    echo(m.say)
-    echo(m.foo)
+
+    Base base := m
+    echo(base.say)
+
+    Bar bar := m
+    echo(bar.foo)
   }
 }

@@ -11,6 +11,7 @@
 #include "PodGen.hpp"
 #include "MethodGen.h"
 #include "FCodeUtil.hpp"
+#include <stdlib.h>
 
 TypeGen::TypeGen(PodGen *podGen, FType *type)
 : podGen(podGen), type(type) {
@@ -83,7 +84,7 @@ void TypeGen::genImple(Printer *printer) {
         gmethod.genImples(printer, false);
         printer->newLine();
     }
-    genVTableInit(printer);
+    genTypeInit(printer);
     printer->newLine();
 }
 
@@ -126,8 +127,20 @@ void TypeGen::genVTable(Printer *printer) {
     printer->println("struct %s_vtable *%s_class__(fr_Env __env);", name.c_str(), name.c_str());
 }
 
+void TypeGen::genTypeMetadata(Printer *printer) {
+    std::string &typeName = type->c_pod->names[type->meta.self];
+    printer->println("((fr_Type)vtable)->name = \"%s\";", typeName.c_str());
+    
+    std::string baseName = podGen->getTypeRefName(type->meta.base);
+    printer->println("((fr_Type)vtable)->base = (fr_Type)%s_class__(__env);", baseName.c_str());
+    
+    printer->println("((fr_Type)vtable)->fieldCount = %d;", type->fields.size());
+    
+    printer->println("((fr_Type)vtable)->methodCount = %d;", type->methods.size());
+}
+
 void TypeGen::genVTableInit(Printer *printer) {
-    printer->println("void %s_initVTable(struct %s_vtable *vtable) {", name.c_str(), name.c_str());
+    printer->println("void %s_initVTable(fr_Env __env, struct %s_vtable *vtable) {", name.c_str(), name.c_str());
     
     printer->indent();
     
@@ -136,16 +149,29 @@ void TypeGen::genVTableInit(Printer *printer) {
     bool isRootType = false;
     if (name == "sys_Obj") {
         isRootType = true;
-        printer->println("fr_VTable_init(&vtable->super__);");
+        printer->println("fr_VTable_init(__env, &vtable->super__);");
     } else {
-        printer->println("%s_initVTable(&vtable->super__);", baseName.c_str());
+        printer->println("%s_initVTable(__env, &vtable->super__);", baseName.c_str());
     }
     
     std::string base;
-    for (int i=0; i<type->meta.mixin.size(); ++i) {
-        base = podGen->getTypeRefName(type->meta.mixin[i]);
-        printer->println("%s_initVTable(&vtable->%s_super__);", base.c_str(), base.c_str());
+    int minxinSize = (int)type->meta.mixin.size();
+    if (minxinSize > 10) {
+        printf("ERROR: too many mixin size %d > MAX_INTERFACE_SIZE\n", minxinSize);
+        abort();
     }
+    for (int i=0; i<minxinSize; ++i) {
+        base = podGen->getTypeRefName(type->meta.mixin[i]);
+        printer->println("%s_initVTable(__env, &vtable->%s_super__);", base.c_str(), base.c_str());
+        printer->println("((fr_Type)vtable)->interfaceVTableMap[%d].type = %s_class__(__env);"
+                         , i, base.c_str());
+        printer->println("((fr_Type)vtable)->interfaceVTableMap[%d].vtable = &vtable->%s_super__;"
+                         , i, base.c_str());
+    }
+    
+    printer->println("((fr_Type)vtable)->mixinCount = %d;", minxinSize);
+    
+    genTypeMetadata(printer);
     
     //set self virutal func
     for (int i=0; i<type->methods.size(); ++i) {
@@ -190,16 +216,20 @@ void TypeGen::genVTableInit(Printer *printer) {
                     std::string base = podGen->getTypeRefName(type->meta.mixin[i]);
                     for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
                         printer->println("vtable->%s_super__.%s%d = %s_%s%d;", base.c_str(), gmethod.name.c_str(),
-                                    j, name.c_str(), gmethod.name.c_str(), j);
+                                         j, name.c_str(), gmethod.name.c_str(), j);
                     }
                 }
             }
         }
     }
+    
     printer->unindent();
     printer->println("};");
+}
+
+void TypeGen::genTypeInit(Printer *printer) {
+    genVTableInit(printer);
     
-    ////////////////////////////////////////
     printer->println("struct %s_vtable *%s_class__(fr_Env __env) {", name.c_str(), name.c_str());
     printer->indent();
     
@@ -210,7 +240,7 @@ void TypeGen::genVTableInit(Printer *printer) {
     printer->println("%s_class_instance = (struct %s_vtable*)"
                      "malloc(sizeof(struct %s_vtable));"
                      , name.c_str(), name.c_str(), name.c_str());
-    printer->println("%s_initVTable(%s_class_instance);", name.c_str(), name.c_str());
+    printer->println("%s_initVTable(__env, %s_class_instance);", name.c_str(), name.c_str());
     
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];

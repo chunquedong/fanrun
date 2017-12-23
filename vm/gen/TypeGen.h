@@ -28,13 +28,15 @@ public:
     void genTypeDeclare(Printer *printer);
     void genStruct(Printer *printer);
     void genVTable(Printer *printer);
-    void genVTableInit(Printer *printer);
+    void genTypeInit(Printer *printer);
     void genMethodDeclare(Printer *printer);
     void genInline(Printer *printer);
     void genImple(Printer *printer);
     void genStaticField(Printer *printer, bool isExtern);
 private:
     void genField(Printer *printer);
+    void genTypeMetadata(Printer *printer);
+    void genVTableInit(Printer *printer);
     bool isOverrideFrom(uint16_t tid, std::string &name);
     
 };

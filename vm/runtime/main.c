@@ -13,7 +13,7 @@ int main() {
     fr_FVM vm = fr_startVm();
     fr_Env env = fr_getEnv(vm);
     
-    testlib_Main_main0(env);
+    testlib_Sub_main0(env);
     
     fr_releaseEnv(env);
     fr_stopVm(vm);

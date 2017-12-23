@@ -50,13 +50,20 @@ struct fr_Method {
     //Obj facetList;
 };
 
+typedef struct fr_Type_ *fr_Type;
+struct fr_IVTableMapItem {
+    fr_Type type;
+    fr_Type vtable;
+};
+
+#define MAX_INTERFACE_SIZE 10
+
 typedef struct fr_Type_ {
     const char *name;
     uint32_t flags;
   
-    struct Type_ *base;
+    struct fr_Type_ *base;
     int mixinCount;
-    struct Type_ **mixinList;
   
     int fieldCount;
     struct Field *fieldList;
@@ -68,12 +75,16 @@ typedef struct fr_Type_ {
     //Obj facetList;
   
     fr_Function finalize;
+    
+    struct fr_IVTableMapItem interfaceVTableMap[MAX_INTERFACE_SIZE];
 } *fr_Type;
 
-void fr_VTable_init(fr_Type type);
+void fr_VTable_init(fr_Env self, fr_Type type);
 
 bool fr_Type_is(fr_Type self, fr_Obj obj);
 
-fr_Type fr_getType(fr_Obj obj);
+fr_Type fr_getType(fr_Env self, fr_Obj obj);
+
+fr_Type fr_getInterfaceVTable(fr_Env self, fr_Obj obj, fr_Type itype);
 
 #endif /* defined(__fcode__Type__) */
