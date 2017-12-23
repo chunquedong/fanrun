@@ -45,7 +45,7 @@ void TypeGen::genStruct(Printer *printer) {
     printer->println("struct %s_struct {", name.c_str());
     
     printer->indent();
-    if (name == "sys_Obj") {
+    if (name == "sys_Obj" || baseName == "sys_Obj") {
         //printer->println("fr_Obj super__;");
     } else {
         printer->println("struct %s_struct super__;", baseName.c_str());
@@ -96,7 +96,7 @@ void TypeGen::genVTable(Printer *printer) {
     std::string baseName = podGen->getTypeRefName(type->meta.base);
     
     if (name == "sys_Obj") {
-        printer->println("fr_Type super__;");
+        printer->println("struct fr_Type_ super__;");
     } else {
         printer->println("struct %s_vtable super__;", baseName.c_str());
     }
@@ -122,6 +122,8 @@ void TypeGen::genVTable(Printer *printer) {
     printer->unindent();
     
     printer->println("};");
+    
+    printer->println("struct %s_vtable *%s_class__(fr_Env __env);", name.c_str(), name.c_str());
 }
 
 void TypeGen::genVTableInit(Printer *printer) {
@@ -196,6 +198,33 @@ void TypeGen::genVTableInit(Printer *printer) {
     }
     printer->unindent();
     printer->println("};");
+    
+    ////////////////////////////////////////
+    printer->println("struct %s_vtable *%s_class__(fr_Env __env) {", name.c_str(), name.c_str());
+    printer->indent();
+    
+    printer->println("static struct %s_vtable *%s_class_instance = NULL;", name.c_str(), name.c_str());
+    
+    printer->println("if (%s_class_instance == NULL) {", name.c_str());
+    printer->indent();
+    printer->println("%s_class_instance = (struct %s_vtable*)"
+                     "malloc(sizeof(struct %s_vtable));"
+                     , name.c_str(), name.c_str(), name.c_str());
+    printer->println("%s_initVTable(%s_class_instance);", name.c_str(), name.c_str());
+    
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod *method = &type->methods[i];
+        std::string mname = FCodeUtil::getIdentifierName(podGen->pod, method->name);
+        if (mname == "static__init") {
+            printer->println("%s_static__init0(__env);", name.c_str());
+        }
+    }
+    
+    printer->unindent();
+    printer->println("}");
+    printer->println("return %s_class_instance;", name.c_str());
+    printer->unindent();
+    printer->println("}");
 }
 
 bool TypeGen::isOverrideFrom(uint16_t tid, std::string &name) {
@@ -244,8 +273,11 @@ void TypeGen::genStaticField(Printer *printer, bool isExtern) {
         auto typeName = podGen->getTypeRefName(field->type);
         if (isExtern) {
             printer->printf("extern ");
+            printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());
+        } else {
+            printer->println("%s %s_%s = 0;", typeName.c_str(), this->name.c_str(), name.c_str());
         }
-        printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());
+        
     }
 }
 

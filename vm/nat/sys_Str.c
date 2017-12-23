@@ -7,7 +7,127 @@
 //
 
 #include "sys.h"
+#include "runtime.h"
 
+#include <stdlib.h>
+#include <string.h>
+#include "utf8.h"
+#include <wchar.h>
+
+static sys_Int hash(sys_Str str) {
+    sys_Int hashValue = 0;
+    size_t i;
+    for (i=0; i<str->size; ++i) {
+        hashValue = (str->data[i]) + 31 * hashValue;
+    }
+    return hashValue;
+}
+
+size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal) {
+    if (n == 0)
+        return 0;
+    
+    char *s = (char *)str;
+    size_t i = 0;
+    wchar_t uc = 0;
+    int r_illegal_all = 0, r_illegal;
+    
+    while ((uc = getu8c(&s, &r_illegal)))
+    {
+        if (i < (n - 1))
+        {
+            des[i++] = uc;
+            r_illegal_all += r_illegal;
+        }
+        else
+        {
+            break;
+        }
+    }
+    
+    des[i] = 0;
+    if (illegal)
+    {
+        *illegal = r_illegal_all + r_illegal;
+    }
+    
+    return i;
+}
+
+size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
+{
+    if (n == 0)
+        return 0;
+    
+    char *s = des;
+    size_t left = n;
+    size_t len = 0;
+    int r_illegal = 0;
+    
+    *s = 0;
+    while (*us)
+    {
+        int ret = putu8c(*us, &s, &left);
+        if (ret > 0)
+        {
+            len += ret;
+        }
+        else if (ret == -1)
+        {
+            r_illegal += 1;
+        }
+        else
+        {
+            break;
+        }
+        
+        ++us;
+    }
+    
+    if (illegal)
+    {
+        *illegal = r_illegal;
+    }
+    
+    return len;
+}
+
+//////////////////////////////////////////////////////////
+
+fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes) {
+    size_t len;
+    size_t size;
+    struct sys_Str_vtable *vtable;
+    len = strlen(bytes);
+    size = len + 1;
+    
+    vtable = sys_Str_class__(__env);
+    sys_Str str = fr_malloc(__env, sizeof(struct sys_Str_struct)
+                            , (fr_Type)vtable);
+    
+    //struct sys_Str_vtable *type = fr_getType(str);
+    
+    str->data = (wchar_t*)malloc(sizeof(wchar_t)*size);
+    //mbstowcs();
+    //str->size = mbstowcs(cstr, str->data, len);
+    str->size = utf8decode(bytes, str->data, size, NULL);
+    
+    str->hashCode = hash(str);
+    str->utf8 = NULL;
+    return str;
+}
+
+const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj) {
+    size_t size;
+    size_t realSize;
+    sys_Str str = (sys_Str)obj;
+    if (str->utf8) return str->utf8;
+    size = str->size * 4 + 1;
+    str->utf8 = malloc(size);
+    realSize = utf8encode(str->data, str->utf8, size, NULL);
+    str->utf8[realSize] = 0;
+    return str->utf8;
+}
 
 void sys_Str_privateMake0(fr_Env __env, sys_Str_ref __self){ return; }
 sys_Str sys_Str_fromChars1(fr_Env __env, sys_List chars){ return 0; }
@@ -16,7 +136,9 @@ sys_Bool sys_Str_equalsIgnoreCase1(fr_Env __env, sys_Str_ref __self, sys_Str s){
 sys_Int sys_Str_compare1(fr_Env __env, sys_Str_ref __self, sys_Obj obj){ return 0; }
 sys_Int sys_Str_compareIgnoreCase1(fr_Env __env, sys_Str_ref __self, sys_Str s){ return 0; }
 sys_Int sys_Str_hash0(fr_Env __env, sys_Str_ref __self){ return 0; }
-sys_Str sys_Str_toStr0(fr_Env __env, sys_Str_ref __self){ return 0; }
+sys_Str sys_Str_toStr0(fr_Env __env, sys_Str_ref __self){
+    return __self;
+}
 sys_Str sys_Str_toLocale0(fr_Env __env, sys_Str_ref __self){ return 0; }
 sys_Bool sys_Str_isEmpty0(fr_Env __env, sys_Str_ref __self){ return 0; }
 sys_Int sys_Str_size0(fr_Env __env, sys_Str_ref __self){ return 0; }
@@ -89,5 +211,15 @@ sys_Str sys_Str_toCode0(fr_Env __env, sys_Str_ref __self){ return 0; }
 sys_Str sys_Str_toCode1(fr_Env __env, sys_Str_ref __self, sys_Int_null quote){ return 0; }
 sys_Str sys_Str_toCode2(fr_Env __env, sys_Str_ref __self, sys_Int_null quote, sys_Bool escapeUnicode){ return 0; }
 sys_Str sys_Str_toXml0(fr_Env __env, sys_Str_ref __self){ return 0; }
-void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){ return; }
-void sys_Str_static__init0(fr_Env __env){ return; }
+void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){
+    free(__self->data);
+    free(__self->utf8);
+    __self->data = NULL;
+    __self->utf8 = NULL;
+    __self->size = 0;
+    __self->hashCode = 0;
+    return;
+}
+void sys_Str_static__init0(fr_Env __env){
+    sys_Str_defVal = fr_newStrUtf8(__env, "");
+}

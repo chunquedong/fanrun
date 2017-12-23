@@ -57,6 +57,7 @@ void fr_gc(fr_Env self);
 // Util
 ////////////////////////////
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
+const char *fr_getStrUtf8(fr_Env env__, fr_Obj str);
 GcObj *fr_toGcObj(fr_Obj obj);
 
 #ifdef  __cplusplus

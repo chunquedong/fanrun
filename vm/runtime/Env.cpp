@@ -17,6 +17,7 @@ struct FVM_ : public GcSupport {
     
     FVM_() {
         gc = new Gc();
+        gc->gcSupport = this;
     }
     
     virtual void walkNodeChildren(Gc *gc, GcObj *obj) override {
@@ -161,7 +162,4 @@ void fr_gc(fr_Env self) {
     env->vm->gc->collect();
 }
 
-fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes) {
-    //TODO
-    return nullptr;
-}
+

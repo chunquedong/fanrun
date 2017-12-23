@@ -7,7 +7,7 @@
 //
 
 #include "sys.h"
-
+#include <stdio.h>
 
 void sys_Obj_make0(fr_Env __env, sys_Obj_ref __self){ return; }
 sys_Bool sys_Obj_equals1(fr_Env __env, sys_Obj_ref __self, sys_Obj_null that){ return 0; }
@@ -21,5 +21,19 @@ sys_Bool sys_Obj_isImmutable0(fr_Env __env, sys_Obj_ref __self){ return 0; }
 sys_This sys_Obj_toImmutable0(fr_Env __env, sys_Obj_ref __self){ return 0; }
 sys_Type sys_Obj_typeof_0(fr_Env __env, sys_Obj_ref __self){ return 0; }
 void sys_Obj_finalize0(fr_Env __env, sys_Obj_ref __self){ return; }
-void sys_Obj_echo0(fr_Env __env){ return; }
-void sys_Obj_echo1(fr_Env __env, sys_Obj_null x){ return; }
+void sys_Obj_echo0(fr_Env __env){
+    printf("\n");
+}
+void sys_Obj_echo1(fr_Env __env, sys_Obj_null x){
+    if (x == NULL) {
+        printf("null\n");
+        return;
+    }
+    fr_Obj str = FR_VCALL(sys_Obj, toStr0, x);
+    if (str == NULL) {
+        printf("ERROR:null\n");
+        return;
+    }
+    const char *utf8 = fr_getStrUtf8(__env, str);
+    printf("%s\n", utf8);
+}

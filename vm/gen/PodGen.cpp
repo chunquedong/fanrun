@@ -58,6 +58,11 @@ void PodGen::horizontalLine(Printer *printer, const char *name) {
 void PodGen::genHeader(Printer *printer) {
     printer->println("#ifndef _%s_h_", podName.c_str());
     printer->println("#define _%s_h_", podName.c_str());
+    
+    printer->println("#ifdef __cplusplus");
+    printer->println("extern \"C\" {");
+    printer->println("#endif //__cplusplus");
+    
     printer->println("#include \"runtime.h\"");
     for (int i=0; i<pod->c_dependPods.size(); ++i) {
         std::string& dep = pod->c_dependPods[i];
@@ -107,6 +112,12 @@ void PodGen::genHeader(Printer *printer) {
         gtype->genVTable(printer);
         printer->newLine();
     }
+    
+    //printer->println("void %s_initPod(fr_Env __env);", podName.c_str());
+    
+    printer->println("#ifdef __cplusplus");
+    printer->println("}//extern C");
+    printer->println("#endif //__cplusplus");
     printer->println("#endif //_%s_h_", podName.c_str());
 }
 
