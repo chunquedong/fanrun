@@ -281,6 +281,47 @@ void TypeGen::genMethodDeclare(Printer *printer) {
     }
 }
 
+void TypeGen::genMethodWrap(Printer *printer) {
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod *method = &type->methods[i];
+        if ((method->flags & FFlags::Abstract) != 0) {
+            continue;
+        }
+        MethodGen gmethod(this, method);
+        gmethod.genRegisterWrap(printer);
+    }
+}
+
+void TypeGen::genMethodRegister(Printer *printer) {
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod *method = &type->methods[i];
+        if ((method->flags & FFlags::Abstract) != 0) {
+            continue;
+        }
+        MethodGen gmethod(this, method);
+        gmethod.genRegister(printer);
+    }
+}
+
+void TypeGen::genMethodStub(Printer *printer) {
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod *method = &type->methods[i];
+        if ((type->meta.flags & FFlags::Native) != 0
+            || (method->flags & FFlags::Native) != 0
+            || (method->flags & FFlags::Abstract) != 0) {
+            continue;
+        }
+        MethodGen gmethod(this, method);
+        gmethod.genStub(printer);
+    }
+    printer->println("struct %s_vtable *%s_class__(fr_Env __env) {", name.c_str(), name.c_str());
+    printer->indent();
+    printer->println("return (struct %s_vtable*)fr_findType(__env, \"%s\");"
+                     , name.c_str(), name.c_str());
+    printer->unindent();
+    printer->println("}");
+}
+
 void TypeGen::genField(Printer *printer) {
     for (int i=0; i<type->fields.size(); ++i) {
         FField *field = &type->fields[i];

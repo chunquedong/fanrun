@@ -9,59 +9,57 @@
 #ifndef __fcode__Env__
 #define __fcode__Env__
 
-#ifdef  __cplusplus
-extern  "C" {
-#endif
+#include "Gc.h"
+#include <assert.h>
+#include <vector>
+#include "runtime.h"
 
-#include "Type.h"
-#include <setjmp.h>
-#include "gcobj.h"
-
-typedef void *fr_FVM;
-typedef void *fr_Env;
-
-////////////////////////////
-// VM
-////////////////////////////
-
-fr_FVM fr_startVm();
-void fr_stopVm(fr_FVM vm);
-fr_Env fr_getEnv(fr_FVM vm);
-
-void fr_initEnv(fr_Env env);
-void fr_releaseEnv(fr_Env env);
-
-////////////////////////////
-// Exception
-////////////////////////////
+struct FVM_ : public GcSupport {
+    Gc *gc;
+    std::vector<GcObj*> globalRef;
     
-void fr_pushFrame(fr_Env self, const char*func);
-void fr_popFrame(fr_Env self);
-
-jmp_buf *fr_pushJmpBuf(fr_Env self);
-jmp_buf *fr_popJmpBuf(fr_Env self);
-
-fr_Obj fr_getErr(fr_Env self);
-void fr_throwErr(fr_Env self, fr_Obj err);
-void fr_clearErr(fr_Env self);
-
-////////////////////////////
-// GC
-////////////////////////////
-
-void fr_addGlobalRef(fr_Env self, fr_Obj obj);
-fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable);
-void fr_gc(fr_Env self);
+    FVM_() {
+        gc = new Gc();
+        gc->gcSupport = this;
+    }
     
-////////////////////////////
-// Util
-////////////////////////////
-fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
-const char *fr_getStrUtf8(fr_Env env__, fr_Obj str);
-GcObj *fr_toGcObj(fr_Obj obj);
+    virtual void walkNodeChildren(Gc *gc, GcObj *obj) override {
+        
+    }
+    virtual void walkRoot(Gc *gc) override {
+        
+    }
+    
+    virtual void finalizeObj(GcObj *obj) override {
+        
+    }
+    virtual void puaseWorld() override {
+        
+    }
+    virtual void resumeWorld() override {
+        
+    }
+    virtual void printObj(GcObj *obj) override {
+        
+    }
+    virtual int allocSize(void *type) override {
+        return 0;
+    }
+};
 
-#ifdef  __cplusplus
-}
-#endif
+struct JmpBuf {
+    jmp_buf buf;
+};
+
+struct Env_ {
+    FVM_ *vm;
+    fr_Obj error;
+    std::vector<const char*> stackTrace;
+    std::vector<JmpBuf> exception;
+    
+    Env_() : vm(nullptr), error(0) {
+    }
+};
+
 
 #endif /* defined(__fcode__Env__) */

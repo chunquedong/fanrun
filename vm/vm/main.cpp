@@ -12,6 +12,8 @@
 #include "Fvm.h"
 #include <string.h>
 
+#ifndef FR_RUN
+
 CF_BEGIN
 
 void register_sys(fr_Fvm vm);
@@ -48,11 +50,10 @@ FObj *makeArgArray(Env *env, int start, int argc, const char * argv[]) {
     return val.any.o;
 }
 
-//-g/Users/yangjiandong/workspace/code/fanrun/vm/native/ -p/Users/yangjiandong/workspace/soft/fantom-1.0.68 -d testlib::Main#main
+//-p/Users/yangjiandong/workspace/soft/fantom-1.0.68 -d testlib::Main#main
 int main(int argc, const char * argv[]) {
     char buf[256] = {0};
     const char *libPath = NULL;
-    const char *nativeOutPath = NULL;
     int i = 1;
     bool debug = false;
     
@@ -61,10 +62,6 @@ int main(int argc, const char * argv[]) {
     while (argc > i && argv[i] && argv[i][0] == '-') {
         const char *op = argv[i] + 1;
         switch (op[0]) {
-            case 'g': {
-                nativeOutPath = op+1;
-            }
-                break;
             case 'p': {
                 strncpy(buf, op+1, 256);
                 strncat(buf, "/lib/fan/", 256);
@@ -120,9 +117,6 @@ int main(int argc, const char * argv[]) {
         method = method + 1;
     }
     
-    printf("genCode:%s, fanHome:%s %s::%s#%s\n", nativeOutPath, libPath, pod, type, method);
-    puts("------------------");
-    
     PodManager podMgr;
     Fvm vm(&podMgr);
     podMgr.vm = &vm;
@@ -138,16 +132,6 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    
-    if (nativeOutPath) {
-        NativeGen nativeGen;
-        //nativeGen.genStub = true;
-        nativeGen.genNative(nativeOutPath, "sys", &podMgr);
-        puts("------------------");
-    }
-    
-//run
-#if 1
     register_sys(&vm);
     
     vm.start();
@@ -160,8 +144,8 @@ int main(int argc, const char * argv[]) {
     vm.releaseEnv(env);
     env = nullptr;
     vm.stop();
-#endif
-    
+
     puts("DONE!");
     return 0;
 }
+#endif

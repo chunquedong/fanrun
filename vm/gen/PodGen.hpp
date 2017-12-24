@@ -28,15 +28,15 @@ public:
     
 public:
     PodGen(PodLoader *podMgr, const std::string& podName);
-    
     void gen(std::string &path);
-    
+private:
     void genHeader(Printer *printer);
     void genImple(Printer *printer);
     void horizontalLine(Printer *printer, const char *name);
-    
+    void genRegister(Printer *printer);
+    void genStub(Printer *printer);
+public:
     std::string getTypeRefName(uint16_t tid);
-    
     TypeGen* findType(std::string &name);
 private:
     void topoSortType();

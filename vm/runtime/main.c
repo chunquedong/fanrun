@@ -6,7 +6,9 @@
 //  Copyright © 2017年 yangjiandong. All rights reserved.
 //
 
-#include "Env.h"
+#include "runtime.h"
+
+//#if FR_RUN
 #include "testlib.h"
 
 int main() {
@@ -18,3 +20,5 @@ int main() {
     fr_releaseEnv(env);
     fr_stopVm(vm);
 }
+
+//#endif

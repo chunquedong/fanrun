@@ -6,8 +6,7 @@
 //  Copyright (c) 2015年 yangjiandong. All rights reserved.
 //
 
-#include "Type.h"
-#include "Env.h"
+#include "runtime.h"
 #include <stdio.h>
 
 bool fr_Type_is(fr_Type self, fr_Obj obj) {

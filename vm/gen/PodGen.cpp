@@ -39,6 +39,14 @@ void PodGen::gen(std::string &path) {
     std::string impleFile = path + podName + ".c";
     Printer implePrinter(impleFile.c_str());
     genImple(&implePrinter);
+    
+    std::string regisFile = path + podName + "_register.c";
+    Printer regisPrinter(regisFile.c_str());
+    genRegister(&regisPrinter);
+    
+    std::string stubFile = path + podName + "_stub.c";
+    Printer stubPrinter(stubFile.c_str());
+    genStub(&stubPrinter);
 }
 
 void PodGen::horizontalLine(Printer *printer, const char *name) {
@@ -130,6 +138,28 @@ void PodGen::genImple(Printer *printer) {
         TypeGen *gtype = sortedTypes[i];
         gtype->genImple(printer);
         //printer->newLine();
+    }
+}
+
+void PodGen::genRegister(Printer *printer) {
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        gtype->genMethodWrap(printer);
+    }
+    printer->println("void %s_register(fr_FVM vm) {", podName.c_str());
+    printer->indent();
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        gtype->genMethodRegister(printer);
+    }
+    printer->unindent();
+    printer->println("}");
+}
+
+void PodGen::genStub(Printer *printer) {
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        gtype->genMethodStub(printer);
     }
 }
 

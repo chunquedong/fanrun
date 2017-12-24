@@ -9,10 +9,62 @@
 #ifndef runtime_h
 #define runtime_h
 
+#ifdef  __cplusplus
+extern  "C" {
+#endif
+
 //#include "common.h"
 #include "miss.h"
-#include "Env.h"
+#include "Type.h"
+#include "gcobj.h"
+#include <setjmp.h>
 
+typedef void *fr_FVM;
+typedef void *fr_Env;
+
+////////////////////////////
+// VM
+////////////////////////////
+
+fr_FVM fr_startVm();
+void fr_stopVm(fr_FVM vm);
+fr_Env fr_getEnv(fr_FVM vm);
+
+void fr_initEnv(fr_Env env);
+void fr_releaseEnv(fr_Env env);
+
+////////////////////////////
+// Exception
+////////////////////////////
+
+void fr_pushFrame(fr_Env self, const char*func);
+void fr_popFrame(fr_Env self);
+
+jmp_buf *fr_pushJmpBuf(fr_Env self);
+jmp_buf *fr_popJmpBuf(fr_Env self);
+
+fr_Obj fr_getErr(fr_Env self);
+void fr_throwErr(fr_Env self, fr_Obj err);
+void fr_clearErr(fr_Env self);
+
+////////////////////////////
+// GC
+////////////////////////////
+
+void fr_addGlobalRef(fr_Env self, fr_Obj obj);
+fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable);
+void fr_gc(fr_Env self);
+GcObj *fr_toGcObj(fr_Obj obj);
+
+////////////////////////////
+// Util
+////////////////////////////
+fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
+const char *fr_getStrUtf8(fr_Env env__, fr_Obj str);
+
+////////////////////////////
+// Buildin type
+////////////////////////////
 typedef int64_t sys_Int_val;
 typedef double sys_Float_val;
 typedef bool sys_Bool_val;
@@ -27,7 +79,9 @@ struct sys_Bool_struct {
     bool val;
 };
 
-
+////////////////////////////
+// Other
+////////////////////////////
 #define FR_TYPE(type) (type)(0)
 #define FR_TYPE_IS(obj, type) (true)
 #define FR_TYPE_AS(obj, type) (obj)
@@ -48,6 +102,8 @@ struct sys_Bool_struct {
 #define FR_UNBOX(obj, fromType, toType) ((toType)obj)
 #define FR_CAST(obj, fromType, toType) ((toType)obj)
 
-
+#ifdef  __cplusplus
+}
+#endif
 
 #endif /* runtime_h */
