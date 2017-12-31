@@ -797,7 +797,6 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->obj = block->pop();
                 
                 Var &var = block->newVar(opObj.i1);
-                var.typeName = "sys_Bool";
                 Expr value;
                 value.type = ExprType::tempVar;
                 value.varRef.index = var.index;

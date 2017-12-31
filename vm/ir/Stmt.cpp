@@ -152,6 +152,34 @@ void Expr::print(IRMethod *method, Printer& printer, int pass) {
     }
 }
 
+bool Expr::isValueType(IRMethod *method) {
+    switch (type) {
+        case ExprType::constant: {
+            printf("ERROR:TODO");
+            return false;
+            break;
+        }
+        case ExprType::localVar: {
+            if (varRef.block == -1) {
+                Var &var = method->locals[varRef.index];
+                return FCodeUtil::isValType(var.typeName);
+            } else {
+                printf("ERROR: block is %d\n", varRef.block);
+            }
+            break;
+        }
+        case ExprType::tempVar: {
+            Block *block = method->blocks[varRef.block];
+            Var &var = block->locals[varRef.index];
+            return FCodeUtil::isValType(var.typeName);
+            break;
+        }
+        default:
+            break;
+    }
+    return false;
+}
+
 void StoreStmt::print(IRMethod *method, Printer& printer, int pass) {
     dst.print(method, printer, pass);
     printer.printf(" = ");
@@ -170,7 +198,11 @@ void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
     } else if (isMixin) {
         printer.printf("FR_ICALL(%s, %s", typeName.c_str(), mthName.c_str());
     } else {
-        printer.printf("FR_VCALL(%s, %s", typeName.c_str(), mthName.c_str());
+        if (params.size() > 0 && params.at(0).isValueType(method)) {
+            printer.printf("%s_%s_val(__env", typeName.c_str(), mthName.c_str());
+        } else {
+            printer.printf("FR_VCALL(%s, %s", typeName.c_str(), mthName.c_str());
+        }
     }
     
     for (int i=0; i<params.size(); ++i) {

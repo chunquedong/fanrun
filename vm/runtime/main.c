@@ -13,7 +13,10 @@
 
 int main() {
     fr_Env env = fr_getEnv();
-    testlib_DefParamTest_main0(env);
+    sys_init__(env);
+    testlib_init__(env);
+    
+    testlib_BoxingTest_main0(env);
     fr_releaseEnv(env);
 }
 

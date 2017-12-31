@@ -53,6 +53,7 @@ public:
     };
     std::string getConstantType();
     void print(IRMethod *method, Printer& printer, int pass);
+    bool isValueType(IRMethod *method);
 };
 
 enum class StmtType {

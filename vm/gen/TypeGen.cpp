@@ -124,7 +124,8 @@ void TypeGen::genVTable(Printer *printer) {
     
     printer->println("};");
     
-    printer->println("fr_Class %s_class__(fr_Env __env);", name.c_str());
+    //printer->println("fr_Class %s_class__(fr_Env __env);", name.c_str());
+    printer->println("extern fr_Class %s_class__;", name.c_str());
 }
 
 void TypeGen::genTypeMetadata(Printer *printer) {
@@ -135,7 +136,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
     printer->println("((fr_Class)vtable)->allocSize = sizeof(struct %s_struct);", name.c_str());
     
     std::string baseName = podGen->getTypeRefName(type->meta.base);
-    printer->println("((fr_Class)vtable)->base = (fr_Class)%s_class__(__env);", baseName.c_str());
+    printer->println("((fr_Class)vtable)->base = (fr_Class)%s_class__;", baseName.c_str());
     
     printer->println("((fr_Class)vtable)->fieldCount = %d;", type->fields.size());
     
@@ -166,7 +167,7 @@ void TypeGen::genVTableInit(Printer *printer) {
     for (int i=0; i<minxinSize; ++i) {
         base = podGen->getTypeRefName(type->meta.mixin[i]);
         printer->println("%s_initVTable(__env, &vtable->%s_super__);", base.c_str(), base.c_str());
-        printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].type = %s_class__(__env);"
+        printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].type = %s_class__;"
                          , i, base.c_str());
         printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].vtable = &vtable->%s_super__;"
                          , i, base.c_str());
@@ -218,6 +219,8 @@ void TypeGen::genVTableInit(Printer *printer) {
 void TypeGen::genTypeInit(Printer *printer) {
     genVTableInit(printer);
     
+    printer->println("fr_Class %s_class__ = NULL;", name.c_str());
+    /*
     printer->println("fr_Class %s_class__(fr_Env __env) {", name.c_str());
     printer->indent();
     
@@ -243,6 +246,7 @@ void TypeGen::genTypeInit(Printer *printer) {
     printer->println("return %s_class_instance;", name.c_str());
     printer->unindent();
     printer->println("}");
+     */
 }
 
 void TypeGen::genOverrideVTable(uint16_t tid, std::string &rawMethodName
@@ -326,12 +330,14 @@ void TypeGen::genMethodStub(Printer *printer) {
         MethodGen gmethod(this, method);
         gmethod.genStub(printer);
     }
+    /*
     printer->println("struct %s_vtable *%s_class__(fr_Env __env) {", name.c_str(), name.c_str());
     printer->indent();
     printer->println("return (struct %s_vtable*)fr_findType(__env, \"%s\");"
                      , name.c_str(), name.c_str());
     printer->unindent();
     printer->println("}");
+     */
 }
 
 void TypeGen::genField(Printer *printer) {

@@ -33,8 +33,12 @@ sys_Int sys_Int_mod1(fr_Env __env, sys_Int_ref __self, sys_Int b){ return 0; }
 sys_Int sys_Int_mod1_val(fr_Env __env, sys_Int_val __self, sys_Int b){ return 0; }
 sys_Float sys_Int_modFloat1(fr_Env __env, sys_Int_ref __self, sys_Float b){ return 0; }
 sys_Float sys_Int_modFloat1_val(fr_Env __env, sys_Int_val __self, sys_Float b){ return 0; }
-sys_Int sys_Int_plus1(fr_Env __env, sys_Int_ref __self, sys_Int b){ return 0; }
-sys_Int sys_Int_plus1_val(fr_Env __env, sys_Int_val __self, sys_Int b){ return 0; }
+sys_Int sys_Int_plus1(fr_Env __env, sys_Int_ref __self, sys_Int b){
+    return sys_Int_plus1_val(__env, __self->val, b);
+}
+sys_Int sys_Int_plus1_val(fr_Env __env, sys_Int_val __self, sys_Int b){
+    return __self + b;
+}
 sys_Float sys_Int_plusFloat1(fr_Env __env, sys_Int_ref __self, sys_Float b){ return 0; }
 sys_Float sys_Int_plusFloat1_val(fr_Env __env, sys_Int_val __self, sys_Float b){ return 0; }
 sys_Int sys_Int_minus1(fr_Env __env, sys_Int_ref __self, sys_Int b){ return 0; }

@@ -92,10 +92,10 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 // Other
 ////////////////////////////
 
-#define FR_TYPE(type) fr_sysType(__env, type##_class__(__env))
-#define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__(__env))
+#define FR_TYPE(type) fr_sysType(__env, type##_class__)
+#define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:0)
-#define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__(__env)))
+#define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__))
 
 #ifdef LONG_JMP_EXCEPTION
     #define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)))
@@ -110,7 +110,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #endif
 
 #define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
-#define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__(__env)) )
+#define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__) )
 
 #define FR_VCALL(type, method, self, ...)  _FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
 #define FR_ICALL(type, method, self, ...) _FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__)

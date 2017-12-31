@@ -121,7 +121,7 @@ void PodGen::genHeader(Printer *printer) {
         printer->newLine();
     }
     
-    //printer->println("void %s_initPod(fr_Env __env);", podName.c_str());
+    printer->println("void %s_init__(fr_Env __env);", podName.c_str());
     
     printer->println("#ifdef __cplusplus");
     printer->println("}//extern C");
@@ -139,6 +139,37 @@ void PodGen::genImple(Printer *printer) {
         gtype->genImple(printer);
         //printer->newLine();
     }
+    
+    genStaticInit(printer);
+}
+
+void PodGen::genStaticInit(Printer *printer) {
+    printer->println("void %s_init__(fr_Env __env) {", podName.c_str());
+    printer->indent();
+    printer->println("static bool inited = false;");
+    printer->println("if (inited) { printf(\"ERROR: pod already inited\"); return; }");
+    printer->println("inited = true;");
+    
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        printer->println("%s_class__ = (fr_Class)"
+                         "malloc(sizeof(struct %s_vtable));"
+                         , gtype->name.c_str(), gtype->name.c_str());
+        printer->println("%s_initVTable(__env, (struct %s_vtable*)%s_class__);"
+                         , gtype->name.c_str(), gtype->name.c_str(), gtype->name.c_str());
+    }
+    printer->newLine();
+    printer->newLine();
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        std::string staticInit = "static$init";
+        auto itr = gtype->type->c_methodMap.find(staticInit);
+        if (itr != gtype->type->c_methodMap.end()) {
+            printer->println("%s_static__init0(__env);", gtype->name.c_str());
+        }
+    }
+    printer->unindent();
+    printer->println("}");
 }
 
 void PodGen::genRegister(Printer *printer) {
