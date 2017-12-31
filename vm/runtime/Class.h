@@ -61,6 +61,9 @@ struct fr_IVTableMapItem {
 typedef struct fr_Type_ {
     const char *name;
     uint32_t flags;
+    
+    int allocSize;
+    void *sysType;
   
     struct fr_Type_ *base;
     int mixinCount;
@@ -81,7 +84,7 @@ typedef struct fr_Type_ {
 
 void fr_VTable_init(fr_Env self, fr_Type type);
 
-bool fr_Type_is(fr_Type self, fr_Obj obj);
+bool fr_isType(fr_Env self, fr_Obj obj, fr_Type type);
 
 fr_Type fr_getType(fr_Env self, fr_Obj obj);
 

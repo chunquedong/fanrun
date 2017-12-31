@@ -12,13 +12,9 @@
 #include "testlib.h"
 
 int main() {
-    fr_FVM vm = fr_startVm();
-    fr_Env env = fr_getEnv(vm);
-    
+    fr_Env env = fr_getEnv();
     testlib_Sub_main0(env);
-    
     fr_releaseEnv(env);
-    fr_stopVm(vm);
 }
 
 //#endif

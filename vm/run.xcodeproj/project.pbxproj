@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		326165501FF8A578002174D6 /* Vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3261654F1FF8A578002174D6 /* Vm.cpp */; };
 		3291F92F1F6D416C00F12438 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9221F6D416C00F12438 /* Env.cpp */; };
-		3291F9311F6D416C00F12438 /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9261F6D416C00F12438 /* runtime.c */; };
-		3291F9321F6D416C00F12438 /* Type.c in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9281F6D416C00F12438 /* Type.c */; };
+		3291F9311F6D416C00F12438 /* runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9261F6D416C00F12438 /* runtime.cpp */; };
+		3291F9321F6D416C00F12438 /* Class.c in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9281F6D416C00F12438 /* Class.c */; };
 		3291F9331F6D416C00F12438 /* sys.c in Sources */ = {isa = PBXBuildFile; fileRef = 3291F92B1F6D416C00F12438 /* sys.c */; };
 		3291F9341F6D416C00F12438 /* testlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 3291F92D1F6D416C00F12438 /* testlib.c */; };
 		3291F9391F6D418600F12438 /* Gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9361F6D418600F12438 /* Gc.cpp */; };
@@ -72,13 +73,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3261654E1FF8A578002174D6 /* Vm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Vm.hpp; sourceTree = "<group>"; };
+		3261654F1FF8A578002174D6 /* Vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vm.cpp; sourceTree = "<group>"; };
 		3291F9111F6D40C200F12438 /* run */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = run; sourceTree = BUILT_PRODUCTS_DIR; };
 		3291F9221F6D416C00F12438 /* Env.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Env.cpp; sourceTree = "<group>"; };
 		3291F9231F6D416C00F12438 /* Env.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Env.h; sourceTree = "<group>"; };
-		3291F9261F6D416C00F12438 /* runtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = runtime.c; sourceTree = "<group>"; };
+		3291F9261F6D416C00F12438 /* runtime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime.cpp; sourceTree = "<group>"; };
 		3291F9271F6D416C00F12438 /* runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
-		3291F9281F6D416C00F12438 /* Type.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Type.c; sourceTree = "<group>"; };
-		3291F9291F6D416C00F12438 /* Type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Type.h; sourceTree = "<group>"; };
+		3291F9281F6D416C00F12438 /* Class.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Class.c; sourceTree = "<group>"; };
+		3291F9291F6D416C00F12438 /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Class.h; sourceTree = "<group>"; };
 		3291F92B1F6D416C00F12438 /* sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys.c; sourceTree = "<group>"; };
 		3291F92C1F6D416C00F12438 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys.h; sourceTree = "<group>"; };
 		3291F92D1F6D416C00F12438 /* testlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testlib.c; sourceTree = "<group>"; };
@@ -201,12 +204,14 @@
 		3291F9211F6D416C00F12438 /* runtime */ = {
 			isa = PBXGroup;
 			children = (
+				3261654E1FF8A578002174D6 /* Vm.hpp */,
+				3261654F1FF8A578002174D6 /* Vm.cpp */,
 				3291F9221F6D416C00F12438 /* Env.cpp */,
 				3291F9231F6D416C00F12438 /* Env.h */,
-				3291F9261F6D416C00F12438 /* runtime.c */,
+				3291F9261F6D416C00F12438 /* runtime.cpp */,
 				3291F9271F6D416C00F12438 /* runtime.h */,
-				3291F9281F6D416C00F12438 /* Type.c */,
-				3291F9291F6D416C00F12438 /* Type.h */,
+				3291F9281F6D416C00F12438 /* Class.c */,
+				3291F9291F6D416C00F12438 /* Class.h */,
 				32C107051FE6B57B006248C6 /* main.c */,
 			);
 			path = runtime;
@@ -416,7 +421,7 @@
 				32C106EB1FE6AE84006248C6 /* sys_Func.c in Sources */,
 				3291F9821F6D41DE00F12438 /* minizip.c in Sources */,
 				32C106E31FE6AA38006248C6 /* sys_Num.c in Sources */,
-				3291F9311F6D416C00F12438 /* runtime.c in Sources */,
+				3291F9311F6D416C00F12438 /* runtime.cpp in Sources */,
 				32C107001FE6B3A4006248C6 /* sys_Param.c in Sources */,
 				32C106F71FE6B21B006248C6 /* sys_Slot.c in Sources */,
 				3291F9871F6D41DE00F12438 /* compress.c in Sources */,
@@ -426,7 +431,7 @@
 				3291F98F1F6D41DE00F12438 /* uncompr.c in Sources */,
 				3291F97D1F6D41DE00F12438 /* ioapi_buf.c in Sources */,
 				3291F9841F6D41DE00F12438 /* unzip.c in Sources */,
-				3291F9321F6D416C00F12438 /* Type.c in Sources */,
+				3291F9321F6D416C00F12438 /* Class.c in Sources */,
 				3291F9801F6D41DE00F12438 /* Makefile in Sources */,
 				3291F9331F6D416C00F12438 /* sys.c in Sources */,
 				32C106E11FE6A9B3006248C6 /* sys_Float.c in Sources */,
@@ -454,6 +459,7 @@
 				32C106F91FE6B22C006248C6 /* sys_Field.c in Sources */,
 				3291F97B1F6D41DE00F12438 /* utf8.c in Sources */,
 				3291F9341F6D416C00F12438 /* testlib.c in Sources */,
+				326165501FF8A578002174D6 /* Vm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,36 +15,31 @@ extern  "C" {
 
 //#include "common.h"
 #include "miss.h"
-#include "Type.h"
+#include "Class.h"
 #include "gcobj.h"
 #include <setjmp.h>
 
-typedef void *fr_FVM;
+#define LONG_JMP_EXCEPTION
+
 typedef void *fr_Env;
 
 ////////////////////////////
 // VM
 ////////////////////////////
 
-fr_FVM fr_startVm();
-void fr_stopVm(fr_FVM vm);
-fr_Env fr_getEnv(fr_FVM vm);
-
-void fr_initEnv(fr_Env env);
+fr_Env fr_getEnv();
 void fr_releaseEnv(fr_Env env);
 
 ////////////////////////////
 // Exception
 ////////////////////////////
-
-void fr_pushFrame(fr_Env self, const char*func);
-void fr_popFrame(fr_Env self);
-
+#ifdef LONG_JMP_EXCEPTION
 jmp_buf *fr_pushJmpBuf(fr_Env self);
 jmp_buf *fr_popJmpBuf(fr_Env self);
+#endif
 
 fr_Obj fr_getErr(fr_Env self);
-void fr_throwErr(fr_Env self, fr_Obj err);
+void fr_setErr(fr_Env self, fr_Obj err);
 void fr_clearErr(fr_Env self);
 
 ////////////////////////////
@@ -55,6 +50,7 @@ void fr_addGlobalRef(fr_Env self, fr_Obj obj);
 fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable);
 void fr_gc(fr_Env self);
 GcObj *fr_toGcObj(fr_Obj obj);
+fr_Obj fr_fromGcObj(GcObj *g);
 
 ////////////////////////////
 // Util
@@ -83,14 +79,21 @@ struct sys_Bool_struct {
 // Other
 ////////////////////////////
 #define FR_TYPE(type) (type)(0)
-#define FR_TYPE_IS(obj, type) (true)
-#define FR_TYPE_AS(obj, type) (obj)
+#define FR_TYPE_IS(obj, type) fr_isType(__env, obj, type##_class__(__env))
+#define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:0)
 #define FR_ALLOC(type) fr_malloc(__env, sizeof(struct type##_struct), type##_class__(__env))
 
-#define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)))
-#define FR_CATCH else
-#define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
-#define FR_THROW(err) { fr_throwErr(__env, err); longjmp(*fr_popJmpBuf(__env), 1);}
+#ifdef LONG_JMP_EXCEPTION
+    #define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)))
+    #define FR_CATCH else
+    #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
+    #define FR_THROW(err) { fr_setErr(__env, err); longjmp(*fr_popJmpBuf(__env), 1);}
+#else
+    #define FR_TRY try
+    #define FR_CATCH catch(...)
+    #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
+    #define FR_THROW(err) { fr_setErr(__env, err); throw std::exception();}
+#endif
 
 #define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getType(__env, self) )
 #define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__(__env)) )

@@ -9,14 +9,22 @@
 #include "runtime.h"
 #include <stdio.h>
 
-bool fr_Type_is(fr_Type self, fr_Obj obj) {
-    return true;
+bool fr_isType(fr_Env self, fr_Obj obj, fr_Type type) {
+    fr_Type tempType = fr_getType(self, obj);
+    while (true) {
+        if (tempType == type) return true;
+        tempType = tempType->base;
+        if (!tempType) return false;
+    }
+    return false;
 }
 
 void fr_VTable_init(fr_Env self, fr_Type type) {
     type->name = "";
     type->base = NULL;
     type->mixinCount = 0;
+    type->allocSize = 0;
+    type->sysType = NULL;
 }
 
 fr_Type fr_getType(fr_Env self, fr_Obj obj) {

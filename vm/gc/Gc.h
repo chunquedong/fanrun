@@ -16,7 +16,7 @@
 #include <list>
 #include <vector>
 #include <set>
-#include "tinycthread.h"
+#include <mutex>
 
 
 class Gc;
@@ -40,7 +40,7 @@ class Gc {
     std::vector<GcObj*> gcRoot;
     std::set<GcObj*> allRef;
     
-    mtx_t lock;
+    std::recursive_mutex lock;
     bool isStopWorld;
     int marker;
     bool running;

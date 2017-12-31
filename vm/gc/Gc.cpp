@@ -13,23 +13,19 @@
 #include <assert.h>
 
 Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr) {
-    mtx_init(&lock, mtx_recursive);
     lastAllocSize = 1024;
 }
 
 Gc::~Gc() {
-    mtx_destroy(&lock);
 }
 
 void Gc::pinObj(GcObj* obj) {
-    mtx_lock(&lock);
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     pinObjs.push_back(obj);
-    mtx_unlock(&lock);
 }
 void Gc::unpinObj(GcObj* obj) {
-    mtx_lock(&lock);
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     pinObjs.remove(obj);
-    mtx_unlock(&lock);
 }
 void Gc::onRoot(GcObj* obj) {
     if (obj == nullptr) {
@@ -70,9 +66,9 @@ GcObj* Gc::alloc(void *type, int asize) {
     gc_setMark(obj, marker);
     gc_setDirty(obj, 0);
     
-    mtx_lock(&lock);
+    lock.lock();
     newAllocRef.push_back(obj);
-    mtx_unlock(&lock);
+    lock.unlock();
     
     if (trace) {
         printf("malloc %p %p\n", type, obj);
@@ -82,15 +78,13 @@ GcObj* Gc::alloc(void *type, int asize) {
 
 void Gc::collect() {
     {
-        mtx_lock(&lock);
+        std::lock_guard<std::recursive_mutex> lock_guard(lock);
         if (running) {
-            mtx_unlock(&lock);
             return;
         }
         running = true;
         mergeNewAlloc();
         marker = !marker;
-        mtx_unlock(&lock);
     }
     
     getRoot();
@@ -104,10 +98,9 @@ void Gc::collect() {
     sweep();
     
     {
-        mtx_lock(&lock);
+        std::lock_guard<std::recursive_mutex> lock_guard(lock);
         lastAllocSize = allocSize;
         running = false;
-        mtx_unlock(&lock);
     }
 }
 
@@ -116,11 +109,11 @@ void Gc::getRoot() {
     
     puaseWorld();
     
-    mtx_lock(&lock);
+    lock.lock();
     for (auto it = pinObjs.begin(); it != pinObjs.end(); ++it) {
         gcRoot.push_back(*it);
     }
-    mtx_unlock(&lock);
+    lock.unlock();
     
     gcSupport->walkRoot(this);
     

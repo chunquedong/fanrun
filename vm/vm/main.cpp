@@ -54,6 +54,7 @@ FObj *makeArgArray(Env *env, int start, int argc, const char * argv[]) {
 int main(int argc, const char * argv[]) {
     char buf[256] = {0};
     const char *libPath = NULL;
+    const char *nativeOutPath = NULL;
     int i = 1;
     bool debug = false;
     
@@ -62,6 +63,10 @@ int main(int argc, const char * argv[]) {
     while (argc > i && argv[i] && argv[i][0] == '-') {
         const char *op = argv[i] + 1;
         switch (op[0]) {
+            case 'g': {
+                nativeOutPath = op+1;
+            }
+                break;
             case 'p': {
                 strncpy(buf, op+1, 256);
                 strncat(buf, "/lib/fan/", 256);
@@ -130,6 +135,13 @@ int main(int argc, const char * argv[]) {
             const char *testPos = argv[i+1];
             podMgr.load(libPath, testPos);
         }
+    }
+    
+    if (nativeOutPath) {
+        NativeGen nativeGen;
+        //nativeGen.genStub = true;
+        nativeGen.genNative(nativeOutPath, "sys", &podMgr);
+        puts("------------------");
     }
     
     register_sys(&vm);
