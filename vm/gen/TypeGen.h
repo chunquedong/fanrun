@@ -14,6 +14,7 @@
 #include "Printer.h"
 
 class PodGen;
+class MethodGen;
 
 class TypeGen {
 public:
@@ -41,7 +42,8 @@ private:
     void genField(Printer *printer);
     void genTypeMetadata(Printer *printer);
     void genVTableInit(Printer *printer);
-    bool isOverrideFrom(uint16_t tid, std::string &name);
+    void genOverrideVTable(uint16_t tid, std::string &name
+                           , Printer *printer, MethodGen &gmethod, std::string from);
     
 };
 

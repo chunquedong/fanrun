@@ -16,8 +16,16 @@ sys_Bool sys_Bool_equals1(fr_Env __env, sys_Bool_ref __self, sys_Obj_null obj){ 
 sys_Bool sys_Bool_equals1_val(fr_Env __env, sys_Bool_val __self, sys_Obj_null obj){ return 0; }
 sys_Int sys_Bool_hash0(fr_Env __env, sys_Bool_ref __self){ return 0; }
 sys_Int sys_Bool_hash0_val(fr_Env __env, sys_Bool_val __self){ return 0; }
-sys_Str sys_Bool_toStr0(fr_Env __env, sys_Bool_ref __self){ return 0; }
-sys_Str sys_Bool_toStr0_val(fr_Env __env, sys_Bool_val __self){ return 0; }
+sys_Str sys_Bool_toStr0(fr_Env __env, sys_Bool_ref __self){
+    return sys_Bool_toStr0_val(__env, __self->val);
+}
+sys_Str sys_Bool_toStr0_val(fr_Env __env, sys_Bool_val __self){
+    if (__self) {
+        return fr_newStrUtf8(__env, "true");
+    } else {
+        return fr_newStrUtf8(__env, "false");
+    }
+}
 sys_Str sys_Bool_toLocale0(fr_Env __env, sys_Bool_ref __self){ return 0; }
 sys_Str sys_Bool_toLocale0_val(fr_Env __env, sys_Bool_val __self){ return 0; }
 sys_Bool sys_Bool_not0(fr_Env __env, sys_Bool_ref __self){ return 0; }

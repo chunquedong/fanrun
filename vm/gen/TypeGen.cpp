@@ -128,8 +128,9 @@ void TypeGen::genVTable(Printer *printer) {
 }
 
 void TypeGen::genTypeMetadata(Printer *printer) {
-    std::string &typeName = type->c_pod->names[type->meta.self];
-    printer->println("((fr_Class)vtable)->name = \"%s\";", typeName.c_str());
+    FTypeRef &typeRef = type->c_pod->typeRefs[type->meta.self];
+    std::string &rawTypeName = type->c_pod->names[typeRef.typeName];
+    printer->println("((fr_Class)vtable)->name = \"%s\";", rawTypeName.c_str());
     
     printer->println("((fr_Class)vtable)->allocSize = sizeof(struct %s_struct);", name.c_str());
     
@@ -197,31 +198,16 @@ void TypeGen::genVTableInit(Printer *printer) {
     if (!isRootType) {
         for (int i=0; i<type->methods.size(); ++i) {
             FMethod *method = &type->methods[i];
-            if ((method->flags & FFlags::Ctor) != 0 || (method->flags & FFlags::Static) != 0) {
+            if ((method->flags & FFlags::Override) == 0) {
                 continue;
             }
-            std::string raw_name = podGen->pod->names[method->name];
-            if (name == "sys_Type" && raw_name == "make") {
+            std::string rawMethodName = podGen->pod->names[method->name];
+            if (name == "sys_Type" && rawMethodName == "make") {
                 continue;
             }
             
-            if (isOverrideFrom(type->meta.base, raw_name)) {
-                MethodGen gmethod(this, method);
-                for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
-                    printer->println("vtable->super__.%s%d = %s_%s%d;", gmethod.name.c_str(),
-                                     j, name.c_str(), gmethod.name.c_str(), j);
-                }
-            }
-            for (int i=0; i<type->meta.mixin.size(); ++i) {
-                if (isOverrideFrom(type->meta.mixin[i], raw_name)) {
-                    MethodGen gmethod(this, method);
-                    std::string base = podGen->getTypeRefName(type->meta.mixin[i]);
-                    for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
-                        printer->println("vtable->%s_super__.%s%d = %s_%s%d;", base.c_str(), gmethod.name.c_str(),
-                                         j, name.c_str(), gmethod.name.c_str(), j);
-                    }
-                }
-            }
+            MethodGen gmethod(this, method);
+            genOverrideVTable(type->meta.base, rawMethodName, printer, gmethod, "vtable->");
         }
     }
     
@@ -259,13 +245,37 @@ void TypeGen::genTypeInit(Printer *printer) {
     printer->println("}");
 }
 
-bool TypeGen::isOverrideFrom(uint16_t tid, std::string &name) {
+void TypeGen::genOverrideVTable(uint16_t tid, std::string &rawMethodName
+                                , Printer *printer, MethodGen &gmethod, std::string from) {
     FTypeRef &typeRef = podGen->pod->typeRefs[tid];
     std::string &podName = podGen->pod->names[typeRef.podName];
     std::string &typeName = podGen->pod->names[typeRef.typeName];
     FPod *tpod = podGen->podMgr->findPod(podName);
     FType *ttype = tpod->c_typeMap[typeName];
-    return ttype->c_methodMap.find(name) != ttype->c_methodMap.end();
+    
+    auto found = ttype->c_methodMap.find(rawMethodName);
+    
+    if (found != ttype->c_methodMap.end()) {
+        if ((found->second->flags & FFlags::Private)) {
+            return;
+        }
+        
+        for (int j=gmethod.beginDefaultParam; j<=gmethod.method->paramCount; ++j) {
+            printer->println("%ssuper__.%s%d = %s_%s%d;", from.c_str()
+                             , gmethod.name.c_str(),
+                             j, name.c_str(), gmethod.name.c_str(), j);
+        }
+    }
+    if (podName == "sys" && typeName == "Obj") return;
+    genOverrideVTable(ttype->meta.base, rawMethodName, printer, gmethod, from + "super__.");
+    
+    for (int i=0; i<type->meta.mixin.size(); ++i) {
+        uint16_t mixin = type->meta.mixin[i];
+        if (mixin == tid) continue;
+        std::string base = podGen->getTypeRefName(mixin);
+        from  = from + base + "_";
+        genOverrideVTable(mixin, rawMethodName, printer, gmethod, from);
+    }
 }
 
 void TypeGen::genMethodDeclare(Printer *printer) {

@@ -1,5 +1,5 @@
 #include "sys.h"
-
+#include <stdio.h>
 
 sys_Int_null sys_Int_fromStr1(fr_Env __env, sys_Str s) {
     return sys_Int_fromStr2(__env, s, 10);
@@ -101,8 +101,15 @@ sys_Int sys_Int_localeUpper0(fr_Env __env, sys_Int_ref __self){ return 0; }
 sys_Int sys_Int_localeUpper0_val(fr_Env __env, sys_Int_val __self){ return 0; }
 sys_Int sys_Int_localeLower0(fr_Env __env, sys_Int_ref __self){ return 0; }
 sys_Int sys_Int_localeLower0_val(fr_Env __env, sys_Int_val __self){ return 0; }
-sys_Str sys_Int_toStr0(fr_Env __env, sys_Int_ref __self){ return 0; }
-sys_Str sys_Int_toStr0_val(fr_Env __env, sys_Int_val __self){ return 0; }
+sys_Str sys_Int_toStr0(fr_Env __env, sys_Int_ref __self){
+    return sys_Int_toStr0_val(__env, __self->val);
+}
+sys_Str sys_Int_toStr0_val(fr_Env __env, sys_Int_val __self){
+    char buf[256];
+    snprintf(buf, 256, "%lld", __self);
+    return fr_newStrUtf8(__env, buf);
+}
+
 sys_Str sys_Int_toHex0(fr_Env __env, sys_Int_ref __self){ return 0; }
 sys_Str sys_Int_toHex1(fr_Env __env, sys_Int_ref __self, sys_Int_null width){ return 0; }
 sys_Str sys_Int_toHex0_val(fr_Env __env, sys_Int_val __self){ return 0; }
