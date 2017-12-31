@@ -7,7 +7,7 @@
 //
 
 #include "runtime.h"
-#include "Env.h"
+#include "Env.hpp"
 #include "Vm.hpp"
 
 Vm *fvm = nullptr;
@@ -38,9 +38,9 @@ fr_Obj fr_fromGcObj(GcObj *g) {
     return obj;
 }
 
-fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable) {
+fr_Obj fr_malloc(fr_Env self, fr_Class vtable) {
     Env *env = (Env*)self;
-    GcObj *gcobj = env->vm->getGc()->alloc(vtable, size);
+    GcObj *gcobj = env->vm->getGc()->alloc(vtable, vtable->allocSize);
     fr_Obj obj = (fr_Obj)(++gcobj);
     return obj;
 }
@@ -49,3 +49,17 @@ void fr_gc(fr_Env self) {
     Env *env = (Env*)self;
     env->vm->getGc()->collect();
 }
+
+void fr_addGlobalRef(fr_Env self, fr_Obj obj) {
+    Env *env = (Env*)self;
+    env->vm->getGc()->pinObj(fr_toGcObj(obj));
+}
+void fr_deleteGlobalRef(fr_Env self, fr_Obj obj) {
+    Env *env = (Env*)self;
+    env->vm->getGc()->unpinObj(fr_toGcObj(obj));
+}
+void fr_addStaticRef(fr_Env self, fr_Obj obj) {
+    Env *env = (Env*)self;
+    env->vm->addStaticRef(obj);
+}
+

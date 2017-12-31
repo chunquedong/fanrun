@@ -32,7 +32,7 @@ struct sys_Str_struct {
     size_t size;
     
     size_t hashCode;
-    char *utf8;
+    const char *utf8;
 };
 
 struct sys_StrBuf_struct {
@@ -78,6 +78,7 @@ struct sys_Pod_struct {
 
 struct sys_Type_struct {
     //struct sys_Obj_struct super__;
+    fr_Class rawClass;
 };
 
 #endif /* sys_native_h */

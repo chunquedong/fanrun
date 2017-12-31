@@ -10,12 +10,12 @@
 ** This represents a method return type which is
 ** always [this type]`docLang::Methods#thisReturns`.
 **
-native const final class FanThis
+const final class FanThis
 {
 
   **
   ** Private constructor.
   **
-  private new make()
+  private new make() {}
 
 }

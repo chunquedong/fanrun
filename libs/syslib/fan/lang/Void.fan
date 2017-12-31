@@ -9,12 +9,12 @@
 **
 ** Void is used to represent the absence of a return value in a Method.
 **
-native const final class FanVoid
+const final class FanVoid
 {
 
   **
   ** Private constructor.
   **
-  private new make()
+  private new make() {}
 
 }

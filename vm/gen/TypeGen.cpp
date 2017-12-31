@@ -97,7 +97,7 @@ void TypeGen::genVTable(Printer *printer) {
     std::string baseName = podGen->getTypeRefName(type->meta.base);
     
     if (name == "sys_Obj") {
-        printer->println("struct fr_Type_ super__;");
+        printer->println("struct fr_Class_ super__;");
     } else {
         printer->println("struct %s_vtable super__;", baseName.c_str());
     }
@@ -124,19 +124,21 @@ void TypeGen::genVTable(Printer *printer) {
     
     printer->println("};");
     
-    printer->println("struct %s_vtable *%s_class__(fr_Env __env);", name.c_str(), name.c_str());
+    printer->println("fr_Class %s_class__(fr_Env __env);", name.c_str());
 }
 
 void TypeGen::genTypeMetadata(Printer *printer) {
     std::string &typeName = type->c_pod->names[type->meta.self];
-    printer->println("((fr_Type)vtable)->name = \"%s\";", typeName.c_str());
+    printer->println("((fr_Class)vtable)->name = \"%s\";", typeName.c_str());
+    
+    printer->println("((fr_Class)vtable)->allocSize = sizeof(struct %s_struct);", name.c_str());
     
     std::string baseName = podGen->getTypeRefName(type->meta.base);
-    printer->println("((fr_Type)vtable)->base = (fr_Type)%s_class__(__env);", baseName.c_str());
+    printer->println("((fr_Class)vtable)->base = (fr_Class)%s_class__(__env);", baseName.c_str());
     
-    printer->println("((fr_Type)vtable)->fieldCount = %d;", type->fields.size());
+    printer->println("((fr_Class)vtable)->fieldCount = %d;", type->fields.size());
     
-    printer->println("((fr_Type)vtable)->methodCount = %d;", type->methods.size());
+    printer->println("((fr_Class)vtable)->methodCount = %d;", type->methods.size());
 }
 
 void TypeGen::genVTableInit(Printer *printer) {
@@ -163,13 +165,13 @@ void TypeGen::genVTableInit(Printer *printer) {
     for (int i=0; i<minxinSize; ++i) {
         base = podGen->getTypeRefName(type->meta.mixin[i]);
         printer->println("%s_initVTable(__env, &vtable->%s_super__);", base.c_str(), base.c_str());
-        printer->println("((fr_Type)vtable)->interfaceVTableMap[%d].type = %s_class__(__env);"
+        printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].type = %s_class__(__env);"
                          , i, base.c_str());
-        printer->println("((fr_Type)vtable)->interfaceVTableMap[%d].vtable = &vtable->%s_super__;"
+        printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].vtable = &vtable->%s_super__;"
                          , i, base.c_str());
     }
     
-    printer->println("((fr_Type)vtable)->mixinCount = %d;", minxinSize);
+    printer->println("((fr_Class)vtable)->mixinCount = %d;", minxinSize);
     
     genTypeMetadata(printer);
     
@@ -230,7 +232,7 @@ void TypeGen::genVTableInit(Printer *printer) {
 void TypeGen::genTypeInit(Printer *printer) {
     genVTableInit(printer);
     
-    printer->println("struct %s_vtable *%s_class__(fr_Env __env) {", name.c_str(), name.c_str());
+    printer->println("fr_Class %s_class__(fr_Env __env) {", name.c_str());
     printer->indent();
     
     printer->println("static struct %s_vtable *%s_class_instance = NULL;", name.c_str(), name.c_str());

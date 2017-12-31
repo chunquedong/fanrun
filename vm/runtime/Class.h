@@ -50,22 +50,22 @@ struct fr_Method {
     //Obj facetList;
 };
 
-typedef struct fr_Type_ *fr_Type;
+typedef struct fr_Class_ *fr_Class;
 struct fr_IVTableMapItem {
-    fr_Type type;
-    fr_Type vtable;
+    fr_Class type;
+    fr_Class vtable;
 };
 
 #define MAX_INTERFACE_SIZE 10
 
-typedef struct fr_Type_ {
+typedef struct fr_Class_ {
     const char *name;
     uint32_t flags;
     
     int allocSize;
-    void *sysType;
+    fr_Obj sysType;
   
-    struct fr_Type_ *base;
+    struct fr_Class_ *base;
     int mixinCount;
   
     int fieldCount;
@@ -80,14 +80,14 @@ typedef struct fr_Type_ {
     fr_Function finalize;
     
     struct fr_IVTableMapItem interfaceVTableMap[MAX_INTERFACE_SIZE];
-} *fr_Type;
+} *fr_Class;
 
-void fr_VTable_init(fr_Env self, fr_Type type);
+void fr_VTable_init(fr_Env env, fr_Class type);
 
-bool fr_isType(fr_Env self, fr_Obj obj, fr_Type type);
+bool fr_isClass(fr_Env env, fr_Obj obj, fr_Class type);
 
-fr_Type fr_getType(fr_Env self, fr_Obj obj);
+fr_Class fr_getClass(fr_Env env, fr_Obj obj);
 
-fr_Type fr_getInterfaceVTable(fr_Env self, fr_Obj obj, fr_Type itype);
+fr_Class fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Class itype);
 
 #endif /* defined(__fcode__Type__) */

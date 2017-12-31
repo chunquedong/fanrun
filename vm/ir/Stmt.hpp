@@ -204,14 +204,14 @@ public:
 
 class CoerceStmt : public Stmt {
 public:
-    enum CType { cast, boxing, unboxing, other };
+    enum CType { nonNull, boxing, unboxing, other };
     CType coerceType;
     Expr from;
     Expr to;
     uint16_t fromType;
     uint16_t toType;
     
-    CoerceStmt() : coerceType(cast), fromType(0), toType(0) {}
+    CoerceStmt() : coerceType(nonNull), fromType(0), toType(0) {}
     
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     

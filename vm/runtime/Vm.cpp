@@ -7,7 +7,7 @@
 //
 
 #include "Vm.hpp"
-#include "Env.h"
+#include "Env.hpp"
 #include "system.h"
 
 Vm::Vm() {
@@ -104,11 +104,11 @@ void Vm::resumeWorld() {
 }
 void Vm::printObj(GcObj *gcobj) {
     fr_Obj obj = fr_fromGcObj(gcobj);
-    fr_Type type = fr_getType(this, obj);
+    fr_Class type = fr_getClass(this, obj);
     printf("%s\n", type->name);
 }
 
 int Vm::allocSize(void *type) {
-    fr_Type t = (fr_Type)type;
+    fr_Class t = (fr_Class)type;
     return t->allocSize;
 }

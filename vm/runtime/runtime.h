@@ -17,6 +17,9 @@ extern  "C" {
 #include "miss.h"
 #include "Class.h"
 #include "gcobj.h"
+
+#include <stdlib.h>
+#include <stdlib.h>
 #include <setjmp.h>
 
 #define LONG_JMP_EXCEPTION
@@ -47,7 +50,10 @@ void fr_clearErr(fr_Env self);
 ////////////////////////////
 
 void fr_addGlobalRef(fr_Env self, fr_Obj obj);
-fr_Obj fr_malloc(fr_Env self, int size, fr_Type vtable);
+void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
+void fr_addStaticRef(fr_Env self, fr_Obj obj);
+    
+fr_Obj fr_malloc(fr_Env self, fr_Class vtable);
 void fr_gc(fr_Env self);
 GcObj *fr_toGcObj(fr_Obj obj);
 fr_Obj fr_fromGcObj(GcObj *g);
@@ -57,6 +63,9 @@ fr_Obj fr_fromGcObj(GcObj *g);
 ////////////////////////////
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj str);
+    
+fr_Obj fr_sysType(fr_Env env, fr_Class);
+void fr_throwNPE(fr_Env __env);
 
 ////////////////////////////
 // Buildin type
@@ -75,13 +84,18 @@ struct sys_Bool_struct {
     bool val;
 };
 
+fr_Obj fr_box_int(fr_Env, sys_Int_val val);
+fr_Obj fr_box_float(fr_Env, sys_Float_val val);
+fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
+
 ////////////////////////////
 // Other
 ////////////////////////////
-#define FR_TYPE(type) (type)(0)
-#define FR_TYPE_IS(obj, type) fr_isType(__env, obj, type##_class__(__env))
+
+#define FR_TYPE(type) fr_sysType(__env, type##_class__(__env))
+#define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__(__env))
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:0)
-#define FR_ALLOC(type) fr_malloc(__env, sizeof(struct type##_struct), type##_class__(__env))
+#define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__(__env)))
 
 #ifdef LONG_JMP_EXCEPTION
     #define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)))
@@ -95,15 +109,23 @@ struct sys_Bool_struct {
     #define FR_THROW(err) { fr_setErr(__env, err); throw std::exception();}
 #endif
 
-#define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getType(__env, self) )
+#define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
 #define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__(__env)) )
 
 #define FR_VCALL(type, method, self, ...)  _FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
 #define FR_ICALL(type, method, self, ...) _FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
 
-#define FR_BOX(val, fromType, toType) ((toType)val)
-#define FR_UNBOX(obj, fromType, toType) ((toType)obj)
-#define FR_CAST(obj, fromType, toType) ((toType)obj)
+#define FR_BOXING(tagert, value, fromType, toType) {\
+    fromType##_ref tmp##__LINE__ = FR_ALLOC(fromType);\
+    tmp##__LINE__->val = value;\
+    tagert = (toType)tmp##__LINE__;}
+
+#define FR_BOX_INT(tagert, value, fromType, toType) tagert = fr_box_int(__env, value)
+#define FR_BOX_FLOAT(tagert, value, fromType, toType) tagert = fr_box_float(__env, value)
+#define FR_BOX_BOOL(tagert, value, fromType, toType) tagert = fr_box_bool(__env, value)
+
+#define FR_UNBOXING(tagert, obj, fromType, toType) tagert = (((toType##_null)obj)->val)
+#define FR_NNULL(tagert, obj, fromType, toType) tagert = ( (toType)(obj?obj:(fr_throwNPE(__env),0)) )
 
 #ifdef  __cplusplus
 }

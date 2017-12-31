@@ -479,25 +479,38 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
 void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
     std::string typeName1 = FCodeUtil::getTypeRefName(curPod, fromType, true);
     std::string typeName2 = FCodeUtil::getTypeRefName(curPod, toType, true);
-    to.print(method, printer, pass);
+    
     switch (coerceType) {
-        case cast: {
-            printer.printf(" = FR_CAST(");
+        case nonNull: {
+            printer.printf("FR_NNULL(");
             break;
         }
         case boxing: {
-            printer.printf(" = FR_BOX(");
+            if (typeName1 == "sys_Int") {
+                printer.printf("FR_BOX_INT(");
+            }
+            else if (typeName1 == "sys_Float") {
+                printer.printf("FR_BOX_FLOAT(");
+            }
+            else if (typeName1 == "sys_Bool") {
+                printer.printf("FR_BOX_BOOL(");
+            }
+            else {
+                printer.printf("FR_BOXING(");
+            }
             break;
         }
         case unboxing: {
-            printer.printf(" = FR_UNBOX(");
+            printer.printf("FR_UNBOXING(");
             break;
         }
         default:
             break;
     }
+    to.print(method, printer, pass);
+    printer.printf(", ");
     from.print(method, printer, pass);
-    printer.printf(",%s,%s", typeName1.c_str(), typeName2.c_str());
+    printer.printf(", %s ,%s", typeName1.c_str(), typeName2.c_str());
     printer.printf(");");
 }
 

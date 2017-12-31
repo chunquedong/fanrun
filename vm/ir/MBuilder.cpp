@@ -194,7 +194,7 @@ CoerceStmt::CType MBuilder::typeCoerce(uint16_t from, uint16_t to) {
         return CoerceStmt::unboxing;
     }
     
-    return CoerceStmt::cast;
+    return CoerceStmt::nonNull;
 }
 
 void MBuilder::initJumpTarget() {

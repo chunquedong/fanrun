@@ -8,7 +8,6 @@
 
 #include "sys.h"
 
-
 void sys_Type_privateMake0(fr_Env __env, sys_Type_ref __self){ return; }
 sys_Type sys_Type_of1(fr_Env __env, sys_Obj obj){ return 0; }
 sys_Type_null sys_Type_find1(fr_Env __env, sys_Str qname){ return 0; }

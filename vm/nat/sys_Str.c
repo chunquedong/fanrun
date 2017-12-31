@@ -11,10 +11,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "utf8.h"
 #include <wchar.h>
+#include "utf8.h"
 
-static sys_Int hash(sys_Str str) {
+sys_Int strHash(sys_Str str) {
     sys_Int hashValue = 0;
     size_t i;
     for (i=0; i<str->size; ++i) {
@@ -92,42 +92,7 @@ size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
     return len;
 }
 
-//////////////////////////////////////////////////////////
-
-fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes) {
-    size_t len;
-    size_t size;
-    struct sys_Str_vtable *vtable;
-    len = strlen(bytes);
-    size = len + 1;
-    
-    vtable = sys_Str_class__(__env);
-    sys_Str str = fr_malloc(__env, sizeof(struct sys_Str_struct)
-                            , (fr_Type)vtable);
-    
-    //struct sys_Str_vtable *type = fr_getType(str);
-    
-    str->data = (wchar_t*)malloc(sizeof(wchar_t)*size);
-    //mbstowcs();
-    //str->size = mbstowcs(cstr, str->data, len);
-    str->size = utf8decode(bytes, str->data, size, NULL);
-    
-    str->hashCode = hash(str);
-    str->utf8 = NULL;
-    return str;
-}
-
-const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj) {
-    size_t size;
-    size_t realSize;
-    sys_Str str = (sys_Str)obj;
-    if (str->utf8) return str->utf8;
-    size = str->size * 4 + 1;
-    str->utf8 = malloc(size);
-    realSize = utf8encode(str->data, str->utf8, size, NULL);
-    str->utf8[realSize] = 0;
-    return str->utf8;
-}
+/////////////////////////////////////////////////////////////
 
 void sys_Str_privateMake0(fr_Env __env, sys_Str_ref __self){ return; }
 sys_Str sys_Str_fromChars1(fr_Env __env, sys_List chars){ return 0; }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		326165501FF8A578002174D6 /* Vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3261654F1FF8A578002174D6 /* Vm.cpp */; };
+		326165561FF8B97E002174D6 /* runtime_native.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 326165551FF8B97E002174D6 /* runtime_native.cpp */; };
 		3291F92F1F6D416C00F12438 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9221F6D416C00F12438 /* Env.cpp */; };
 		3291F9311F6D416C00F12438 /* runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9261F6D416C00F12438 /* runtime.cpp */; };
 		3291F9321F6D416C00F12438 /* Class.c in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9281F6D416C00F12438 /* Class.c */; };
@@ -75,9 +76,10 @@
 /* Begin PBXFileReference section */
 		3261654E1FF8A578002174D6 /* Vm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Vm.hpp; sourceTree = "<group>"; };
 		3261654F1FF8A578002174D6 /* Vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vm.cpp; sourceTree = "<group>"; };
+		326165551FF8B97E002174D6 /* runtime_native.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime_native.cpp; sourceTree = "<group>"; };
 		3291F9111F6D40C200F12438 /* run */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = run; sourceTree = BUILT_PRODUCTS_DIR; };
 		3291F9221F6D416C00F12438 /* Env.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Env.cpp; sourceTree = "<group>"; };
-		3291F9231F6D416C00F12438 /* Env.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Env.h; sourceTree = "<group>"; };
+		3291F9231F6D416C00F12438 /* Env.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Env.hpp; sourceTree = "<group>"; };
 		3291F9261F6D416C00F12438 /* runtime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime.cpp; sourceTree = "<group>"; };
 		3291F9271F6D416C00F12438 /* runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
 		3291F9281F6D416C00F12438 /* Class.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Class.c; sourceTree = "<group>"; };
@@ -207,7 +209,7 @@
 				3261654E1FF8A578002174D6 /* Vm.hpp */,
 				3261654F1FF8A578002174D6 /* Vm.cpp */,
 				3291F9221F6D416C00F12438 /* Env.cpp */,
-				3291F9231F6D416C00F12438 /* Env.h */,
+				3291F9231F6D416C00F12438 /* Env.hpp */,
 				3291F9261F6D416C00F12438 /* runtime.cpp */,
 				3291F9271F6D416C00F12438 /* runtime.h */,
 				3291F9281F6D416C00F12438 /* Class.c */,
@@ -348,6 +350,7 @@
 				32C107011FE6B47E006248C6 /* sys_ObjArray.c */,
 				32C107031FE6B491006248C6 /* sys_StrBuf.c */,
 				32C107081FE6BBD3006248C6 /* sys_native.h */,
+				326165551FF8B97E002174D6 /* runtime_native.cpp */,
 			);
 			path = nat;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 			files = (
 				3291F98A1F6D41DE00F12438 /* infback.c in Sources */,
 				32C106E71FE6ADCB006248C6 /* sys_Err.c in Sources */,
+				326165561FF8B97E002174D6 /* runtime_native.cpp in Sources */,
 				3291F98D1F6D41DE00F12438 /* inftrees.c in Sources */,
 				3291F9791F6D41DE00F12438 /* system.c in Sources */,
 				3291F98E1F6D41DE00F12438 /* trees.c in Sources */,
