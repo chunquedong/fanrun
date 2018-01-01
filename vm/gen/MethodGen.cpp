@@ -123,6 +123,10 @@ void MethodGen::genImples(Printer *printer) {
                 || (parent->type->meta.flags & FFlags::Native)) {
                 continue;
             }
+        } else {
+            if (parent->name == "sys_Func") {
+                continue;
+            }
         }
         genPrototype(printer, false, isVal, i);
         printer->println(" {");
@@ -136,6 +140,7 @@ void MethodGen::genImples(Printer *printer) {
             irMethod.print(*printer, 1);
             printer->unindent();
         } else {
+            
             FParamDefault *def = getParamDefault(i);
             if (def == nullptr) {
                 printf("ERROR: get param default fail\n");

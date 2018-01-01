@@ -26,6 +26,7 @@ void fr_VTable_init(fr_Env env, fr_Class type) {
     type->mixinCount = 0;
     type->allocSize = 0;
     type->sysType = NULL;
+    type->funcArity = 0;
 }
 
 fr_Class fr_getClass(fr_Env env, fr_Obj obj) {

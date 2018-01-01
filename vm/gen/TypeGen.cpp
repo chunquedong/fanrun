@@ -140,6 +140,14 @@ void TypeGen::genTypeMetadata(Printer *printer) {
     printer->println("((fr_Class)vtable)->fieldCount = %d;", type->fields.size());
     
     printer->println("((fr_Class)vtable)->methodCount = %d;", type->methods.size());
+    
+    if (baseName == "sys_Func") {
+        auto itr = type->c_methodMap.find("doCall");
+        if (itr != type->c_methodMap.end()) {
+            int funcArity = itr->second->paramCount;
+            printer->println("((fr_Class)vtable)->funcArity = %d;", funcArity);
+        }
+    }
 }
 
 void TypeGen::genVTableInit(Printer *printer) {

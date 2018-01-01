@@ -76,6 +76,9 @@ typedef struct fr_Class_ {
     
     int facetCount;
     //Obj facetList;
+    
+    //only for Func
+    int funcArity;
   
     fr_Function finalize;
     
