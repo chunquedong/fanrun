@@ -155,8 +155,8 @@ void Expr::print(IRMethod *method, Printer& printer, int pass) {
 bool Expr::isValueType(IRMethod *method) {
     switch (type) {
         case ExprType::constant: {
-            printf("ERROR:TODO");
-            return false;
+            std::string ctype = getConstantType();
+            return FCodeUtil::isValType(ctype);
             break;
         }
         case ExprType::localVar: {
@@ -512,35 +512,45 @@ void CoerceStmt::print(IRMethod *method, Printer& printer, int pass) {
     std::string typeName1 = FCodeUtil::getTypeRefName(curPod, fromType, true);
     std::string typeName2 = FCodeUtil::getTypeRefName(curPod, toType, true);
     
+    const char *name = "";
+    bool isPrefix = false;
     switch (coerceType) {
         case nonNull: {
-            printer.printf("FR_NNULL(");
+            name = "FR_NNULL(";
             break;
         }
         case boxing: {
             if (typeName1 == "sys_Int") {
-                printer.printf("FR_BOX_INT(");
+                name =("FR_BOX_INT(");
             }
             else if (typeName1 == "sys_Float") {
-                printer.printf("FR_BOX_FLOAT(");
+                name = ("FR_BOX_FLOAT(");
             }
             else if (typeName1 == "sys_Bool") {
-                printer.printf("FR_BOX_BOOL(");
+                name = ("FR_BOX_BOOL(");
             }
             else {
-                printer.printf("FR_BOXING(");
+                name = ("FR_BOXING(");
+                isPrefix = true;
             }
             break;
         }
         case unboxing: {
-            printer.printf("FR_UNBOXING(");
+            name = ("FR_UNBOXING(");
             break;
         }
         default:
             break;
     }
-    to.print(method, printer, pass);
-    printer.printf(", ");
+    if (isPrefix) {
+        printer.printf("%s", name);
+        to.print(method, printer, pass);
+        printer.printf(", ");
+    } else {
+        to.print(method, printer, pass);
+        printer.printf(" = ");
+        printer.printf("%s", name);
+    }
     from.print(method, printer, pass);
     printer.printf(", %s ,%s", typeName1.c_str(), typeName2.c_str());
     printer.printf(");");

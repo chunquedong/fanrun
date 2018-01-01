@@ -25,7 +25,8 @@ struct MethodGen {
     MethodGen(TypeGen *parent, FMethod *method);
     
     void genDeclares(Printer *printer, bool funcPtr, bool isValType);
-    void genImples(Printer *printer, bool funcPtr);
+    void genImples(Printer *printer);
+    void genImplesToVal(Printer *printer);
     void genStub(Printer *printer);
     
     void genRegisterWrap(Printer *printer);
@@ -33,7 +34,6 @@ struct MethodGen {
 private:
     bool genPrototype(Printer *printer, bool funcPtr, bool isValType, int i);
     FParamDefault *getParamDefault(int i);
-    void genImplesForVal(Printer *printer, bool funcPtr);
     void genMethodStub(Printer *printer, bool isValType, int i);
 };
 

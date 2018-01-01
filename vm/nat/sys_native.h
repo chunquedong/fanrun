@@ -38,18 +38,26 @@ struct sys_Str_struct {
 struct sys_StrBuf_struct {
     //struct sys_Obj_struct super__;
     sys_Int capacity;
+    wchar_t *data;
+    sys_Int size;
 };
 
 struct sys_ByteArray_struct {
     //struct sys_Obj_struct super__;
+    sys_Int size;
+    char *data;
 };
 
 struct sys_IntArray_struct {
     //struct sys_Obj_struct super__;
+    sys_Int size;
+    sys_Int *data;
 };
 
 struct sys_ObjArray_struct {
     //struct sys_Obj_struct super__;
+    sys_Int size;
+    fr_Obj *data;
 };
 
 struct sys_Slot_struct {

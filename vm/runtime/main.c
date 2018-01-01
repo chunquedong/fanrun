@@ -13,10 +13,9 @@
 
 int main() {
     fr_Env env = fr_getEnv();
-    sys_init__(env);
     testlib_init__(env);
     
-    testlib_BoxingTest_main0(env);
+    testlib_StmtTest_main0(env);
     fr_releaseEnv(env);
 }
 

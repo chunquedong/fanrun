@@ -150,6 +150,12 @@ void PodGen::genStaticInit(Printer *printer) {
     printer->println("if (inited) { printf(\"ERROR: pod already inited\"); return; }");
     printer->println("inited = true;");
     
+    for (int i=0; i<pod->c_dependPods.size(); ++i) {
+        std::string& dep = pod->c_dependPods[i];
+        if (dep == podName) continue;
+        printer->println("%s_init__(__env);", dep.c_str());
+    }
+    
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
         printer->println("%s_class__ = (fr_Class)"

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <wctype.h>
 
 //////////////////////////////////////////////////////////
 extern "C" {
@@ -36,7 +37,20 @@ fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes) {
     str->utf8 = NULL;
     return str;
 }
-
+fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size) {
+    sys_Str str = FR_ALLOC(sys_Str);
+    
+    str->data = (wchar_t*)malloc(sizeof(wchar_t)*(size+1));
+    wcsncpy(str->data, data, size);
+    str->size = size;
+    str->hashCode = strHash(str);
+    str->utf8 = NULL;
+    return str;
+}
+fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data) {
+    size_t size = wcslen(data);
+    return fr_newStr(__env, data, size);
+}
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj) {
     size_t size;
     size_t realSize;
@@ -67,6 +81,9 @@ void fr_throwNPE(fr_Env __env) {
 }
 ////////////////////////////////////////////////////////////////
 #include <unordered_map>
+#include <mutex>
+
+std::mutex pool_mutex;
 
 fr_Obj fr_box_int(fr_Env __env, sys_Int_val val) {
     fr_Obj obj;
@@ -74,6 +91,9 @@ fr_Obj fr_box_int(fr_Env __env, sys_Int_val val) {
     if ((val < 256 && val > -256)
         || val == sys_Int_maxVal
         || val == sys_Int_minVal) {
+        
+        std::lock_guard<std::mutex> lock(pool_mutex);
+        
         auto itr = map.find(val);
         if (itr != map.end()) {
             return itr->second;
@@ -95,6 +115,9 @@ fr_Obj fr_box_float(fr_Env __env, sys_Float_val val) {
          || val == sys_Float_pi
          || val == sys_Float_negInf
          || val == sys_Float_posInf) {
+        
+        std::lock_guard<std::mutex> lock(pool_mutex);
+        
         auto itr = map.find(val);
         if (itr != map.end()) {
             return itr->second;
@@ -112,6 +135,7 @@ fr_Obj fr_box_bool(fr_Env __env, sys_Bool_val val) {
     static fr_Obj trueObj = nullptr;
     static fr_Obj falseObj = nullptr;
     if (!trueObj) {
+        std::lock_guard<std::mutex> lock(pool_mutex);
         FR_BOXING(trueObj, true, sys_Bool, sys_Obj);
         FR_BOXING(falseObj, false, sys_Bool, sys_Obj);
         fr_addStaticRef(__env, trueObj);

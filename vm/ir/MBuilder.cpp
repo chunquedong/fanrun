@@ -43,7 +43,7 @@ void MBuilder::rewriteLocals() {
     }
 }
 
-bool MBuilder::buildDefParam(FMethod *method, int paramNum) {
+bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
     if (paramNum < 0 || paramNum >= method->paramCount) {
         printf("ERROR paramNum out of index\n");
         return false;
@@ -93,6 +93,9 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum) {
                                                        , method->c_parent->meta.self, false);
             stmt->mthName = FCodeUtil::getIdentifierName(curPod, method->name);
             stmt->mthName += std::to_string(paramNum+1);
+            if (isVal) {
+                stmt->mthName += "_val";
+            }
             
             for (int i=0; i<irMethod.paramCount+1; ++i) {
                 Expr expr;

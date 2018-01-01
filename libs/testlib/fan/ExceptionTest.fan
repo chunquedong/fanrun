@@ -62,7 +62,8 @@ class ExceptionTest
   }
 
   static Void main() {
-    r := test(0)
+    r := test(6)
+    echo(r)
   }
 }
 

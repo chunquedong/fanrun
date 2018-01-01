@@ -114,9 +114,17 @@ void MethodGen::genDeclares(Printer *printer, bool funcPtr, bool isValType) {
     }
 }
 
-void MethodGen::genImples(Printer *printer, bool funcPtr) {
+void MethodGen::genImples(Printer *printer) {
+    bool isVal = !isStatic && FCodeUtil::isValType(parent->name);
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
-        genPrototype(printer, funcPtr, false, i);
+        if (i == method->paramCount) {
+            if ((method->flags & FFlags::Native)
+                || (method->flags & FFlags::Abstract)
+                || (parent->type->meta.flags & FFlags::Native)) {
+                continue;
+            }
+        }
+        genPrototype(printer, false, isVal, i);
         printer->println(" {");
         if (i == method->paramCount) {
             IRMethod irMethod(parent->podGen->pod, method);
@@ -136,7 +144,7 @@ void MethodGen::genImples(Printer *printer, bool funcPtr) {
             IRMethod irMethod(parent->podGen->pod, method);
             irMethod.name = this->name;
             MBuilder builder(def->opcodes, irMethod);
-            builder.buildDefParam(method, i);
+            builder.buildDefParam(method, i, isVal);
             
             printer->indent();
             irMethod.print(*printer, 1);
@@ -144,42 +152,30 @@ void MethodGen::genImples(Printer *printer, bool funcPtr) {
         }
         printer->println("}");
     }
-    
-    if (!isStatic && FCodeUtil::isValType(parent->name)) {
-        genImplesForVal(printer, funcPtr);
-    }
 }
 
-void MethodGen::genImplesForVal(Printer *printer, bool funcPtr) {
+void MethodGen::genImplesToVal(Printer *printer) {
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
-        genPrototype(printer, funcPtr, true, i);
+        genPrototype(printer, false, false, i);
         printer->println(" {");
-        if (i == method->paramCount) {
-            IRMethod irMethod(parent->podGen->pod, method);
-            irMethod.name = this->name;
-            MBuilder builder(method->code, irMethod);
-            builder.buildMethod(method);
-            
-            printer->indent();
-            irMethod.print(*printer, 1);
-            printer->unindent();
-        } else {
-            /*
-            FParamDefault *def = getParamDefault(i);
-            if (def == nullptr) {
-                printf("ERROR: get param default fail\n");
-                return;
-            }
-            IRMethod irMethod(parent->podGen->pod, method);
-            irMethod.name = this->name;
-            MBuilder builder(def->opcodes, irMethod);
-            builder.buildDefParam(method, i);
-            
-            printer->indent();
-            irMethod.print(*printer, 1);
-            printer->unindent();
-             */
+        printer->indent();
+        
+        auto typeName = parent->podGen->getTypeRefName(method->returnType);
+        
+        if (typeName != "sys_Void") {
+            printer->printf("return ");
         }
+        
+        printer->printf("%s_%s%d_val(__env, __self->_val", parent->name.c_str(), name.c_str(), i);
+        
+        int paramNum = i;
+        for (int j=0; j<paramNum; ++j) {
+            FMethodVar &var = method->vars[j];
+            auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
+            printer->printf(", %s", var_name.c_str());
+        }
+        printer->println(");");
+        printer->unindent();
         printer->println("}");
     }
 }

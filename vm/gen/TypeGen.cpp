@@ -74,14 +74,13 @@ void TypeGen::genImple(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         
-        if ((type->meta.flags & FFlags::Native) != 0
-            || (method->flags & FFlags::Native) != 0
-            || (method->flags & FFlags::Abstract) != 0) {
-            continue;
-        }
-        
         MethodGen gmethod(this, method);
-        gmethod.genImples(printer, false);
+        
+        gmethod.genImples(printer);
+        
+        if (!gmethod.isStatic && FCodeUtil::isValType(name)) {
+            gmethod.genImplesToVal(printer);
+        }
         printer->newLine();
     }
     genTypeInit(printer);

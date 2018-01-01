@@ -13,8 +13,9 @@ bool fr_isClass(fr_Env env, fr_Obj obj, fr_Class type) {
     fr_Class tempType = fr_getClass(env, obj);
     while (true) {
         if (tempType == type) return true;
+        if (tempType == tempType->base) break;
         tempType = tempType->base;
-        if (!tempType) return false;
+        if (!tempType) break;
     }
     return false;
 }
@@ -28,6 +29,9 @@ void fr_VTable_init(fr_Env env, fr_Class type) {
 }
 
 fr_Class fr_getClass(fr_Env env, fr_Obj obj) {
+    if (!obj) {
+        fr_throwNPE(env);
+    }
     GcObj *g = fr_toGcObj(obj);
     //return obj->super.header;
     fr_Class type = (fr_Class)gc_getType(g);
