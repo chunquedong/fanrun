@@ -14,5 +14,5 @@ sys_Int sys_ByteArray_get1(fr_Env __env, sys_ByteArray_ref __self, sys_Int pos){
 sys_Int sys_ByteArray_set2(fr_Env __env, sys_ByteArray_ref __self, sys_Int pos, sys_Int val){ return 0; }
 sys_Int sys_ByteArray_size0(fr_Env __env, sys_ByteArray_ref __self){ return 0; }
 sys_Bool sys_ByteArray_realloc1(fr_Env __env, sys_ByteArray_ref __self, sys_Int newSize){ return 0; }
-sys_This sys_ByteArray_copyFrom4(fr_Env __env, sys_ByteArray_ref __self, sys_ByteArray that, sys_Int thatOffset, sys_Int thisOffset, sys_Int length){ return 0; }
+sys_ByteArray sys_ByteArray_copyFrom4(fr_Env __env, sys_ByteArray_ref __self, sys_ByteArray that, sys_Int thatOffset, sys_Int thisOffset, sys_Int length){ return 0; }
 void sys_ByteArray_finalize0(fr_Env __env, sys_ByteArray_ref __self){ return; }

@@ -32,6 +32,11 @@ jmp_buf *fr_popJmpBuf(fr_Env self) {
     env->exception.pop_back();
     return &back.buf;
 }
+jmp_buf *fr_topJmpBuf(fr_Env self) {
+    Env *env = (Env*)self;
+    JmpBuf &back = env->exception.back();
+    return &back.buf;
+}
 #endif
 
 fr_Obj fr_getErr(fr_Env self) {

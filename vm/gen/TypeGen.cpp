@@ -69,6 +69,9 @@ void TypeGen::genInline(Printer *printer) {
 }
 
 void TypeGen::genImple(Printer *printer) {
+    
+    //if (name != "sys_Enum") return;
+    
     genStaticField(printer, false);
     printer->newLine();
     for (int i=0; i<type->methods.size(); ++i) {
@@ -125,6 +128,9 @@ void TypeGen::genVTable(Printer *printer) {
     
     //printer->println("fr_Class %s_class__(fr_Env __env);", name.c_str());
     printer->println("extern fr_Class %s_class__;", name.c_str());
+    
+    printer->println("void %s_initVTable(fr_Env __env, struct %s_vtable *vtable);"
+                     , name.c_str(), name.c_str());
 }
 
 void TypeGen::genTypeMetadata(Printer *printer) {
@@ -176,7 +182,7 @@ void TypeGen::genVTableInit(Printer *printer) {
         printer->println("%s_initVTable(__env, &vtable->%s_super__);", base.c_str(), base.c_str());
         printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].type = %s_class__;"
                          , i, base.c_str());
-        printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].vtable = &vtable->%s_super__;"
+        printer->println("((fr_Class)vtable)->interfaceVTableMap[%d].vtable = (fr_Class)&vtable->%s_super__;"
                          , i, base.c_str());
     }
     
@@ -271,10 +277,14 @@ void TypeGen::genOverrideVTable(uint16_t tid, std::string &rawMethodName
             return;
         }
         
+        //FMethod *parentMethod = found->second;
         for (int j=gmethod.beginDefaultParam; j<=gmethod.method->paramCount; ++j) {
-            printer->println("%ssuper__.%s%d = %s_%s%d;", from.c_str()
-                             , gmethod.name.c_str(),
-                             j, name.c_str(), gmethod.name.c_str(), j);
+            //FMethodVar methVar = parentMethod->vars.at(j-1);
+            //std::string varType = FCodeUtil::getTypeRefName(podGen->pod
+            //                                                , methVar.type, true);
+            printer->println("*((int**)(&(%ssuper__.%s%d))) = (int*)%s_%s%d;", from.c_str()
+                             , gmethod.name.c_str(), j
+                             , name.c_str(), gmethod.name.c_str(), j);
         }
     }
     if (podName == "sys" && typeName == "Obj") return;

@@ -631,7 +631,7 @@ final class FanMap
         itr = itr.next
       }
     }
-    return this
+    return null
   }
 
   **

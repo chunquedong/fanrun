@@ -76,6 +76,9 @@ bool MethodGen::genPrototype(Printer *printer, bool funcPtr, bool isValType, int
     if (typeName == "sys_Void") {
         typeName = "void";
     }
+    else if (typeName == "sys_This") {
+        typeName = parent->name;
+    }
     
     const char *valFlag = "";
     if (isValType) valFlag = "_val";

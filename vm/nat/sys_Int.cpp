@@ -14,9 +14,9 @@ sys_Int_null sys_Int_fromStr3(fr_Env __env, sys_Str s, sys_Int radix, sys_Bool c
     sys_Int res = wcstoll(s->data, &str_end, (int)radix);
     if (checked && str_end == s->data) {
         sys_ParseErr e = FR_ALLOC(sys_ParseErr);
-        FR_THROW(e);
+        throw(e);
     }
-    return fr_box_int(__env, res);
+    return (sys_Int_null)fr_box_int(__env, res);
 }
 //sys_Int sys_Int_random0(fr_Env __env){
 //    return sys_Int_random1(__env, NULL);
@@ -76,7 +76,7 @@ sys_Float sys_Int_multFloat1_val(fr_Env __env, sys_Int_val __self, sys_Float b){
 sys_Int sys_Int_div1_val(fr_Env __env, sys_Int_val __self, sys_Int b){
     if (b == 0) {
         sys_Err e = FR_ALLOC(sys_Err);
-        FR_THROW(e);
+        throw(e);
     }
     return __self / b;
 }
@@ -131,7 +131,7 @@ sys_Int sys_Int_max1_val(fr_Env __env, sys_Int_val __self, sys_Int that){
 sys_Int sys_Int_pow1_val(fr_Env __env, sys_Int_val __self, sys_Int pow){
     if (pow < 0) {
         sys_ArgErr e = FR_ALLOC(sys_ArgErr);
-        FR_THROW(e);
+        throw(e);
     }
     return powf(__self, pow);
 }
@@ -184,7 +184,7 @@ sys_Int_null sys_Int_toDigit1_val(fr_Env __env, sys_Int_val __self, sys_Int radi
     const wchar_t *str= L"0123456789abcdef";
     if (__self < 16 && __self < radix) {
         sys_Int res = str[__self];
-        return fr_box_int(__env, res);
+        return (sys_Int_null)fr_box_int(__env, res);
     }
     return NULL;
 }
@@ -197,18 +197,18 @@ sys_Int_null sys_Int_fromDigit1_val(fr_Env __env, sys_Int_val __self, sys_Int ra
     if (radix == 10) {
         if (c >= L'0' && c <= L'9') {
             res = c - L'0';
-            return fr_box_int(__env, res);
+            return (sys_Int_null)fr_box_int(__env, res);
         }
     }
     else if (radix == 16) {
         if (c >= L'0' && c <= L'9') {
             res = c - L'0';
-            return fr_box_int(__env, res);
+            return (sys_Int_null)fr_box_int(__env, res);
         }
         c = towlower(c);
         if (c >= L'a' && c <= L'f') {
             res = (c - L'a')+10;
-            return fr_box_int(__env, res);
+            return (sys_Int_null)fr_box_int(__env, res);
         }
     }
     return NULL;
@@ -233,7 +233,7 @@ sys_Int sys_Int_localeLower0_val(fr_Env __env, sys_Int_val __self){
 sys_Str sys_Int_toStr0_val(fr_Env __env, sys_Int_val __self){
     wchar_t buf[256];
     swprintf(buf, 256, L"%lld", __self);
-    return fr_newStrNT(__env, buf);
+    return (sys_Str)fr_newStrNT(__env, buf);
 }
 
 //sys_Str sys_Int_toHex0_val(fr_Env __env, sys_Int_val __self){
@@ -251,7 +251,7 @@ sys_Str sys_Int_toHex1_val(fr_Env __env, sys_Int_val __self, sys_Int_null width)
         snprintf(format, 256, "%%0%lldllx", __self);
         snprintf(buf, 256, format, __self);
     }
-    return fr_newStrUtf8(__env, buf);
+    return (sys_Str)fr_newStrUtf8(__env, buf);
 }
 //sys_Str sys_Int_toRadix1_val(fr_Env __env, sys_Int_val __self, sys_Int radix){
 //    return sys_Int_toRadix2_val(__env, __self, radix, NULL);
@@ -267,17 +267,18 @@ sys_Str sys_Int_toRadix2_val(fr_Env __env, sys_Int_val __self, sys_Int radix, sy
             snprintf(format, 256, "%%0%lldlld", __self);
             snprintf(buf, 256, format, __self);
         }
-        return fr_newStrUtf8(__env, buf);
+        return (sys_Str)fr_newStrUtf8(__env, buf);
     }
     else if (radix == 16) {
         return sys_Int_toHex1_val(__env, __self, width);
     }
     FR_ALLOC_THROW(sys_UnsupportedErr);
+    return NULL;
 }
 sys_Str sys_Int_toChar0_val(fr_Env __env, sys_Int_val __self){
     wchar_t buf[256];
     swprintf(buf, 256, L"%c", (wchar_t)__self);
-    return fr_newStrNT(__env, buf);
+    return (sys_Str)fr_newStrNT(__env, buf);
 }
 //sys_Str sys_Int_toCode0_val(fr_Env __env, sys_Int_val __self){
 //    return sys_Int_toCode1_val(__env, __self, 10);
@@ -286,19 +287,20 @@ sys_Str sys_Int_toCode1_val(fr_Env __env, sys_Int_val __self, sys_Int base){
     if (base == 10) {
         char buf[256];
         snprintf(buf, 256, "%lld", __self);
-        return fr_newStrUtf8(__env, buf);
+        return (sys_Str)fr_newStrUtf8(__env, buf);
     }
     else if (base == 16) {
         char buf[256];
         snprintf(buf, 256, "%llx", __self);
-        return fr_newStrUtf8(__env, buf);
+        return (sys_Str)fr_newStrUtf8(__env, buf);
     }
     FR_ALLOC_THROW(sys_UnsupportedErr);
+    return NULL;
 }
 void sys_Int_times1_val(fr_Env __env, sys_Int_val __self, sys_Func c){
     for (int i=0; i<__self; ++i) {
         fr_Obj a = fr_box_int(__env, i);
-        FR_VCALL(sys_Func, call1, c, a);
+        FR_VCALL(sys_Func, call1, c, (sys_Obj)a);
     }
 }
 void sys_Int_make0_val(fr_Env __env, sys_Int_val __self){

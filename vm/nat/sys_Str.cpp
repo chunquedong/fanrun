@@ -12,8 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-#include "utf8.h"
 
+extern "C" {
+#include "utf8.h"
 sys_Int strHash(sys_Str str) {
     sys_Int hashValue = 0;
     size_t i;
@@ -91,7 +92,7 @@ size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
     
     return len;
 }
-
+}//extern "C" {
 /////////////////////////////////////////////////////////////
 
 void sys_Str_privateMake0(fr_Env __env, sys_Str_ref __self){
@@ -151,7 +152,7 @@ sys_Int_null sys_Str_index2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int
     wchar_t *found = wcsstr(str, s->data);
     if (!found) return NULL;
     sys_Int diff = (found - __self->data);
-    return fr_box_int(__env, diff);
+    return (sys_Int_null)fr_box_int(__env, diff);
 }
 //sys_Int_null sys_Str_indexr1(fr_Env __env, sys_Str_ref __self, sys_Str s){ return 0; }
 sys_Int_null sys_Str_indexr2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int offset){ return 0; }
@@ -245,7 +246,7 @@ sys_Str sys_Str_toCode2(fr_Env __env, sys_Str_ref __self, sys_Int_null quote, sy
 sys_Str sys_Str_toXml0(fr_Env __env, sys_Str_ref __self){ return 0; }
 void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){
     free(__self->data);
-    free(__self->utf8);
+    free((void*)__self->utf8);
     __self->data = NULL;
     __self->utf8 = NULL;
     __self->size = 0;
@@ -253,5 +254,5 @@ void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){
     return;
 }
 void sys_Str_static__init0(fr_Env __env){
-    sys_Str_defVal = fr_newStrUtf8(__env, "");
+    sys_Str_defVal = (sys_Str)fr_newStrUtf8(__env, "");
 }

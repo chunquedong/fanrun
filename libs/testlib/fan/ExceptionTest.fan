@@ -13,6 +13,52 @@ class ExceptionTest
     return res
   }
 
+  static Int test2() {
+    try {
+      return 1
+    }
+    catch {}
+    return 0
+  }
+
+  static Int test3() {
+    try {
+      return 2
+    }
+    catch {
+      return 3
+    }
+    return 0
+  }
+
+  static Int test4() {
+    res := 0
+    try {
+      return 2
+    }
+    catch {
+      return 3
+    }
+    finally {
+      res = 4
+    }
+    return res
+  }
+
+  static Int test5() {
+    res := 0
+    try {
+      return 2
+    }
+    catch (Err e) {
+      return 3
+    }
+    finally {
+      res = 4
+    }
+    return res
+  }
+
   static Int testNest() {
     res := 100
     try {

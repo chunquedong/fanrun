@@ -14,10 +14,10 @@
 //}
 sys_Bool_null sys_Bool_fromStr2(fr_Env __env, sys_Str s, sys_Bool checked){
     if (wcsncmp(s->data, L"true", s->size) == 0) {
-        return fr_box_bool(__env, true);
+        return (sys_Bool_null)fr_box_bool(__env, true);
     }
     else if (wcsncmp(s->data, L"false", s->size) == 0) {
-        return fr_box_bool(__env, false);
+        return (sys_Bool_null)fr_box_bool(__env, false);
     }
     if (checked) {
         FR_ALLOC_THROW(sys_ParseErr);
@@ -38,9 +38,9 @@ sys_Int sys_Bool_hash0_val(fr_Env __env, sys_Bool_val __self){
 }
 sys_Str sys_Bool_toStr0_val(fr_Env __env, sys_Bool_val __self){
     if (__self) {
-        return fr_newStrNT(__env, L"true");
+        return (sys_Str)fr_newStrNT(__env, L"true");
     } else {
-        return fr_newStrNT(__env, L"false");
+        return (sys_Str)fr_newStrNT(__env, L"false");
     }
 }
 sys_Str sys_Bool_toLocale0_val(fr_Env __env, sys_Bool_val __self){

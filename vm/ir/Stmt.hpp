@@ -53,6 +53,7 @@ public:
     };
     std::string getConstantType();
     void print(IRMethod *method, Printer& printer, int pass);
+    std::string getTypeName(IRMethod *method);
     bool isValueType(IRMethod *method);
 };
 
@@ -104,7 +105,7 @@ public:
 
 class CallStmt : public Stmt {
 public:
-    //FMethodRef *methodRef;
+    FMethodRef *methodRef;
     //FMethod *method;
     
     std::string typeName;
@@ -116,6 +117,11 @@ public:
     bool isStatic;
     bool isVirtual;
     bool isMixin;
+    
+    //for compare which no methodRef
+    std::vector<std::string> argsType;
+    
+    CallStmt() : methodRef(NULL) {}
     
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     

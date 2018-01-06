@@ -126,6 +126,32 @@ std::string Expr::getConstantType() {
     return res;
 }
 
+std::string Expr::getTypeName(IRMethod *method) {
+    switch (type) {
+        case ExprType::constant: {
+            return "";
+        }
+        case ExprType::localVar: {
+            if (varRef.block == -1) {
+                Var &var = method->locals[varRef.index];
+                return var.typeName;
+            } else {
+                printf("ERROR: block is %d\n", varRef.block);
+            }
+            break;
+        }
+        case ExprType::tempVar: {
+            Block *block = method->blocks[varRef.block];
+            Var &var = block->locals[varRef.index];
+            return var.typeName;
+            break;
+        }
+        default:
+            break;
+    }
+    return "";
+}
+
 void Expr::print(IRMethod *method, Printer& printer, int pass) {
     switch (type) {
         case ExprType::constant: {
@@ -183,6 +209,7 @@ bool Expr::isValueType(IRMethod *method) {
 void StoreStmt::print(IRMethod *method, Printer& printer, int pass) {
     dst.print(method, printer, pass);
     printer.printf(" = ");
+    printer.printf("(%s)", dst.getTypeName(method).c_str());
     src.print(method, printer, pass);
     printer.printf(";");
 }
@@ -207,6 +234,30 @@ void CallStmt::print(IRMethod *method, Printer& printer, int pass) {
     
     for (int i=0; i<params.size(); ++i) {
         printer.printf(",");
+        std::string varTypeName;
+        int j = -1;
+        if (isStatic) {
+            j = i;
+        }
+        else if (i > 0) {
+            j = i - 1;
+        }
+        else if (methodRef) {
+            varTypeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, true);
+        }
+        
+        if (j >= 0) {
+            if (methodRef) {
+                uint16_t var = methodRef->params.at(j);
+                //FTypeRef vart = curPod->typeRefs[var];
+                varTypeName = FCodeUtil::getTypeRefName(curPod, var, true);
+            } else if (argsType.size() > 0) {
+                varTypeName = argsType.at(j);
+            }
+        }
+        if (varTypeName.size() > 0) {
+            printer.printf("(%s)", varTypeName.c_str());
+        }
         params[i].print(method, printer, pass);
     }
     printer.printf(");");
@@ -254,9 +305,14 @@ void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
             printer.printf(") goto ");
         }
             break;
-        case finallyJmp:
+        case finallyJmp: {
+            //printer.println("fr_clearErr(__env);");
+            //printer.println("FR_LEAVE");
+            printer.printf("goto ");
+        }
+            break;
         case leaveJmp : {
-            printer.println("fr_clearErr(__env);");
+            //printer.println("FR_LEAVE");
             printer.printf("goto ");
         }
             break;
@@ -275,15 +331,17 @@ void AllocStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void CmpStmt::print(IRMethod *method, Printer& printer, int pass) {
-    FTypeRef &typeRef1 = curPod->typeRefs[opObj.i1];
-    FTypeRef &typeRef2 = curPod->typeRefs[opObj.i2];
-    bool isVal1, isVal2, isNullable1, isNullable2;
-    FCodeUtil::getTypeInfo(curPod, typeRef1, isVal1, isNullable1);
-    FCodeUtil::getTypeInfo(curPod, typeRef2, isVal2, isNullable2);
-    
     bool direct = false;
-    if (isVal1 && !isNullable1 && isVal2 && !isNullable2) {
-        direct = true;
+    if (opObj.i1 > 0 || opObj.i2 > 0) {
+        FTypeRef &typeRef1 = curPod->typeRefs[opObj.i1];
+        FTypeRef &typeRef2 = curPod->typeRefs[opObj.i2];
+        bool isVal1, isVal2, isNullable1, isNullable2;
+        FCodeUtil::getTypeInfo(curPod, typeRef1, isVal1, isNullable1);
+        FCodeUtil::getTypeInfo(curPod, typeRef2, isVal2, isNullable2);
+        
+        if (isVal1 && !isNullable1 && isVal2 && !isNullable2) {
+            direct = true;
+        }
     }
     
     result.print(method, printer, pass);
@@ -292,6 +350,7 @@ void CmpStmt::print(IRMethod *method, Printer& printer, int pass) {
     if (direct) {
         switch (opObj.opcode) {
             case FOp::CompareEQ: {
+                
                 param1.print(method, printer, pass);
                 printer.printf(" == ");
                 param2.print(method, printer, pass);
@@ -363,63 +422,67 @@ void CmpStmt::print(IRMethod *method, Printer& printer, int pass) {
     } else {
         switch (opObj.opcode) {
             case FOp::CompareEQ: {
-                printer.printf("FR_VCALL(sys_Obj, equals1, ");
+                printer.printf("FR_VCALL(sys_Obj, equals1, (sys_Obj)");
                 param1.print(method, printer, pass);
-                printer.printf(",");
+                printer.printf(", (sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(");");
                 break;
             }
             case FOp::CompareNE: {
-                printer.printf("!(FR_VCALL(sys_Obj, equals1, ");
+                printer.printf("!(FR_VCALL(sys_Obj, equals1, (sys_Obj)");
                 param1.print(method, printer, pass);
-                printer.printf(",");
+                printer.printf(", (sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf("));");
                 break;
             }
             case FOp::CompareLT: {
-                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                printer.printf("(FR_VCALL(sys_Obj, compare1, (sys_Obj)");
                 param1.print(method, printer, pass);
-                printer.printf(",");
+                printer.printf(", (sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(")) < 0;");
                 break;
             }
             case FOp::CompareLE: {
-                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                printer.printf("(FR_VCALL(sys_Obj, compare1, (sys_Obj)");
                 param1.print(method, printer, pass);
-                printer.printf(",");
+                printer.printf(", (sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(")) <= 0;");
                 break;
             }
             case FOp::CompareGE: {
-                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                printer.printf("(FR_VCALL(sys_Obj, compare1, (sys_Obj)");
                 param1.print(method, printer, pass);
-                printer.printf(",");
+                printer.printf(", (sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(")) >= 0;");
                 break;
             }
             case FOp::CompareGT: {
-                printer.printf("(FR_VCALL(sys_Obj, compare1, ");
+                printer.printf("(FR_VCALL(sys_Obj, compare1, (sys_Obj)");
                 param1.print(method, printer, pass);
-                printer.printf(",");
+                printer.printf(", (sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(")) > 0;");
                 break;
             }
             case FOp::CompareSame: {
+                printer.printf("(sys_Obj)");
                 param1.print(method, printer, pass);
                 printer.printf("==");
+                printer.printf("(sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(";");
                 break;
             }
             case FOp::CompareNotSame: {
+                printer.printf("(sys_Obj)");
                 param1.print(method, printer, pass);
                 printer.printf("!=");
+                printer.printf("(sys_Obj)");
                 param2.print(method, printer, pass);
                 printer.printf(";");
                 break;
@@ -451,7 +514,7 @@ void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void ThrowStmt::print(IRMethod *method, Printer& printer, int pass) {
-    printer.printf("FR_THROW(");
+    printer.printf("throw(");
     var.print(method, printer, pass);
     printer.printf(");");
 }
@@ -459,9 +522,10 @@ void ThrowStmt::print(IRMethod *method, Printer& printer, int pass) {
 void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
     switch (etype) {
         case TryStart:
-            printer.printf("FR_TRY {");
+            printer.printf("try {");
             break;
         case TryEnd: {
+            /*
             printer.println(";");//print NOP(no operation)
             
             printer.println("} FR_CATCH {");
@@ -489,19 +553,30 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
             }
             printer.unindent();
             printer.println("}//end catch");
+             */
         }
             break;
         case CatchStart:
-            //printer.printf("} catch(%d) {", catchType);
+            printer.println(";");
+            if (catchType == -1) {
+                printer.println("} catch(...) {");
+            } else {
+                std::string typeName = FCodeUtil::getTypeRefName(curPod, catchType, false);
+                printer.printf("} catch(%s ", typeName.c_str());
+                catchVar.print(method, printer, 0);
+                printer.println(") {");
+            }
             break;
         case CatchEnd:
-            //printer.printf("}//end catch");
+            printer.println(";");
+            printer.println("}//end catch");
             break;
         case FinallyStart:
-            //printer.printf("finally {");
+            printer.println(";//finally");
+            printer.println("} catch(...) {");
             break;
         case FinallyEnd:
-            //printer.printf("}");
+            printer.println("}");
             break;
         default:
             break;

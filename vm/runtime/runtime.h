@@ -22,7 +22,7 @@ extern  "C" {
 #include <stdio.h>
 #include <setjmp.h>
 
-#define LONG_JMP_EXCEPTION
+//#define LONG_JMP_EXCEPTION
 
 typedef void *fr_Env;
 
@@ -39,6 +39,7 @@ void fr_releaseEnv(fr_Env env);
 #ifdef LONG_JMP_EXCEPTION
 jmp_buf *fr_pushJmpBuf(fr_Env self);
 jmp_buf *fr_popJmpBuf(fr_Env self);
+jmp_buf *fr_topJmpBuf(fr_Env self);
 #endif
 
 fr_Obj fr_getErr(fr_Env self);
@@ -97,22 +98,11 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 
 #define FR_TYPE(type) fr_sysType(__env, type##_class__)
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
-#define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:0)
+#define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
 #define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__))
 
-#ifdef LONG_JMP_EXCEPTION
-    #define FR_TRY if(setjmp(*fr_pushJmpBuf(__env)) == 0)
-    #define FR_CATCH else
-    #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
-    #define FR_THROW(err) { fr_setErr(__env, err); longjmp(*fr_popJmpBuf(__env), 1);}
-#else
-    #define FR_TRY try
-    #define FR_CATCH catch(...)
-    #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
-    #define FR_THROW(err) { fr_setErr(__env, (err)); throw std::exception();}
-#endif
     
-#define FR_ALLOC_THROW(errType) FR_THROW(FR_ALLOC(errType))
+#define FR_ALLOC_THROW(errType) throw(FR_ALLOC(errType))
 
 #define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
 #define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__) )
@@ -125,12 +115,12 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
     tmp##__LINE__->_val = value;\
     tagert = (toType)tmp##__LINE__;}
 
-#define FR_BOX_INT(value, fromType, toType) fr_box_int(__env, value)
-#define FR_BOX_FLOAT(value, fromType, toType) fr_box_float(__env, value)
-#define FR_BOX_BOOL(value, fromType, toType) fr_box_bool(__env, value)
+#define FR_BOX_INT(value, fromType, toType) (toType)fr_box_int(__env, value)
+#define FR_BOX_FLOAT(value, fromType, toType) (toType)fr_box_float(__env, value)
+#define FR_BOX_BOOL(value, fromType, toType) (toType)fr_box_bool(__env, value)
 
 #define FR_UNBOXING(obj, fromType, toType) (((toType##_null)obj)->_val)
-#define FR_NNULL(obj, fromType, toType) ( (toType)(obj?obj:(fr_throwNPE(__env),0)) )
+#define FR_NNULL(obj, fromType, toType) ( (obj?(toType)obj:(fr_throwNPE(__env),(toType)0)) )
 
 #ifdef  __cplusplus
 }

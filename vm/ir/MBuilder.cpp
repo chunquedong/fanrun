@@ -105,10 +105,14 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
                 stmt->params.push_back(expr);
             }
             
-            bool isVoid = FCodeUtil::isVoidTypeRef(curPod, method->returnType);
-            stmt->isVoid = isVoid;
-            if (!isVoid) {
+            std::string retType = FCodeUtil::getTypeRefName(curPod, method->returnType, true);
+            stmt->isVoid = retType == "sys_Void";
+            if (!stmt->isVoid) {
                 Var &var = b->newVar(method->returnType);
+                if (retType == "sys_This") {
+                    var.typeName = FCodeUtil::getTypeRefName(curPod, method->c_parent->meta.self
+                                                             , false);
+                }
                 //var.typeRef = stmt->methodRef->retType;
                 stmt->retValue.type = ExprType::tempVar;
                 stmt->retValue.varRef.index = var.index;
@@ -120,8 +124,8 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
             //-----------------------------------
             //add return
             RetStmt *retStmt = new RetStmt();
-            retStmt->isVoid = isVoid;
-            if (!isVoid) {
+            retStmt->isVoid = stmt->isVoid;
+            if (!stmt->isVoid) {
                 retStmt->retValue = b->pop();
             }
             b->stmts.push_back(retStmt);
@@ -327,6 +331,7 @@ void MBuilder::insertException() {
                 tryEnd->catchType = trap.type;
                 tryEnd->handler = trap.handler;
                 Block *eb = posToBlock[trap.end];
+                eb = this->blocks.at(eb->index-1);
                 eb->stmts.push_back(tryEnd);
             }
             
@@ -377,6 +382,7 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     stmt->curPod = curPod;
     //stmt->methodRefId = opObj.i1;
     FMethodRef *methodRef = &curPod->methodRefs[opObj.i1];
+    stmt->methodRef = methodRef;
     
     stmt->typeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
     stmt->mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
@@ -696,6 +702,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->isVoid = false;
                 stmt->typeName = "sys_Obj";
                 stmt->mthName = "compare1";
+                stmt->argsType.push_back("sys_Obj");
                 stmt->params.push_back(block->pop());
                 stmt->params.push_back(block->pop());
                 Var &var = block->newVar(0);

@@ -36,7 +36,7 @@ void PodGen::gen(std::string &path) {
     Printer headerPrinter(headerFile.c_str());
     genHeader(&headerPrinter);
     
-    std::string impleFile = path + podName + ".c";
+    std::string impleFile = path + podName + ".cpp";
     Printer implePrinter(impleFile.c_str());
     genImple(&implePrinter);
     
