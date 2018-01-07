@@ -522,13 +522,33 @@ void ThrowStmt::print(IRMethod *method, Printer& printer, int pass) {
 void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
     switch (etype) {
         case TryStart:
-            printer.printf("try {");
+            printer.printf("FR_TRY {");
             break;
         case TryEnd: {
-            /*
-            printer.println(";");//print NOP(no operation)
             
-            printer.println("} FR_CATCH {");
+            //printer.println(";");//print NOP(no operation)
+            std::string typeName = FCodeUtil::getTypeRefName(curPod, catchType, false);
+            
+            if (handlerStmt) {
+                if (handlerStmt->etype == CatchStart) {
+                    printer.printf("} FR_CATCH(%s) {", typeName.c_str());
+                    
+                    if (handlerStmt->catchType > 0) {
+                        handlerStmt->catchVar.print(method, printer, 0);
+                        printer.println(" = (%s)fr_getErr(__env); fr_clearErr(__env); goto l__%d;}"
+                                        ,typeName.c_str(), handler);
+                    } else {
+                        printer.println("fr_clearErr(__env); goto l__%d;}", handler);
+                    }
+                }
+                else if (handlerStmt->etype == FinallyStart) {
+                    printer.println("} FR_CATCH(...) { goto l__%d; }", handler);
+                }
+            }
+            else {
+                printf("ERROR: try end error\n");
+            }
+            /*
             printer.indent();
             bool hasCatchAll = false;
             for (int i=0; i<catchs.size(); ++i) {
@@ -548,15 +568,17 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
                 printer.printf(" = (%s)fr_getErr(__env);", typeName.c_str());
                 printer.println(" goto l__%d; }", handler);
             }
-            if (!hasCatchAll) {
-                printer.println("FR_THROW(fr_getErr(__env));");
-            }
+            //if (!hasCatchAll) {
+            //    printer.println("FR_THROW(fr_getErr(__env));");
+            //}
             printer.unindent();
-            printer.println("}//end catch");
-             */
+            printer.println("}//ce");
+            */
         }
             break;
         case CatchStart:
+            printer.println("//catch start");
+            /*
             printer.println(";");
             if (catchType == -1) {
                 printer.println("} catch(...) {");
@@ -566,17 +588,26 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
                 catchVar.print(method, printer, 0);
                 printer.println(") {");
             }
+             */
             break;
         case CatchEnd:
+            printer.println("//catch end");
+            /*
             printer.println(";");
             printer.println("}//end catch");
+             */
             break;
         case FinallyStart:
-            printer.println(";//finally");
+            printer.println("//finally start");
+            /*
             printer.println("} catch(...) {");
+             */
             break;
         case FinallyEnd:
-            printer.println("}");
+            printer.println("//finally end");
+            
+            printer.println("if (fr_getErr(__env)) { throw fr_getErr(__env); }");
+            
             break;
         default:
             break;

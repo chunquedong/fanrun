@@ -314,7 +314,7 @@ void MBuilder::insertException() {
     
     for (FErrTable *et : attrs) {
         for (FTrap &trap : et->traps) {
-            if (trap.start != start || trap.end != end) {
+            //if (trap.start != start || trap.end != end) {
                 tryStart = new ExceptionStmt();
                 tryStart->curPod = curPod;
                 tryStart->etype = ExceptionStmt::TryStart;
@@ -333,16 +333,19 @@ void MBuilder::insertException() {
                 Block *eb = posToBlock[trap.end];
                 eb = this->blocks.at(eb->index-1);
                 eb->stmts.push_back(tryEnd);
-            }
+            //}
             
             Block *cb = posToBlock[trap.handler];
             for (Stmt *s : cb->stmts) {
                 ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);
                 if (!catchStart) continue;
                 if (catchStart->pos == trap.handler) {
-                    tryEnd->catchs.push_back(catchStart);
+                    tryEnd->handlerStmt = (catchStart);
                     break;
                 }
+            }
+            if (tryEnd->handlerStmt == NULL) {
+                printf("ERROR: not found catch handlerStmt\n");
             }
         }
     }
@@ -916,6 +919,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::FinallyStart: {
                 ExceptionStmt *stmt = new ExceptionStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
                 stmt->etype = ExceptionStmt::FinallyStart;
                 block->stmts.push_back(stmt);
             }

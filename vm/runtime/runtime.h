@@ -101,7 +101,10 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
 #define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__))
 
-    
+#define FR_TRY try
+#define FR_CATCH(type) catch(type)
+#define FR_THROW(err) {fr_setErr(__env, err); throw 1;}
+#define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
 #define FR_ALLOC_THROW(errType) throw(FR_ALLOC(errType))
 
 #define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
