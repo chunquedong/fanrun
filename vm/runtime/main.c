@@ -15,7 +15,7 @@ int main() {
     fr_Env env = fr_getEnv();
     testlib_init__(env);
     
-    testlib_ExceptionTest_main0(env);
+    testlib_CmpTest_main0(env);
     fr_releaseEnv(env);
 }
 

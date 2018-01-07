@@ -699,25 +699,21 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Compare: {
-                CallStmt *stmt = new CallStmt();
+                CmpStmt *stmt = new CmpStmt();
                 stmt->curPod = curPod;
-                stmt->isStatic = false;
-                stmt->isVirtual = true;
-                stmt->isMixin = false;
-                stmt->isVoid = false;
-                stmt->typeName = "sys_Obj";
-                stmt->mthName = "compare1";
-                stmt->argsType.push_back("sys_Obj");
-                stmt->params.push_back(block->pop());
-                stmt->params.push_back(block->pop());
+                stmt->param2 = block->pop();
+                stmt->param1 = block->pop();
+                stmt->opObj = opObj;
                 Var &var = block->newVar(0);
                 var.typeName = "sys_Int";
-                stmt->retValue.type = ExprType::tempVar;
-                stmt->retValue.varRef.index = var.index;
-                stmt->retValue.varRef.block = var.block;
+                stmt->result.type = ExprType::tempVar;
+                stmt->result.varRef.index = var.index;
+                stmt->result.varRef.block = var.block;
                 block->stmts.push_back(stmt);
                 
-                block->push(stmt->retValue);
+                block->push(stmt->result);
+                break;
+
                 break;
             }
             case FOp::CompareEQ:

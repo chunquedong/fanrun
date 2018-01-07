@@ -12,7 +12,7 @@
 //#include "FType.h"
 #include <assert.h>
 
-Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr) {
+Gc::Gc() : allocSize(0), running(false), marker(0), trace(false), gcSupport(nullptr) {
     lastAllocSize = 1024;
 }
 
