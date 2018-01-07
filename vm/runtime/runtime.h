@@ -52,12 +52,13 @@ void fr_clearErr(fr_Env self);
 
 void fr_addGlobalRef(fr_Env self, fr_Obj obj);
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
-void fr_addStaticRef(fr_Env self, fr_Obj obj);
+void fr_addStaticRef(fr_Env self, fr_Obj *obj);
     
 fr_Obj fr_malloc(fr_Env self, fr_Class vtable);
 void fr_gc(fr_Env self);
 GcObj *fr_toGcObj(fr_Obj obj);
 fr_Obj fr_fromGcObj(GcObj *g);
+void fr_checkPoint(fr_Env self);
 
 ////////////////////////////
 // Util
@@ -124,6 +125,8 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 
 #define FR_UNBOXING(obj, fromType, toType) (((toType##_null)obj)->_val)
 #define FR_NNULL(obj, fromType, toType) ( (obj?(toType)obj:(fr_throwNPE(__env),(toType)0)) )
+    
+#define FR_CHECK_POINT fr_checkPoint(__env);
 
 #ifdef  __cplusplus
 }

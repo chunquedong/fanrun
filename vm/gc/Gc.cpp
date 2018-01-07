@@ -12,8 +12,9 @@
 //#include "FType.h"
 #include <assert.h>
 
-Gc::Gc() : allocSize(0), running(false), marker(0), trace(false), gcSupport(nullptr) {
-    lastAllocSize = 1024;
+Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr)
+    , maxAddress(NULL), minAddress(NULL){
+    lastAllocSize = 29;
 }
 
 Gc::~Gc() {
@@ -31,7 +32,13 @@ void Gc::onRoot(GcObj* obj) {
     if (obj == nullptr) {
         return;
     }
-    gcRoot.push_back(obj);
+    if (allRef.find(obj) == allRef.end()) {
+        printf("ERROR:");
+        gcSupport->printObj(obj);
+        printf("\n");
+        return;
+    }
+    tempGcRoot.push_back(obj);
 }
 
 void Gc::mergeNewAlloc() {
@@ -61,11 +68,19 @@ GcObj* Gc::alloc(void *type, int asize) {
     gc_setDirty(obj, 0);
     
     lock.lock();
+    if (maxAddress == NULL || obj > maxAddress) {
+        maxAddress = obj;
+    }
+    if (minAddress == NULL || obj < minAddress) {
+        minAddress = obj;
+    }
     newAllocRef.push_back(obj);
     lock.unlock();
     
     if (trace) {
-        printf("malloc %p %p\n", type, obj);
+        printf("malloc ");
+        gcSupport->printObj(obj);
+        printf("\n");
     }
     return obj;
 }
@@ -99,13 +114,13 @@ void Gc::collect() {
 }
 
 void Gc::getRoot() {
-    gcRoot.clear();
+    tempGcRoot.clear();
     
     puaseWorld();
     
     lock.lock();
     for (auto it = pinObjs.begin(); it != pinObjs.end(); ++it) {
-        gcRoot.push_back(*it);
+        tempGcRoot.push_back(*it);
     }
     lock.unlock();
     
@@ -113,7 +128,7 @@ void Gc::getRoot() {
     
     if (trace) {
         printf("ROOT:\n");
-        for (auto it = gcRoot.begin(); it != gcRoot.end(); ++it) {
+        for (auto it = tempGcRoot.begin(); it != tempGcRoot.end(); ++it) {
             gcSupport->printObj(*it);
             printf(", ");
         }
@@ -123,7 +138,7 @@ void Gc::getRoot() {
 }
 
 void Gc::mark() {
-    for (auto it = gcRoot.begin(); it != gcRoot.end(); ++it) {
+    for (auto it = tempGcRoot.begin(); it != tempGcRoot.end(); ++it) {
         markNode(*it);
     }
 }
@@ -173,10 +188,19 @@ void Gc::markNode(GcObj* obj) {
     if (obj == nullptr) {
         return;
     }
+    if (allRef.find(obj) == allRef.end()) {
+        printf("ERROR: unknow obj %p", obj);
+        return;
+    }
     if (!gc_isDirty(obj) && gc_getMark(obj) == marker) {
         return;
     }
     gc_setMark(obj, marker);
     gc_setDirty(obj, 0);
+//    printf("mark %d:", marker);
+//    gcSupport->printObj(obj);
+//    if (gc_getMark(obj) != marker) {
+//        printf("ERROR");
+//    }
     gcSupport->walkNodeChildren(this, obj);
 }

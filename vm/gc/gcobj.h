@@ -33,7 +33,7 @@ inline void gc_setDirty(GcObj *obj, int dirty) {
     setBitField((uint64_t *)(&(obj->header)), 1, dirty);
 }
 inline void gc_setMark(GcObj *obj, int marker) {
-    setBitField((uint64_t *)(&(obj->header)), 1, marker);
+    setBitField((uint64_t *)(&(obj->header)), 0, marker);
 }
 
 

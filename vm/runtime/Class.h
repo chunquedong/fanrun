@@ -20,7 +20,9 @@ struct fr_Field {
     uint32_t flags;
     const char *type;
     int offset;
-    //Obj *pointer;
+    bool isStatic;
+    bool isValType;
+    void *pointer;
   
     int facetCount;
     //Obj facetList;
@@ -69,10 +71,10 @@ typedef struct fr_Class_ {
     int mixinCount;
   
     int fieldCount;
-    struct Field *fieldList;
+    struct fr_Field *fieldList;
     
     int methodCount;
-    struct Method *methodList;
+    struct fr_Method *methodList;
     
     int facetCount;
     //Obj facetList;
@@ -92,5 +94,8 @@ bool fr_isClass(fr_Env env, fr_Obj obj, fr_Class type);
 fr_Class fr_getClass(fr_Env env, fr_Obj obj);
 
 fr_Class fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Class itype);
+
+void fr_registerClass(fr_Env env, const char *pod, const char *clz, fr_Class type);
+fr_Class fr_findClass(fr_Env env, const char *pod, const char *clz);
 
 #endif /* defined(__fcode__Type__) */

@@ -473,6 +473,10 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->dst.varRef.index = newVar.index;
                 stmt->dst.varRef.block = newVar.block;
                 
+                if (newVar.index == -1 && newVar.block == -1) {
+                    printf("ERROR\n");
+                }
+                
                 if (previous->stmts.size() == 0 || previous->isForward) {
                     previous->stmts.push_back(stmt);
                 } else {
@@ -580,7 +584,6 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
                 stmt->value = var;
-                block->push(stmt->value);
                 
                 block->stmts.push_back(stmt);
                 break;
@@ -613,7 +616,6 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
                 stmt->value = var;
-                block->push(stmt->value);
                 
                 block->stmts.push_back(stmt);
                 break;
@@ -668,7 +670,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::allJmp;
                 //stmt->opObj = opObj;
-                stmt->pos = opObj.i1;
+                stmt->selfPos = opObj.pos;
+                stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
@@ -680,7 +683,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->jmpType = JmpStmt::trueJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
-                stmt->pos = opObj.i1;
+                stmt->selfPos = opObj.pos;
+                stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
@@ -692,7 +696,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->jmpType = JmpStmt::falseJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
-                stmt->pos = opObj.i1;
+                stmt->selfPos = opObj.pos;
+                stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
@@ -856,7 +861,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::leaveJmp;
                 //stmt->opObj = opObj;
-                stmt->pos = opObj.i1;
+                stmt->selfPos =
+                stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);
@@ -867,7 +873,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::finallyJmp;
                 //stmt->opObj = opObj;
-                stmt->pos = opObj.i1;
+                stmt->selfPos = opObj.pos;
+                stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
                 block->stmts.push_back(stmt);

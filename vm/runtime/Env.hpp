@@ -32,6 +32,9 @@ public:
 public:
     bool needStop;
     bool isStoped;
+    
+    void **statckStart;
+    void **statckEnd;
 
 public:
     Env(Vm *vm);

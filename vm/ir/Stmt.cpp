@@ -209,7 +209,11 @@ bool Expr::isValueType(IRMethod *method) {
 void StoreStmt::print(IRMethod *method, Printer& printer, int pass) {
     dst.print(method, printer, pass);
     printer.printf(" = ");
-    printer.printf("(%s)", dst.getTypeName(method).c_str());
+    std::string desType = dst.getTypeName(method);
+    if (desType.empty()) {
+        printf("ERROR");
+    }
+    printer.printf("(%s)", desType.c_str());
     src.print(method, printer, pass);
     printer.printf(";");
 }
@@ -294,12 +298,18 @@ void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
 void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
     switch (jmpType) {
         case trueJmp:{
+            if (targetPos < selfPos) {
+                printer.println("FR_CHECK_POINT");
+            }
             printer.printf("if (");
             expr.print(method, printer, pass);
             printer.printf(") goto ");
         }
             break;
         case falseJmp: {
+            if (targetPos < selfPos) {
+                printer.println("FR_CHECK_POINT");
+            }
             printer.printf("if (!");
             expr.print(method, printer, pass);
             printer.printf(") goto ");
@@ -316,8 +326,12 @@ void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {
             printer.printf("goto ");
         }
             break;
-        default:
+        default: {
+            if (targetPos < selfPos) {
+                printer.println("FR_CHECK_POINT");
+            }
             printer.printf("goto ");
+        }
             break;
     }
     printer.printf("l__%d;", targetBlock->pos);

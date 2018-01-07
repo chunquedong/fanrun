@@ -8,6 +8,8 @@
 
 #include "runtime.h"
 #include <stdio.h>
+#include "Env.hpp"
+#include "Vm.hpp"
 
 bool fr_isClass(fr_Env env, fr_Obj obj, fr_Class type) {
     fr_Class tempType = fr_getClass(env, obj);
@@ -24,6 +26,8 @@ void fr_VTable_init(fr_Env env, fr_Class type) {
     type->name = "";
     type->base = NULL;
     type->mixinCount = 0;
+    type->fieldCount = 0;
+    type->methodCount = 0;
     type->allocSize = 0;
     type->sysType = NULL;
     type->funcArity = 0;
@@ -49,4 +53,14 @@ fr_Class fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Class itype) {
     }
     printf("ERROR: not found interface vtable %s\n", itype->name);
     return NULL;
+}
+
+void fr_registerClass(fr_Env env, const char *pod, const char *clz, fr_Class type) {
+    Env *e = (Env*)env;
+    e->vm->registerClass(pod, clz, type);
+}
+
+fr_Class fr_findClass(fr_Env env, const char *pod, const char *clz) {
+    Env *e = (Env*)env;
+    return e->vm->findClass(pod, clz);
 }

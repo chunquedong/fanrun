@@ -15,19 +15,31 @@
 #include <stdio.h>
 #include "runtime.h"
 #include <unordered_map>
+#include <map>
 #include <thread>
+#include <string>
+#include <set>
 
 class Env;
 
 class Vm : public GcSupport {
     Gc *gc;
-    std::vector<GcObj*> globalRef;
+    //std::vector<GcObj*> globalRef;
     std::unordered_map<std::thread::id, Env*> threads;
-    std::vector<GcObj*> staticFieldRef;
+    std::vector<fr_Obj*> staticFieldRef;
     std::recursive_mutex lock;
+    //typedef std::unordered_map<std::string, std::unordered_map<std::string, fr_Class> > ClassMap;
+    typedef std::map<std::string, fr_Class> ClassMap;
+    typedef std::map<std::string, ClassMap > PodMap;
+    PodMap typeDb;
+public:
+    std::set<fr_Class> classSet;
 public:
     Vm();
     ~Vm();
+    
+    void registerClass(const char *pod, const char *clz, fr_Class type);
+    fr_Class findClass(const char *pod, const char *clz);
     
     void start();
     void stop();
@@ -35,7 +47,7 @@ public:
     Gc *getGc() { return gc; }
     Env *getEnv();
     void releaseEnv(Env *env);
-    void addStaticRef(fr_Obj obj);
+    void addStaticRef(fr_Obj *obj);
     
     virtual void walkNodeChildren(Gc *gc, GcObj *obj) override;
     virtual void walkRoot(Gc *gc) override;

@@ -70,7 +70,7 @@ void TypeGen::genInline(Printer *printer) {
 
 void TypeGen::genImple(Printer *printer) {
     
-    //if (name != "sys_Enum") return;
+    //if (name != "testlib_GcTest") return;
     
     genStaticField(printer, false);
     printer->newLine();
@@ -144,6 +144,32 @@ void TypeGen::genTypeMetadata(Printer *printer) {
     printer->println("((fr_Class)vtable)->base = (fr_Class)%s_class__;", baseName.c_str());
     
     printer->println("((fr_Class)vtable)->fieldCount = %d;", type->fields.size());
+    printer->println("((fr_Class)vtable)->fieldList = (struct fr_Field*)malloc(sizeof(struct fr_Field)*%d);", type->fields.size());
+    //int offset = 0;
+    for (int i=0; i<type->fields.size(); ++i) {
+        FField &field = type->fields[i];
+        std::string fieldName = type->c_pod->names[field.name];
+        std::string fieldIdName = fieldName;
+        FCodeUtil::escapeIdentifierName(fieldIdName);
+        
+        printer->println("((fr_Class)vtable)->fieldList[%d].name = \"%s\";", i, fieldName.c_str());
+        std::string typeName = podGen->getTypeRefName(field.type);
+        printer->println("((fr_Class)vtable)->fieldList[%d].type = \"%s\";", i, typeName.c_str());
+    
+        bool isValType = FCodeUtil::isValType(typeName);
+        printer->println("((fr_Class)vtable)->fieldList[%d].isValType = %s;", i, isValType ? "true" : "false");
+        
+        if (field.flags & FFlags::Static) {
+            printer->println("((fr_Class)vtable)->fieldList[%d].isStatic = true;", i);
+            printer->println("((fr_Class)vtable)->fieldList[%d].pointer = (void*)(&%s_%s);"
+                             , i, name.c_str(), fieldIdName.c_str());
+        } else {
+            printer->println("((fr_Class)vtable)->fieldList[%d].isStatic = false;", i);
+            
+            printer->println("((fr_Class)vtable)->fieldList[%d].offset = offsetof(struct %s_struct, %s);"
+                         , i, name.c_str(), fieldIdName.c_str());
+        }
+    }
     
     printer->println("((fr_Class)vtable)->methodCount = %d;", type->methods.size());
     
@@ -154,6 +180,9 @@ void TypeGen::genTypeMetadata(Printer *printer) {
             printer->println("((fr_Class)vtable)->funcArity = %d;", funcArity);
         }
     }
+    
+    printer->println("fr_registerClass(__env, \"%s\", \"%s\", (fr_Class)%s_class__);"
+                     , podGen->podName.c_str(), rawTypeName.c_str(), name.c_str());
 }
 
 void TypeGen::genVTableInit(Printer *printer) {
@@ -187,8 +216,6 @@ void TypeGen::genVTableInit(Printer *printer) {
     }
     
     printer->println("((fr_Class)vtable)->mixinCount = %d;", minxinSize);
-    
-    genTypeMetadata(printer);
     
     //set self virutal func
     for (int i=0; i<type->methods.size(); ++i) {
@@ -224,6 +251,8 @@ void TypeGen::genVTableInit(Printer *printer) {
             genOverrideVTable(type->meta.base, rawMethodName, printer, gmethod, "vtable->");
         }
     }
+    
+    genTypeMetadata(printer);
     
     printer->unindent();
     printer->println("};");

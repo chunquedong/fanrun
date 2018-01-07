@@ -7,12 +7,42 @@
 //
 
 #include "Env.hpp"
+#include "Vm.hpp"
 
 Env::Env(Vm *vm) : vm(vm), error(0)
-, isStoped(false), needStop(false) {
+, isStoped(false), needStop(false), statckStart(NULL) {
+    statckStart = NULL;
+    statckEnd = statckStart;
+}
+
+static bool isPointer(Vm *vm, Gc *gc, int64_t pointer) {
+    if (pointer == 0) return false;
+    if (pointer % 8 != 0) return false;
+    GcObj *gcobj = fr_toGcObj((fr_Obj)(pointer));
+    if (gcobj < gc->minAddress || gcobj > gc->maxAddress) {
+        return false;
+    }
+    int64_t type = (int64_t)gc_getType(gcobj);
+    if (type % 8 != 0) return false;
+    if (vm->classSet.find((fr_Class)type) == vm->classSet.end()) {
+        return false;
+    }
+    return true;
 }
 
 void Env::walkLocalRoot(Gc *gc) {
+    if (error) {
+        gc->onRoot(fr_toGcObj(error));
+    }
+    
+    void **min = statckStart > statckEnd ? statckEnd : statckStart;
+    void **max = statckStart < statckEnd ? statckEnd : statckStart;
+    for (void **ptr = min; ptr <= max; ++ptr) {
+        if (isPointer(vm, gc, (int64_t)(*ptr))) {
+            GcObj *obj = fr_toGcObj((fr_Obj)(*ptr));
+            gc->onRoot(obj);
+        }
+    }
 }
 
 ////////////////////////////

@@ -47,41 +47,43 @@ void Vm::releaseEnv(Env *env) {
     delete env;
 }
 
-void Vm::addStaticRef(fr_Obj obj) {
-    std::lock_guard<std::recursive_mutex> lock_guard(lock);
-    
-    GcObj *gcobj = fr_toGcObj(obj);
-    staticFieldRef.push_back(gcobj);
-}
-
-void Vm::walkNodeChildren(Gc *gc, GcObj *obj) {
-    
+void Vm::walkNodeChildren(Gc *gc, GcObj *gcobj) {
+    fr_Obj obj = fr_fromGcObj(gcobj);
+    fr_Class type = (fr_Class)gc_getType(gcobj);
+    for (int i=0; i<type->fieldCount; ++i) {
+        fr_Field &f = type->fieldList[i];
+        if (!f.isStatic && !f.isValType) {
+            fr_Obj* objAddress = (fr_Obj*)(((char*)(obj)) + f.offset);
+            if (*objAddress == NULL) continue;
+            GcObj *gp = fr_toGcObj(*objAddress);
+            gc->onChild(gp);
+        }
+    }
 }
 void Vm::walkRoot(Gc *gc) {
-    //global ref
-//    LinkedListElem *it = LinkedList_first(&globalRefList);
-//    LinkedListElem *end = LinkedList_end(&globalRefList);
-//    while (it != end) {
-//        gc->onRoot(static_cast<GcObj*>(it->data));
-//        it = it->next;
-//    }
-    
     //static field
     for (auto it = staticFieldRef.begin(); it != staticFieldRef.end(); ++it) {
-        gc->onRoot(static_cast<GcObj*>(*it));
+        fr_Obj *obj = *it;
+        if (*obj == NULL) continue;
+        GcObj *gobj = fr_toGcObj(*obj);
+        gc->onRoot(gobj);
     }
     
-//    //local
-//    for (auto it = threads.begin(); it != threads.end(); ++it) {
-//        Env *env = it->second;
-//        env->walkLocalRoot(gc);
-//    }
+    //local
+    for (auto it = threads.begin(); it != threads.end(); ++it) {
+        Env *env = it->second;
+        env->walkLocalRoot(gc);
+    }
 }
 
-void Vm::finalizeObj(GcObj *obj) {
-    
+void Vm::finalizeObj(GcObj *gcobj) {
+    //fr_Obj obj = fr_fromGcObj(gcobj);
+    //fr_Class type = (fr_Class)gc_getType(gcobj);
+    //printf("release %s %p\n", type->name, obj);
 }
 void Vm::puaseWorld() {
+    void *statckVar = 0;
+    
     for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;
         env->needStop = true;
@@ -89,10 +91,18 @@ void Vm::puaseWorld() {
     
     System_barrier();
     
+    std::thread::id tid = std::this_thread::get_id();
     for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;
+        
+        //is current thread
+        if (it->first == tid) {
+            env->statckEnd = &statckVar;
+            continue;
+        }
+        
         while (!env->isStoped) {
-            System_sleep(5);
+            System_sleep(10);
         }
     }
 }
@@ -104,11 +114,39 @@ void Vm::resumeWorld() {
 }
 void Vm::printObj(GcObj *gcobj) {
     fr_Obj obj = fr_fromGcObj(gcobj);
-    fr_Class type = fr_getClass(this, obj);
-    printf("%s\n", type->name);
+    fr_Class type = (fr_Class)gc_getType(gcobj);
+    printf("%s %p", type->name, obj);
 }
 
 int Vm::allocSize(void *type) {
     fr_Class t = (fr_Class)type;
     return t->allocSize;
+}
+
+void Vm::addStaticRef(fr_Obj *objAddress) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    staticFieldRef.push_back(objAddress);
+}
+
+void Vm::registerClass(const char *pod, const char *clz, fr_Class type) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    std::string podName = pod;
+    std::string clzName = clz;
+    typeDb[podName][clzName] = type;
+    classSet.insert(type);
+    for (int i=0; i<type->fieldCount; ++i) {
+        fr_Field &f = type->fieldList[i];
+        if (f.isStatic && !f.isValType) {
+            fr_Obj* objAddress = (fr_Obj*)(f.pointer);
+            addStaticRef(objAddress);
+        }
+    }
+}
+fr_Class Vm::findClass(const char *pod, const char *clz) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    auto itr = typeDb.find(pod);
+    if (itr == typeDb.end()) return NULL;
+    auto type = itr->second.find(clz);
+    if (type == itr->second.end()) return NULL;
+    return type->second;
 }

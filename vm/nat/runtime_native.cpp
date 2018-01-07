@@ -100,7 +100,7 @@ fr_Obj fr_box_int(fr_Env __env, sys_Int_val val) {
         }
         
         FR_BOXING(obj, val, sys_Int, sys_Obj);
-        fr_addStaticRef(__env, obj);
+        fr_addGlobalRef(__env, obj);
         map[val] = obj;
         return obj;
     }
@@ -124,7 +124,7 @@ fr_Obj fr_box_float(fr_Env __env, sys_Float_val val) {
         }
         
         FR_BOXING(obj, val, sys_Int, sys_Obj);
-        fr_addStaticRef(__env, obj);
+        fr_addGlobalRef(__env, obj);
         map[val] = obj;
         return obj;
     }
@@ -138,8 +138,8 @@ fr_Obj fr_box_bool(fr_Env __env, sys_Bool_val val) {
         std::lock_guard<std::mutex> lock(pool_mutex);
         FR_BOXING(trueObj, true, sys_Bool, sys_Obj);
         FR_BOXING(falseObj, false, sys_Bool, sys_Obj);
-        fr_addStaticRef(__env, trueObj);
-        fr_addStaticRef(__env, falseObj);
+        fr_addGlobalRef(__env, trueObj);
+        fr_addGlobalRef(__env, falseObj);
     }
     return val ? trueObj : falseObj;
 }

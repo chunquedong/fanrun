@@ -173,7 +173,8 @@ public:
     
     JmpType jmpType;
     Expr expr;
-    uint16_t pos;
+    uint16_t selfPos;
+    uint16_t targetPos;
     
     Block *targetBlock;
     

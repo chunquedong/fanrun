@@ -37,7 +37,7 @@ class Gc {
     std::list<GcObj*> pinObjs;
     std::vector<GcObj*> newAllocRef;
     
-    std::vector<GcObj*> gcRoot;
+    std::vector<GcObj*> tempGcRoot;
     std::set<GcObj*> allRef;
     
     std::recursive_mutex lock;
@@ -49,6 +49,9 @@ public:
     int lastAllocSize;
     int allocSize;
     bool trace;
+    
+    GcObj *maxAddress;
+    GcObj *minAddress;
     
     Gc();
     ~Gc();
