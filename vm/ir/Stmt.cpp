@@ -514,7 +514,7 @@ void RetStmt::print(IRMethod *method, Printer& printer, int pass) {
 }
 
 void ThrowStmt::print(IRMethod *method, Printer& printer, int pass) {
-    printer.printf("throw(");
+    printer.printf("FR_THROW(");
     var.print(method, printer, pass);
     printer.printf(");");
 }
@@ -525,55 +525,27 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
             printer.printf("FR_TRY {");
             break;
         case TryEnd: {
-            
-            //printer.println(";");//print NOP(no operation)
-            std::string typeName = FCodeUtil::getTypeRefName(curPod, catchType, false);
-            
-            if (handlerStmt) {
-                if (handlerStmt->etype == CatchStart) {
-                    printer.printf("} FR_CATCH(%s) {", typeName.c_str());
-                    
-                    if (handlerStmt->catchType > 0) {
-                        handlerStmt->catchVar.print(method, printer, 0);
+            printer.println("} FR_CATCH {");
+            printer.indent();
+            for (int i=0; i<handlerStmt.size(); ++i) {
+                ExceptionStmt *itr = handlerStmt[i];
+                if (itr->etype == CatchStart) {
+                    if (itr->catchType > 0) {
+                        std::string typeName = FCodeUtil::getTypeRefName(curPod, itr->catchType, false);
+                        printer.printf("if (FR_ERR_TYPE(%s)) {", typeName.c_str());
+                        itr->catchVar.print(method, printer, 0);
                         printer.println(" = (%s)fr_getErr(__env); fr_clearErr(__env); goto l__%d;}"
                                         ,typeName.c_str(), handler);
                     } else {
-                        printer.println("fr_clearErr(__env); goto l__%d;}", handler);
+                        printer.println("fr_clearErr(__env); goto l__%d;", handler);
                     }
                 }
-                else if (handlerStmt->etype == FinallyStart) {
-                    printer.println("} FR_CATCH(...) { goto l__%d; }", handler);
+                else if (itr->etype == FinallyStart) {
+                    printer.println("goto l__%d;//goto finally", handler);
                 }
             }
-            else {
-                printf("ERROR: try end error\n");
-            }
-            /*
-            printer.indent();
-            bool hasCatchAll = false;
-            for (int i=0; i<catchs.size(); ++i) {
-                ExceptionStmt *itr = catchs[i];
-                if (itr->catchType == -1) {
-                    printer.println("goto l__%d;//catch all", handler);
-                    hasCatchAll = true;
-                    break;
-                }
-                
-                if (i > 0) {
-                    printer.printf("else ");
-                }
-                std::string typeName = FCodeUtil::getTypeRefName(curPod, itr->catchType, false);
-                printer.println("if (FR_ERR_TYPE(%s)) {", typeName.c_str());
-                itr->catchVar.print(method, printer, 0);
-                printer.printf(" = (%s)fr_getErr(__env);", typeName.c_str());
-                printer.println(" goto l__%d; }", handler);
-            }
-            //if (!hasCatchAll) {
-            //    printer.println("FR_THROW(fr_getErr(__env));");
-            //}
             printer.unindent();
             printer.println("}//ce");
-            */
         }
             break;
         case CatchStart:
@@ -606,7 +578,7 @@ void ExceptionStmt::print(IRMethod *method, Printer& printer, int pass) {
         case FinallyEnd:
             printer.println("//finally end");
             
-            printer.println("if (fr_getErr(__env)) { throw fr_getErr(__env); }");
+            printer.println("if (fr_getErr(__env)) { FR_THROW(fr_getErr(__env)); }");
             
             break;
         default:

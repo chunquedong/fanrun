@@ -314,7 +314,7 @@ void MBuilder::insertException() {
     
     for (FErrTable *et : attrs) {
         for (FTrap &trap : et->traps) {
-            //if (trap.start != start || trap.end != end) {
+            if (trap.start != start || trap.end != end) {
                 tryStart = new ExceptionStmt();
                 tryStart->curPod = curPod;
                 tryStart->etype = ExceptionStmt::TryStart;
@@ -333,20 +333,22 @@ void MBuilder::insertException() {
                 Block *eb = posToBlock[trap.end];
                 eb = this->blocks.at(eb->index-1);
                 eb->stmts.push_back(tryEnd);
-            //}
+            }
             
             Block *cb = posToBlock[trap.handler];
+            ExceptionStmt *handlerStmt = NULL;
             for (Stmt *s : cb->stmts) {
                 ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);
                 if (!catchStart) continue;
                 if (catchStart->pos == trap.handler) {
-                    tryEnd->handlerStmt = (catchStart);
+                    handlerStmt = (catchStart);
                     break;
                 }
             }
-            if (tryEnd->handlerStmt == NULL) {
+            if (handlerStmt == NULL) {
                 printf("ERROR: not found catch handlerStmt\n");
             }
+            tryEnd->handlerStmt.push_back(handlerStmt);
         }
     }
 }

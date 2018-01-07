@@ -200,9 +200,9 @@ public:
     int32_t handler;
     int pos;
     
-    ExceptionStmt* handlerStmt;
+    std::vector<ExceptionStmt*> handlerStmt;
     
-    ExceptionStmt() : catchType(-1), handler(-1), pos(-1), handlerStmt(NULL) {}
+    ExceptionStmt() : catchType(-1), handler(-1), pos(-1) {}
     
     virtual void print(IRMethod *method, Printer& printer, int pass) override;
     

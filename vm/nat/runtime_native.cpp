@@ -77,7 +77,7 @@ fr_Obj fr_sysType(fr_Env __env, fr_Class clz) {
 ////////////////////////////////////////////////////////////////
 void fr_throwNPE(fr_Env __env) {
     sys_NullErr npe = FR_ALLOC(sys_NullErr);
-    throw(npe);
+    FR_THROW(npe);
 }
 ////////////////////////////////////////////////////////////////
 #include <unordered_map>

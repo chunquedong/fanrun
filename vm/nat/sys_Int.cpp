@@ -14,7 +14,7 @@ sys_Int_null sys_Int_fromStr3(fr_Env __env, sys_Str s, sys_Int radix, sys_Bool c
     sys_Int res = wcstoll(s->data, &str_end, (int)radix);
     if (checked && str_end == s->data) {
         sys_ParseErr e = FR_ALLOC(sys_ParseErr);
-        throw(e);
+        FR_THROW(e);
     }
     return (sys_Int_null)fr_box_int(__env, res);
 }
@@ -76,7 +76,7 @@ sys_Float sys_Int_multFloat1_val(fr_Env __env, sys_Int_val __self, sys_Float b){
 sys_Int sys_Int_div1_val(fr_Env __env, sys_Int_val __self, sys_Int b){
     if (b == 0) {
         sys_Err e = FR_ALLOC(sys_Err);
-        throw(e);
+        FR_THROW(e);
     }
     return __self / b;
 }
@@ -131,7 +131,7 @@ sys_Int sys_Int_max1_val(fr_Env __env, sys_Int_val __self, sys_Int that){
 sys_Int sys_Int_pow1_val(fr_Env __env, sys_Int_val __self, sys_Int pow){
     if (pow < 0) {
         sys_ArgErr e = FR_ALLOC(sys_ArgErr);
-        throw(e);
+        FR_THROW(e);
     }
     return powf(__self, pow);
 }

@@ -39,7 +39,7 @@ void sys_StrBuf_capacity1(fr_Env __env, sys_StrBuf_ref __self, sys_Int it){
         }
     } else {
         sys_Err e = FR_ALLOC(sys_Err);
-        throw(e);
+        FR_THROW(e);
     }
 }
 sys_Int sys_StrBuf_get1(fr_Env __env, sys_StrBuf_ref __self, sys_Int index){
@@ -48,7 +48,7 @@ sys_Int sys_StrBuf_get1(fr_Env __env, sys_StrBuf_ref __self, sys_Int index){
     }
     if (index < 0 || index >= __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     return __self->data[index];
 }
@@ -65,16 +65,16 @@ sys_Str sys_StrBuf_getRange1(fr_Env __env, sys_StrBuf_ref __self, sys_Range rang
     
     if (start < 0 || start > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     if (end < 0 || end > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     sys_Int size = end - start;
     if (size < 0) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     sys_Str str = (sys_Str)fr_newStr(__env, __self->data+start, size);
     return str;
@@ -85,7 +85,7 @@ sys_StrBuf sys_StrBuf_set2(fr_Env __env, sys_StrBuf_ref __self, sys_Int index, s
     }
     if (index < 0 || index >= __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     __self->data[index] = (wchar_t)ch;
     return __self;
@@ -125,7 +125,7 @@ sys_StrBuf sys_StrBuf_insert2(fr_Env __env, sys_StrBuf_ref __self, sys_Int index
     }
     if (index < 0 || index > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     
     sys_Str str = FR_VCALL(sys_Obj, toStr0, x);
@@ -145,7 +145,7 @@ sys_StrBuf sys_StrBuf_remove1(fr_Env __env, sys_StrBuf_ref __self, sys_Int index
     }
     if (index < 0 || index >= __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     memmove(__self->data+index, __self->data+index+1, len*sizeof(wchar_t));
     __self->size--;
@@ -164,16 +164,16 @@ sys_StrBuf sys_StrBuf_removeRange1(fr_Env __env, sys_StrBuf_ref __self, sys_Rang
     
     if (start < 0 || start > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     if (end < 0 || end > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     sys_Int size = end - start;
     if (size < 0) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     memmove(__self->data+start, __self->data+end, size*sizeof(wchar_t));
     __self->size-= size;
@@ -192,16 +192,16 @@ sys_StrBuf sys_StrBuf_replaceRange2(fr_Env __env, sys_StrBuf_ref __self, sys_Ran
     
     if (start < 0 || start > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     if (end < 0 || end > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     sys_Int size = end - start;
     if (size < 0) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        throw(e);
+        FR_THROW(e);
     }
     sys_Int dsize = str->size - size;
     if (dsize + __self->size > __self->capacity) {
