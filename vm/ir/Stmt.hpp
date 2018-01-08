@@ -25,7 +25,7 @@ struct Var {
     int index;
     int newIndex;
     int block;
-    //bool isExport;
+    bool isExport;
     
     std::string name;
     std::string typeName;
@@ -36,7 +36,7 @@ struct Var {
     //bool isRef;
     
     Var() : index(-1), newIndex(-1), block(-1),
-        typeRef(0), methodVar(nullptr) {
+        typeRef(0), methodVar(nullptr), isExport(false) {
     }
 };
 

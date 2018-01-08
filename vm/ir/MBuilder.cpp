@@ -438,6 +438,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 if (block->isVisited) {
                     if (i < block->locals.size()) {
                         newVar = block->locals[i];
+                        block->locals[i].isExport = true;
                     }
                 } else {
                     Var &tVar = block->newVar(0);
@@ -456,7 +457,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                         throw "err";
                     }
                     
-                    //tVar.isExport = true;
+                    tVar.isExport = true;
                     newVar = tVar;
                     
                     Expr newExpr;
@@ -464,6 +465,12 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                     newExpr.varRef.index = newVar.index;
                     newExpr.varRef.block = newVar.block;
                     block->push(newExpr);
+                }
+                
+                if (expr.type == ExprType::tempVar) {
+                    Block *tb = blocks.at(expr.varRef.block);
+                    Var &tv = tb->locals.at(expr.varRef.index);
+                    tv.isExport = true;
                 }
                 
                 StoreStmt *stmt = new StoreStmt();
@@ -486,6 +493,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 }
             }
         } else if (!block->isVisited) {
+            for (int i=0; i<previous->stack.size(); ++i) {
+                Expr &expr = previous->stack[i];
+                if (expr.type == ExprType::tempVar) {
+                    Block *tb = blocks.at(expr.varRef.block);
+                    Var &tv = tb->locals.at(expr.varRef.index);
+                    tv.isExport = true;
+                }
+            }
             block->stack = (previous->stack);
         }
     }
@@ -892,6 +907,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
             case FOp::CatchErrStart: {
                 Var &var = block->newVar(opObj.i1);
+                var.isExport = true;
                 //var.typeRef = opObj.i1;
                 Expr value;
                 value.type = ExprType::tempVar;

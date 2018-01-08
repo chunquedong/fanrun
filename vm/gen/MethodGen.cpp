@@ -118,6 +118,8 @@ void MethodGen::genDeclares(Printer *printer, bool funcPtr, bool isValType) {
 }
 
 void MethodGen::genImples(Printer *printer) {
+    //if (name != "flatten") return;
+    
     bool isVal = !isStatic && FCodeUtil::isValType(parent->name);
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
         if (i == method->paramCount) {
