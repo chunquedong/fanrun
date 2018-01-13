@@ -13,7 +13,8 @@
 #include "miss.h"
 
 typedef void *fr_Obj;
-typedef void *fr_Env;
+struct fr_Env_;
+typedef struct fr_Env_ *fr_Env;
 
 struct fr_Field {
     const char *name;

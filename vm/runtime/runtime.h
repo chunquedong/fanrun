@@ -24,7 +24,11 @@ extern  "C" {
 
 //#define LONG_JMP_EXCEPTION
 
-typedef void *fr_Env;
+struct fr_Env_ {
+    bool needStop;
+    bool isStoped;
+};
+typedef struct fr_Env_ *fr_Env;
 
 ////////////////////////////
 // VM
@@ -59,6 +63,7 @@ void fr_gc(fr_Env self);
 GcObj *fr_toGcObj(fr_Obj obj);
 fr_Obj fr_fromGcObj(GcObj *g);
 void fr_checkPoint(fr_Env self);
+void fr_yieldGc(fr_Env self);
 
 ////////////////////////////
 // Util
@@ -126,7 +131,8 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_UNBOXING(obj, fromType, toType) (((toType##_null)obj)->_val)
 #define FR_NNULL(obj, fromType, toType) ( (obj?(toType)obj:(fr_throwNPE(__env),(toType)0)) )
     
-#define FR_CHECK_POINT fr_checkPoint(__env);
+#define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
+#define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);
 
 #ifdef  __cplusplus
 }

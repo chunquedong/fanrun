@@ -9,6 +9,10 @@
 #ifndef gcobj_h
 #define gcobj_h
 
+#ifdef  __cplusplus
+extern  "C" {
+#endif
+    
 #include "miss.h"
 typedef struct GcObj_ {
     void *header;
@@ -36,5 +40,7 @@ inline void gc_setMark(GcObj *obj, int marker) {
     setBitField((uint64_t *)(&(obj->header)), 0, marker);
 }
 
-
+#ifdef  __cplusplus
+}//extern "C"
+#endif
 #endif /* gcobj_h */

@@ -23,11 +23,12 @@ class Gc;
 
 class GcSupport {
 public:
-    virtual void walkNodeChildren(Gc *gc, GcObj *obj) = 0;
+    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::vector<GcObj*> *list) = 0;
     virtual void walkRoot(Gc *gc) = 0;
+    virtual void onStartGc() = 0;
     
     virtual void finalizeObj(GcObj *obj) = 0;
-    virtual void puaseWorld() = 0;
+    virtual void puaseWorld(bool bloking) = 0;
     virtual void resumeWorld() = 0;
     virtual void printObj(GcObj *obj) = 0;
     virtual int allocSize(void *type) = 0;
@@ -36,9 +37,10 @@ public:
 class Gc {
     std::list<GcObj*> pinObjs;
     std::vector<GcObj*> newAllocRef;
+    std::set<GcObj*> allRef;
     
     std::vector<GcObj*> tempGcRoot;
-    std::set<GcObj*> allRef;
+    std::vector<GcObj*> tempArrived;
     
     std::recursive_mutex lock;
     bool isStopWorld;
@@ -62,16 +64,13 @@ public:
     void unpinObj(GcObj* obj);
     
     void onRoot(GcObj* obj);
-    void onChild(GcObj* obj) {
-        markNode(obj);
-    }
  
     void collect();
     
 private:
-    void puaseWorld() {
+    void puaseWorld(bool bloking) {
         isStopWorld = true;
-        gcSupport->puaseWorld();
+        gcSupport->puaseWorld(bloking);
     }
     
     void resumeWorld() {
@@ -80,13 +79,13 @@ private:
     }
     
     void mergeNewAlloc();
-    void mark();
+    bool mark(std::vector<GcObj*> &root, std::vector<GcObj*> *arrived);
     void getRoot();
     void sweep();
-    bool remark();
+//    bool remark();
     void remove(GcObj* obj, std::set<GcObj*>::iterator &it);
     
-    void markNode(GcObj* obj);
+    bool markNode(GcObj* obj);
 };
 
 #endif /* Gc_hpp */

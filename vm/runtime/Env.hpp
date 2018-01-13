@@ -21,7 +21,7 @@ struct JmpBuf {
 
 class Vm;
 
-class Env {
+class Env : public fr_Env_ {
 public:
     Vm *vm;
     fr_Obj error;
@@ -30,8 +30,7 @@ public:
     std::vector<JmpBuf> exception;
 #endif
 public:
-    bool needStop;
-    bool isStoped;
+    
     
     void **statckStart;
     void **statckEnd;

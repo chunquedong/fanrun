@@ -47,7 +47,7 @@ void Vm::releaseEnv(Env *env) {
     delete env;
 }
 
-void Vm::walkNodeChildren(Gc *gc, GcObj *gcobj) {
+void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::vector<GcObj*> *list) {
     fr_Obj obj = fr_fromGcObj(gcobj);
     fr_Class type = (fr_Class)gc_getType(gcobj);
     for (int i=0; i<type->fieldCount; ++i) {
@@ -56,10 +56,11 @@ void Vm::walkNodeChildren(Gc *gc, GcObj *gcobj) {
             fr_Obj* objAddress = (fr_Obj*)(((char*)(obj)) + f.offset);
             if (*objAddress == NULL) continue;
             GcObj *gp = fr_toGcObj(*objAddress);
-            gc->onChild(gp);
+            list->push_back(gp);
         }
     }
 }
+
 void Vm::walkRoot(Gc *gc) {
     //static field
     for (auto it = staticFieldRef.begin(); it != staticFieldRef.end(); ++it) {
@@ -81,31 +82,43 @@ void Vm::finalizeObj(GcObj *gcobj) {
     //fr_Class type = (fr_Class)gc_getType(gcobj);
     //printf("release %s %p\n", type->name, obj);
 }
-void Vm::puaseWorld() {
+
+void Vm::onStartGc() {
     void *statckVar = 0;
-    
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
-        Env *env = it->second;
-        env->needStop = true;
-    }
-    
-    System_barrier();
-    
+    //set statckEnd address
     std::thread::id tid = std::this_thread::get_id();
     for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;
-        
         //is current thread
         if (it->first == tid) {
             env->statckEnd = &statckVar;
             continue;
         }
-        
-        while (!env->isStoped) {
-            System_sleep(10);
+    }
+}
+
+void Vm::puaseWorld(bool bloking) {
+    for (auto it = threads.begin(); it != threads.end(); ++it) {
+        Env *env = it->second;
+        env->needStop = true;
+    }
+    System_barrier();
+    if (bloking) {
+        std::thread::id tid = std::this_thread::get_id();
+        for (auto it = threads.begin(); it != threads.end(); ++it) {
+            Env *env = it->second;
+            //is current thread
+            if (it->first == tid) {
+                continue;
+            }
+            
+            while (!env->isStoped) {
+                System_sleep(10);
+            }
         }
     }
 }
+
 void Vm::resumeWorld() {
     for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;

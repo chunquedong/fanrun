@@ -33,9 +33,9 @@ void Gc::onRoot(GcObj* obj) {
         return;
     }
     if (allRef.find(obj) == allRef.end()) {
-        printf("ERROR:");
-        gcSupport->printObj(obj);
-        printf("\n");
+        //printf("ERROR:");
+        //gcSupport->printObj(obj);
+        //printf("\n");
         return;
     }
     tempGcRoot.push_back(obj);
@@ -86,6 +86,7 @@ GcObj* Gc::alloc(void *type, int asize) {
 }
 
 void Gc::collect() {
+    gcSupport->onStartGc();
     {
         std::lock_guard<std::recursive_mutex> lock_guard(lock);
         if (running) {
@@ -96,14 +97,25 @@ void Gc::collect() {
         marker = !marker;
     }
     
+    //get root
+    puaseWorld(true);
     getRoot();
     
-    mark();
-    
-    puaseWorld();
-    while (remark()) {}
+    //concurrent mark
     resumeWorld();
+    mark(tempGcRoot, &tempArrived);
     
+    //remark changed
+    puaseWorld(false);
+    mark(tempArrived, NULL);
+    
+    //remark root
+    puaseWorld(true);
+    getRoot();
+    mark(tempArrived, NULL);
+    
+    //concurrent sweep
+    resumeWorld();
     sweep();
     
     {
@@ -115,9 +127,6 @@ void Gc::collect() {
 
 void Gc::getRoot() {
     tempGcRoot.clear();
-    
-    puaseWorld();
-    
     lock.lock();
     for (auto it = pinObjs.begin(); it != pinObjs.end(); ++it) {
         tempGcRoot.push_back(*it);
@@ -134,23 +143,20 @@ void Gc::getRoot() {
         }
         printf("\n");
     }
-    resumeWorld();
 }
 
-void Gc::mark() {
-    for (auto it = tempGcRoot.begin(); it != tempGcRoot.end(); ++it) {
-        markNode(*it);
-    }
-}
-
-bool Gc::remark() {
+bool Gc::mark(std::vector<GcObj*> &root, std::vector<GcObj*> *arrived) {
     bool has = false;
-    for (auto it = allRef.begin(); it != allRef.end(); ++it) {
-        GcObj* obj = *it;
-        if (gc_isDirty(obj)) {
+    std::vector<GcObj*> &list = root;
+    if (arrived) arrived->clear();
+    while (list.size() > 0) {
+        GcObj *obj = list.back();
+        list.pop_back();
+        if (markNode(obj)) {
             has = true;
-            markNode(obj);
+            gcSupport->getNodeChildren(this, obj, &list);
         }
+        if (arrived) arrived->push_back(obj);
     }
     return has;
 }
@@ -184,16 +190,16 @@ void Gc::remove(GcObj* obj, std::set<GcObj*>::iterator &it) {
     free(obj);
 }
 
-void Gc::markNode(GcObj* obj) {
+bool Gc::markNode(GcObj* obj) {
     if (obj == nullptr) {
-        return;
+        return false;
     }
     if (allRef.find(obj) == allRef.end()) {
-        printf("ERROR: unknow obj %p", obj);
-        return;
+        //printf("ERROR: unknow obj %p", obj);
+        return false;
     }
     if (!gc_isDirty(obj) && gc_getMark(obj) == marker) {
-        return;
+        return false;
     }
     gc_setMark(obj, marker);
     gc_setDirty(obj, 0);
@@ -202,5 +208,5 @@ void Gc::markNode(GcObj* obj) {
 //    if (gc_getMark(obj) != marker) {
 //        printf("ERROR");
 //    }
-    gcSupport->walkNodeChildren(this, obj);
+    return true;
 }

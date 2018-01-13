@@ -47,9 +47,9 @@ fr_Obj fr_fromGcObj(GcObj *g) {
 void fr_checkPoint(fr_Env self) {
     Env *env = (Env*)self;
     if (env->needStop) {
-        env->isStoped = true;
         void *statckVar = 0;
         env->statckEnd = &statckVar;
+        env->isStoped = true;
         
         System_barrier();
         do {
@@ -58,6 +58,14 @@ void fr_checkPoint(fr_Env self) {
         env->isStoped = false;
         System_barrier();
     }
+}
+
+void fr_yieldGc(fr_Env self) {
+    Env *env = (Env*)self;
+    void *statckVar = 0;
+    env->statckEnd = &statckVar;
+    env->isStoped = true;
+    System_barrier();
 }
 
 fr_Obj fr_malloc(fr_Env self, fr_Class vtable) {

@@ -69,7 +69,7 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
     has = false;
     for (int i=0; i<locals.size(); ++i) {
         Var &v = locals[i];
-        if (!FCodeUtil::isValType(v.typeName)) {
+        if (!v.isExport && !FCodeUtil::isValType(v.typeName)) {
             printer.printf("%s = NULL; ", v.name.c_str());
             has = true;
         }

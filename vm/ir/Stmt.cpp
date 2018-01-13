@@ -293,6 +293,13 @@ void FieldStmt::print(IRMethod *method, Printer& printer, int pass) {
         value.print(method, printer, pass);
     }
     printer.printf(";");
+    
+    
+    if (!isLoad && !isStatic) {
+        printer.printf("FR_SET_DIRTY(");
+        instance.print(method, printer, pass);
+        printer.println(");");
+    }
 }
 
 void JmpStmt::print(IRMethod *method, Printer& printer, int pass) {

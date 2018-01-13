@@ -10,7 +10,9 @@
 #include "Vm.hpp"
 
 Env::Env(Vm *vm) : vm(vm), error(0)
-, isStoped(false), needStop(false), statckStart(NULL) {
+, statckStart(NULL) {
+    isStoped = false;
+    needStop = false;
     statckStart = NULL;
     statckEnd = statckStart;
 }
@@ -22,11 +24,14 @@ static bool isPointer(Vm *vm, Gc *gc, int64_t pointer) {
     if (gcobj < gc->minAddress || gcobj > gc->maxAddress) {
         return false;
     }
+#if GC_POINTER_TEST
+    //test is Obj ptr
     int64_t type = (int64_t)gc_getType(gcobj);
     if (type % 8 != 0) return false;
     if (vm->classSet.find((fr_Class)type) == vm->classSet.end()) {
         return false;
     }
+#endif
     return true;
 }
 
