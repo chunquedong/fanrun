@@ -8,6 +8,18 @@
 #include "IRMethod.h"
 #include "FCodeUtil.hpp"
 
+Var &Block::newVar(int typeRef) {
+    Var var;
+    var.index = (int)locals.size();
+    var.block = this;
+    if (typeRef != -1) {
+        var.typeName = FCodeUtil::getTypeRefName(curPod, typeRef, true);
+    }
+
+    locals.push_back(var);
+    return locals.back();
+}
+
 void Block::print(IRMethod *method, Printer& printer, int pass) {
     //print export temp var
     if (pass == 0) {
@@ -34,12 +46,12 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
     int end = (int)stmts.size();
     bool printLast = false;
     if (stmts.size() > 0) {
-        if (stmts[0]->getType() == StmtType::error) {
-            stmts[0]->print(method, printer, pass);
+        if (dynamic_cast<ExceptionStmt*>(stmts[0])) {
+            stmts[0]->print(printer);
             printer.newLine();
             ++start;
         }
-        if (stmts[end-1]->getType() == StmtType::error) {
+        if (dynamic_cast<ExceptionStmt*>(stmts[end-1])) {
             printLast = true;
             --end;
         }
@@ -61,7 +73,7 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
 
     //print stmts
     for (int i=start; i<end; ++i) {
-        stmts[i]->print(method, printer, pass);
+        stmts[i]->print(printer);
         printer.newLine();
     }
     
@@ -70,6 +82,9 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
     for (int i=0; i<locals.size(); ++i) {
         Var &v = locals[i];
         if (!v.isExport && !FCodeUtil::isValType(v.typeName)) {
+            if (has == false) {
+                printer.println("//reset temp var");
+            }
             printer.printf("%s = NULL; ", v.name.c_str());
             has = true;
         }
@@ -81,7 +96,7 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
     
     //print last exception tryEnd stmt
     if (printLast) {
-        stmts[end]->print(method, printer, pass);
+        stmts[end]->print(printer);
         printer.newLine();
     }
 }
@@ -99,7 +114,7 @@ void IRMethod::print(Printer& printer, int pass) {
     if (pass == 0) {
         printer.printf("%s(", name.c_str());
         for(int i=0; i<paramCount; ++i) {
-            Var &v = locals[i];
+            Var &v = blocks[0]->locals[i];
             if (i != 0) printer.printf(", ");
             printer.printf("%s %s", v.typeName.c_str(), v.name.c_str());
         }
@@ -107,16 +122,18 @@ void IRMethod::print(Printer& printer, int pass) {
     }
     else if (pass == 1) {
         
-        for(int i=paramCount; i<locals.size(); ++i) {
-            Var &v = locals[i];
+        for(int i=paramCount; i<blocks[0]->locals.size(); ++i) {
+            Var &v = blocks[0]->locals[i];
             printer.printf("%s %s; ", v.typeName.c_str(), v.name.c_str());
         }
         printer.newLine();
         
-        for (Block *b : blocks) {
+        for (int i=1; i<blocks.size(); ++i) {
+            Block *b = blocks[i];
             b->print(this, printer, 0);
         }
-        for (Block *b : blocks) {
+        for (int i=1; i<blocks.size(); ++i) {
+            Block *b = blocks[i];
             b->print(this, printer, 1);
         }
     }

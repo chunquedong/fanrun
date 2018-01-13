@@ -5,7 +5,7 @@ class Base {
     i = x
   }
 
-  virtual Str say() { "hi" }
+  virtual Str say(Str name) { "hi $name" }
 }
 
 mixin Bar {
@@ -18,7 +18,7 @@ class Sub : Base, Bar {
     this.j = j
   }
 
-  override Str say() { "hello" }
+  override Str say(Str name) { "hello $name" }
 
   override Str foo() { "sub" }
 
@@ -26,7 +26,7 @@ class Sub : Base, Bar {
     m := Sub(1)
 
     Base base := m
-    echo(base.say)
+    echo(base.say("Q"))
 
     Bar bar := m
     echo(bar.foo)

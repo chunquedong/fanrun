@@ -14,70 +14,61 @@
 #include "Printer.h"
 
 class IRMethod;
+class Block;
 
-enum class ExprType {
-    constant,
-    localVar,
-    tempVar,
+//Ref of var
+struct Expr {
+    //index of parent
+    int index;
+    
+    //parent of block
+    Block *block;
+    
+    Expr() : block(nullptr), index(-1) {}
+    
+    std::string getName();
+    std::string getTypeName();
+    bool isValueType();
 };
 
 struct Var {
+    //position in block
     int index;
-    int newIndex;
-    int block;
-    bool isExport;
+    //parent block
+    Block *block;
     
+    //ref by other block
+    bool isExport;
+    //unused
+    int newIndex;
+    
+    //name of var
     std::string name;
+    //type of var
     std::string typeName;
     
-    //fr_ValueType type;
-    uint16_t typeRef;
-    FMethodVar *methodVar;
-    //bool isRef;
-    
-    Var() : index(-1), newIndex(-1), block(-1),
-        typeRef(0), methodVar(nullptr), isExport(false) {
+    Var() : index(-1), newIndex(-1), block(nullptr),
+    isExport(false) {
     }
-};
-
-class Expr {
-public:
-    struct VarRef {
-        int block;
-        int index;
-    };
-    ExprType type;
-    union {
-        FOpObj opObj;
-        VarRef varRef;
-    };
-    std::string getConstantType();
-    void print(IRMethod *method, Printer& printer, int pass);
-    std::string getTypeName(IRMethod *method);
-    bool isValueType(IRMethod *method);
-};
-
-enum class StmtType {
-    store,
-    field,
-    alloc,
-    call,
-    cmp,
-    ret,
-    jmp,
-    error,
-    coerce,
-    throws,
-    typeCheck,
+    
+    Expr asRef();
 };
 
 class Stmt {
 public:
     FPod *curPod;
-    virtual void print(IRMethod *method, Printer& printer, int pass) = 0;
-    virtual StmtType getType() = 0;
+    IRMethod *method;
+    virtual void print(Printer& printer) = 0;
+    Stmt() : curPod(nullptr), method(nullptr) {}
+};
+
+class ConstStmt : public Stmt {
+public:
+    Expr dst;
+    FOpObj opObj;
     
-    Stmt() : curPod(nullptr) {}
+    virtual void print(Printer& printer) override;
+    std::string getTypeName();
 };
 
 class StoreStmt : public Stmt {
@@ -85,9 +76,7 @@ public:
     Expr src;
     Expr dst;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::store; }
+    virtual void print(Printer& printer) override;
 };
 
 class FieldStmt : public Stmt {
@@ -98,15 +87,12 @@ public:
     FFieldRef *fieldRef;
     Expr value;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::field; }
+    virtual void print(Printer& printer) override;
 };
 
 class CallStmt : public Stmt {
 public:
     FMethodRef *methodRef;
-    //FMethod *method;
     
     std::string typeName;
     std::string mthName;
@@ -123,9 +109,7 @@ public:
     
     CallStmt() : methodRef(NULL) {}
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::call; }
+    virtual void print(Printer& printer) override;
 };
 
 class AllocStmt : public Stmt {
@@ -133,9 +117,7 @@ public:
     uint16_t type;
     Expr obj;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::alloc; }
+    virtual void print(Printer& printer) override;
 };
 
 class CmpStmt : public Stmt {
@@ -145,9 +127,7 @@ public:
     Expr result;
     FOpObj opObj;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::cmp; }
+    virtual void print(Printer& printer) override;
 };
 
 class RetStmt : public Stmt {
@@ -155,9 +135,7 @@ public:
     Expr retValue;
     bool isVoid;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::ret; }
+    virtual void print(Printer& printer) override;
 };
 
 class Block;
@@ -178,24 +156,21 @@ public:
     
     Block *targetBlock;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::cmp; }
+    virtual void print(Printer& printer) override;
 };
 
 class ThrowStmt : public Stmt {
 public:
     Expr var;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::throws; }
+    virtual void print(Printer& printer) override;
 };
 
 class ExceptionStmt : public Stmt {
 public:
     enum EType { TryStart, TryEnd, CatchStart, CatchEnd, FinallyStart, FinallyEnd };
     EType etype;
+    
     int32_t catchType;//err type to catch
     Expr catchVar;
     int32_t handler;
@@ -205,25 +180,24 @@ public:
     
     ExceptionStmt() : catchType(-1), handler(-1), pos(-1) {}
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::error; }
+    virtual void print(Printer& printer) override;
 };
 
 class CoerceStmt : public Stmt {
 public:
-    enum CType { nonNull, boxing, unboxing, other };
-    CType coerceType;
+    //enum CType { nonNull, boxing, unboxing, other };
+    //CType coerceType;
     Expr from;
     Expr to;
+    
     uint16_t fromType;
     uint16_t toType;
     
-    CoerceStmt() : coerceType(nonNull), fromType(0), toType(0) {}
+    bool safe;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
+    CoerceStmt() : safe(true) {}
     
-    StmtType getType() override { return StmtType::coerce; }
+    virtual void print(Printer& printer) override;
 };
 
 class TypeCheckStmt : public Stmt {
@@ -233,9 +207,7 @@ public:
     uint16_t type;
     Expr result;
     
-    virtual void print(IRMethod *method, Printer& printer, int pass) override;
-    
-    StmtType getType() override { return StmtType::typeCheck; }
+    virtual void print(Printer& printer) override;
 };
 
 

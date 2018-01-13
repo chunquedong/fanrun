@@ -44,6 +44,14 @@ namespace FCodeUtil {
         return false;
     }
     
+    bool isNullableType(const std::string& name) {
+        auto pos = name.find("_null");
+        if (pos != std::string::npos) {
+            return true;
+        }
+        return false;
+    }
+    
     void getTypeInfo(FPod *curPod, FTypeRef &typeRef, bool &isVal, bool &isNullable) {
         std::string &podName = curPod->names[typeRef.podName];
         std::string &typeName = curPod->names[typeRef.typeName];

@@ -18,7 +18,6 @@ class MBuilder {
     std::unordered_map<int16_t, Block*> posToBlock;
 
     std::vector<Block *> blocks;
-    std::vector<Var> locals;
     
     int allLocalsCount;
     FPod *curPod;
@@ -39,14 +38,7 @@ private:
     
     void doBuild();
     
-    Var &newVar(uint16_t typeRef) {
-        Var var;
-        var.index = (int)locals.size();
-        var.block = -1;
-        var.typeRef = typeRef;
-        locals.push_back(var);
-        return locals.back();
-    }
+    Var &newVar(int typeRef);
     
     void initJumpTarget();
     
@@ -56,12 +48,12 @@ private:
     
     void rewriteLocals();
     
+    Expr asType(Block *block, Expr expr,const std::string &expectedType);
+    
     void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
               , bool isMixin, bool isAlloc = false);
     
     void parseBlock(Block *block, Block *previous);
-    
-    CoerceStmt::CType typeCoerce(uint16_t from, uint16_t to);
     
     void insertException();
 };

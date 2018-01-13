@@ -32,19 +32,14 @@ public:
     bool isVisited;//flag for builder
     bool isForward;//flag if no jump stmt at last
     
+    FPod *curPod;
+    
     Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false) {
     }
     
     void print(IRMethod *method, Printer& printer, int pass);
     
-    Var &newVar(uint16_t typeRef) {
-        Var var;
-        var.index = (int)locals.size();
-        var.block = this->index;
-        var.typeRef = typeRef;
-        locals.push_back(var);
-        return locals.back();
-    }
+    Var &newVar(int typeRef);
     
     void push(Expr &var) {
         stack.push_back(var);
@@ -54,10 +49,6 @@ public:
             printf("ERROR: statck is empty\n");
             //abort();
             Expr var;
-            var.type = ExprType::tempVar;
-            var.varRef.block = 0;
-            var.varRef.index = 0;
-            
             return var;
         }
         Expr var = stack.back();
@@ -71,7 +62,7 @@ class IRMethod {
     FMethod *method;
 public:
     std::vector<Block *> blocks;
-    std::vector<Var> locals;//include paramCount args
+    //std::vector<Var> locals;//include paramCount args
     
     uint16_t returnType;
     uint16_t selfType;
