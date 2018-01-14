@@ -6,6 +6,11 @@
 //   2 Dec 05  Brian Frank  Creation
 //
 
+facet class T8 {}
+facet class T16 {}
+facet class T32 {}
+facet class T64 {}
+
 **
 ** Int is used to represent a signed 64-bit integer.
 **

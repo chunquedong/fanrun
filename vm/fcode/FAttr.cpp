@@ -13,7 +13,12 @@ FAttr *FAttr::readAttr(FPod *pod, Buffer &buffer) {
     std::string &name = pod->names[nameId];
     
     if (name == "Facets") {
-        
+        FFacets *facets = new FFacets();
+        facets->name = nameId;
+        facets->len = buffer.readInt16();
+        facets->data = NULL;
+        facets->read(pod, buffer);
+        return facets;
     } else if (name == "SourceFile") {
         
     } else if (name == "LineNumber") {
@@ -60,4 +65,13 @@ void FErrTable::read(FPod *pod, Buffer &buffer) {
 
 void FParamDefault::read(FPod *pod, Buffer &buffer) {
     opcodes.read(buffer);
+}
+
+void FFacets::read(FPod *pod, Buffer &buffer) {
+    uint16_t count = buffer.readUInt16();
+    facets.resize(count);
+    for (int i=0; i<count; ++i) {
+        facets[i].type = buffer.readUInt16();
+        facets[i].value = buffer.readString();
+    }
 }

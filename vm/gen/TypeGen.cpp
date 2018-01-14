@@ -394,7 +394,33 @@ void TypeGen::genField(Printer *printer) {
             continue;
         }
         auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
-        auto typeName = podGen->getTypeRefName(field->type);
+        std::string typeName = podGen->getTypeRefName(field->type);
+        if (typeName == "sys_Int") {
+            for (FAttr *attr : field->attrs) {
+                FFacets *facets = dynamic_cast<FFacets*>(attr);
+                if (facets) {
+                    for (FFacet &facet : facets->facets) {
+                        std::string tname = FCodeUtil::getTypeRefName(podGen->pod, facet.type, false);
+                        if (tname == "sys_T8") {
+                            typeName = "int8_t";
+                            break;
+                        }
+                        else if (tname == "sys_T16") {
+                            typeName = "int16_t";
+                            break;
+                        }
+                        else if (tname == "sys_T32") {
+                            typeName = "int32_t";
+                            break;
+                        }
+                        else if (tname == "sys_T64") {
+                            typeName = "int64_t";
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         printer->println("%s %s;", typeName.c_str(), name.c_str());
     }
 }
@@ -411,9 +437,12 @@ void TypeGen::genStaticField(Printer *printer, bool isExtern) {
             printer->printf("extern ");
             printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());
         } else {
-            printer->println("%s %s_%s = 0;", typeName.c_str(), this->name.c_str(), name.c_str());
+            if (FCodeUtil::isBuildinVal(typeName)) {
+                printer->println("%s %s_%s = 0;", typeName.c_str(), this->name.c_str(), name.c_str());
+            } else {
+                printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());
+            }
         }
-        
     }
 }
 

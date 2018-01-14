@@ -250,12 +250,25 @@ void PodGen::topoSortType() {
         std::string baseName = getTypeRefName(type->type->meta.base);
         
         TypeGen *base = exitsBase(this, baseName);
-        if (!base) {
+        if (base) {
+            type = base;
+            continue;
+        }
+        
+        for (int i=0; i<type->type->meta.mixin.size(); ++i) {
+            std::string baseName = getTypeRefName(type->type->meta.mixin[i]);
+            base = exitsBase(this, baseName);
+            if (base) break;
+        }
+        
+        if (base) {
+            type = base;
+            continue;
+        }
+        else {
             sortedTypes.push_back(type);
             type->c_sortFlag = 1;
             type = getOne(this);
-        } else {
-            type = base;
         }
     }
 }
