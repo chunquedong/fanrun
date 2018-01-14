@@ -14,12 +14,17 @@
 
 namespace FCodeUtil {
     std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable);
-    bool isVoidTypeRef(FPod *curPod, uint16_t typeRefId);
-    bool isValType(const std::string& name);
-    bool isNullableType(const std::string& name);
     
-    void getTypeInfo(FPod *curPod, FTypeRef &typeRef, bool &isVal, bool &isNullable);
+    bool isValueTypeRef(FPod *curPod, uint16_t typeRefId);
+    bool isValueType(FType *type);
+    bool isNullableTypeRef(FPod *curPod, uint16_t typeRefId);
     
+    bool isBuildinValType(FType *type);
+    bool isBuildinVal(const std::string &name);
+    
+    bool isInheriteOf(const std::string &pod, const std::string &name
+                      , FPod *curPod, uint16_t typeRefId);
+        
     std::string getIdentifierName(FPod *pod, uint16_t nid);
     void escapeIdentifierName(std::string &name);
 }

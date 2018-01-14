@@ -48,7 +48,7 @@ private:
     
     void rewriteLocals();
     
-    Expr asType(Block *block, Expr expr,const std::string &expectedType);
+    Expr asType(Block *block, Expr expr, TypeInfo &expectedType);
     
     void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
               , bool isMixin, bool isAlloc = false);

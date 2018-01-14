@@ -120,7 +120,7 @@ void MethodGen::genDeclares(Printer *printer, bool funcPtr, bool isValType) {
 void MethodGen::genImples(Printer *printer) {
     //if (name != "flatten") return;
     
-    bool isVal = !isStatic && FCodeUtil::isValType(parent->name);
+    bool isVal = !isStatic && parent->isValueType;
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
         if (i == method->paramCount) {
             if ((method->flags & FFlags::Native)
@@ -176,7 +176,13 @@ void MethodGen::genImplesToVal(Printer *printer) {
             printer->printf("return ");
         }
         
-        printer->printf("%s_%s%d_val(__env, __self->_val", parent->name.c_str(), name.c_str(), i);
+        if (FCodeUtil::isBuildinValType(method->c_parent)) {
+            printer->printf("%s_%s%d_val(__env, FR_UNBOXING_VAL(__self, %s)"
+                            , parent->name.c_str(), name.c_str(), i, parent->name.c_str());
+        } else {
+            printer->printf("%s_%s%d_val(__env, FR_UNBOXING(__self, %s)"
+                            , parent->name.c_str(), name.c_str(), i, parent->name.c_str());
+        }
         
         int paramNum = i;
         for (int j=0; j<paramNum; ++j) {
@@ -237,7 +243,7 @@ void MethodGen::genMethodStub(Printer *printer, bool isValType, int i) {
 void MethodGen::genStub(Printer *printer) {
     for (int i=beginDefaultParam; i<=method->paramCount; ++i) {
         genMethodStub(printer, false, i);
-        if (!isStatic && FCodeUtil::isValType(parent->name)) {
+        if (!isStatic && parent->isValueType) {
             genMethodStub(printer, true, i);
         }
     }

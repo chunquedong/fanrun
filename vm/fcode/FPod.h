@@ -76,6 +76,7 @@ struct FMethodRef {
     FMethod *c_virtualMethod;
 };
 
+class PodLoader;
 class FPod {
 public:
     std::vector<std::string> names;
@@ -97,6 +98,7 @@ public:
     std::unordered_map<std::string, FType*> c_typeMap;
     void *c_wrappedPod;
     std::vector< std::string > c_dependPods;
+    PodLoader *c_loader;
     
     void load(ZipFile &zip, bool isSpecial);
     

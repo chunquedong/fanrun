@@ -62,6 +62,7 @@ bool PodLoader::load(std::string path, std::string name) {
 //    }
     
     FPod *fpod = new FPod();
+    fpod->c_loader = this;
     bool isSpecial = name == "syslib";
     
     fpod->load(*zip, isSpecial);

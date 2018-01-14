@@ -21,6 +21,7 @@ extern  "C" {
 #include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
 
 //#define LONG_JMP_EXCEPTION
 
@@ -105,7 +106,10 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_TYPE(type) (sys_Type)fr_sysType(__env, type##_class__)
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
+#define FR_CAST(obj, type, toType) (FR_TYPE_IS(obj, type)?(toType)obj:(fr_throwNPE(__env),(toType)0) )
+
 #define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__))
+#define FR_INIT_VAL(val, type) (memset(&val, 0, sizeof(struct type##_struct)))
 
 #define FR_TRY try
 #define FR_CATCH catch(...)
@@ -120,17 +124,22 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_ICALL(type, method, self, ...) _FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
 
 #define FR_BOXING(tagert, value, fromType, toType) {\
-    fromType##_ref tmp##__LINE__ = FR_ALLOC(fromType);\
-    tmp##__LINE__->_val = value;\
-    tagert = (toType)tmp##__LINE__;}
+    fromType##_ref tmp__ = FR_ALLOC(fromType);\
+    *tmp__ = value;\
+    tagert = (toType)tmp__;}
+    
+#define FR_BOXING_VAL(tagert, value, fromType, toType) {\
+    fromType##_ref tmp__ = FR_ALLOC(fromType);\
+    tmp__->_val = value;\
+    tagert = (toType)tmp__;}
 
 #define FR_BOX_INT(value) ((sys_Int_ref)fr_box_int(__env, value))
 #define FR_BOX_FLOAT(value) ((sys_Float_ref)fr_box_float(__env, value))
 #define FR_BOX_BOOL(value) ((sys_Bool_ref)fr_box_bool(__env, value))
 
-#define FR_UNBOXING(obj, toType) (((toType##_null)obj)->_val)
+#define FR_UNBOXING(obj, toType) (*((toType##_null)obj))
+#define FR_UNBOXING_VAL(obj, toType) (((toType##_null)obj)->_val)
 #define FR_NOT_NULL(obj, toType) ( (obj?(toType)obj:(fr_throwNPE(__env),(toType)0)) )
-#define FR_SAFE_CAST(obj, type, toType) (FR_TYPE_IS(obj, type)?(toType)obj:(fr_throwNPE(__env),(toType)0) )
     
 #define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
 #define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);

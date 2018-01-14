@@ -68,7 +68,7 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
             //-----------------------------------
             //store default param value
             StoreStmt *storeStmt = new StoreStmt();
-            std::string defVarTypeName = blocks[0]->locals[irMethod.paramCount].typeName;
+            TypeInfo &defVarTypeName = blocks[0]->locals[irMethod.paramCount].type;
             storeStmt->src = asType(b, b->pop(), defVarTypeName);
             storeStmt->dst.index = irMethod.paramCount;
             storeStmt->dst.block = blocks[0];
@@ -89,9 +89,9 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
                                                        , method->c_parent->meta.self, false);
             stmt->mthName = FCodeUtil::getIdentifierName(curPod, method->name);
             stmt->mthName += std::to_string(paramNum+1);
-            if (isVal) {
-                stmt->mthName += "_val";
-            }
+//            if (isVal) {
+//                stmt->mthName += "_val";
+//            }
             
             for (int i=0; i<irMethod.paramCount+1; ++i) {
                 Expr expr;
@@ -100,17 +100,16 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
                 stmt->params.push_back(expr);
             }
             
-            std::string retType = FCodeUtil::getTypeRefName(curPod, method->returnType, true);
-            if (retType == "sys_This") {
-                retType = FCodeUtil::getTypeRefName(curPod, method->c_parent->meta.self
-                                          , false);
+            TypeInfo retType;
+            retType.setFromTypeRef(curPod, method->returnType);
+            if (retType.isThis()) {
+                retType.setFromTypeRef(curPod, method->c_parent->meta.self);
             }
             
-            stmt->isVoid = retType == "sys_Void";
+            stmt->isVoid = retType.isVoid();
             if (!stmt->isVoid) {
                 Var &var = b->newVar(method->returnType);
-                var.typeName = retType;
-                //var.typeRef = stmt->methodRef->retType;
+                var.type = retType;
                 stmt->retValue = var.asRef();
                 b->push(stmt->retValue);
             }
@@ -374,37 +373,34 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     stmt->mthName += std::to_string(methodRef->paramCount);
     
     for (int i=methodRef->paramCount-1; i>=0; --i) {
-        std::string fvarType = FCodeUtil::getTypeRefName(curPod, methodRef->params.at(i), true);
+        TypeInfo fvarType(curPod, methodRef->params.at(i));
         stmt->params.insert(stmt->params.begin(), asType(block, block->pop(), fvarType));
     }
     
     if (!isStatic) {
-        Expr selfExpr = block->pop();
-        stmt->params.insert(stmt->params.begin(), selfExpr);
+        TypeInfo selfType(curPod, methodRef->parent);
+        stmt->params.insert(stmt->params.begin(), asType(block, block->pop(), selfType));
     }
     
-    bool isVoid = FCodeUtil::isVoidTypeRef(curPod, methodRef->retType);
-    stmt->isVoid = isVoid;
-    if (!isVoid) {
-        Var &var = block->newVar(methodRef->retType);
-        if (var.typeName == "sys_This") {
-            var.typeName = stmt->typeName;
+    TypeInfo retType(curPod, methodRef->retType);
+    stmt->isVoid = retType.isVoid();
+    if (!stmt->isVoid) {
+        if (retType.isThis()) {
+            retType.setFromTypeRef(curPod, methodRef->parent);
         }
-        //var.typeRef = stmt->methodRef->retType;
+        Var &var = block->newVarAs(retType);
         stmt->retValue = var.asRef();
         block->push(stmt->retValue);
     }
     block->stmts.push_back(stmt);
 }
 
-Expr MBuilder::asType(Block *block, Expr expr, const std::string &expectedType) {
-    if (expr.getTypeName() == expectedType) return expr;
+Expr MBuilder::asType(Block *block, Expr expr, TypeInfo &expectedType) {
+    if (expr.getType() == expectedType) return expr;
     CoerceStmt *stmt = new CoerceStmt();
     stmt->from = expr;
     
-    Var &var = block->newVar(-1);
-    
-    var.typeName = expectedType;
+    Var &var = block->newVarAs(expectedType);
     stmt->to = var.asRef();
     
     block->stmts.push_back(stmt);
@@ -434,8 +430,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                         block->locals[i].isExport = true;
                     }
                 } else {
-                    Var &tVar = block->newVar(-1);
-                    tVar.typeName = srcExpr.getTypeName();
+                    Var &tVar = block->newVarAs(srcExpr.getType());
                     tVar.isExport = true;
                     newVar = tVar;
                     
@@ -453,15 +448,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
                 //cast if type not match
                 CoerceStmt *coerceStmt = nullptr;
-                std::string expectedType = newVar.typeName;
-                if (srcExpr.getTypeName() == expectedType) {
+                TypeInfo &expectedType = newVar.type;
+                if (srcExpr.getType() == expectedType) {
                     stmt->src = srcExpr;
                 }
                 else {
                     coerceStmt = new CoerceStmt();
                     coerceStmt->from = srcExpr;
-                    Var &var = previous->newVar(-1);
-                    var.typeName = expectedType;
+                    Var &var = previous->newVarAs(expectedType);
                     coerceStmt->to = var.asRef();
                     stmt->src = var.asRef();
                 }
@@ -515,15 +509,11 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::LoadDuration:
             case FOp::LoadUri:
             case FOp::LoadType:{
-                Var &var = block->newVar(-1);
-                
                 ConstStmt *stmt = new ConstStmt();
                 stmt->curPod = curPod;
                 stmt->opObj = opObj;
+                Var &var = block->newVarAs(stmt->getType());
                 stmt->dst = var.asRef();
-                
-                std::string type = stmt->getTypeName();
-                var.typeName = type;
                 
                 block->stmts.push_back(stmt);
                 block->push(stmt->dst);
@@ -542,7 +532,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->dst.index = opObj.i1;
                 stmt->dst.block = blocks[0];
                 
-                stmt->src = asType(block, block->pop(), stmt->dst.getTypeName());
+                stmt->src = asType(block, block->pop(), stmt->dst.getType());
                 block->stmts.push_back(stmt);
                 break;
             }
@@ -569,9 +559,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->isStatic = false;
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
-                std::string typeName = FCodeUtil::getTypeRefName(curPod
-                                                                 , stmt->fieldRef->type, true);
-                stmt->value = asType(block, block->pop(), typeName);
+                TypeInfo type(curPod, stmt->fieldRef->type);
+                stmt->value = asType(block, block->pop(), type);
                 stmt->instance = block->pop();
           
                 block->stmts.push_back(stmt);
@@ -601,9 +590,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->isStatic = true;
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
-                std::string typeName = FCodeUtil::getTypeRefName(curPod
-                                                                 , stmt->fieldRef->type, true);
-                stmt->value = asType(block, block->pop(), typeName);
+                TypeInfo type(curPod, stmt->fieldRef->type);
+                stmt->value = asType(block, block->pop(), type);
                 
                 block->stmts.push_back(stmt);
                 break;
@@ -698,8 +686,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                Var &var = block->newVar(-1);
-                var.typeName = "sys_Int";
+                TypeInfo type;type.makeInt();
+                Var &var = block->newVarAs(type);;
                 stmt->result = var.asRef();
                 block->stmts.push_back(stmt);
                 
@@ -719,8 +707,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                Var &var = block->newVar(-1);
-                var.typeName = "sys_Bool";
+                TypeInfo type;type.makeBool();
+                Var &var = block->newVarAs(type);
                 stmt->result = var.asRef();
                 block->stmts.push_back(stmt);
                 
@@ -733,8 +721,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->curPod = curPod;
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                Var &var = block->newVar(-1);
-                var.typeName = "sys_Bool";
+                TypeInfo type;type.makeBool();
+                Var &var = block->newVarAs(type);
                 stmt->result = var.asRef();
                 block->stmts.push_back(stmt);
                 
@@ -744,16 +732,13 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::Return: {
                 RetStmt *stmt = new RetStmt();
                 stmt->curPod = curPod;
-                bool isVoid = FCodeUtil::isVoidTypeRef(curPod, irMethod.returnType);
-                stmt->isVoid = isVoid;
-                if (!isVoid) {
-                    std::string typeName = FCodeUtil::getTypeRefName(curPod
-                                                                     , irMethod.returnType, true);
-                    if (typeName == "sys_This") {
-                        typeName = FCodeUtil::getTypeRefName(curPod
-                                                             , irMethod.selfType, false);
+                TypeInfo type(curPod, irMethod.returnType);
+                stmt->isVoid = type.isVoid();
+                if (!stmt->isVoid) {
+                    if (type.isThis()) {
+                        type.setFromTypeRef(curPod, irMethod.selfType);
                     }
-                    stmt->retValue = asType(block, block->pop(), typeName);
+                    stmt->retValue = asType(block, block->pop(), type);
                 }
                 
                 block->stmts.push_back(stmt);
@@ -772,12 +757,12 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::Is: {
                 TypeCheckStmt *stmt = new TypeCheckStmt();
                 stmt->curPod = curPod;
-                stmt->isOrAs = false;
+                //stmt->isOrAs = false;
                 stmt->type = opObj.i1;
                 stmt->obj = block->pop();
                 
-                Var &var = block->newVar(-1);
-                var.typeName = "sys_Bool";
+                TypeInfo type;type.makeBool();
+                Var &var = block->newVarAs(type);
                 Expr value = var.asRef();
                 block->push(value);
                 stmt->result = value;
@@ -786,16 +771,17 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::As: {
-                TypeCheckStmt *stmt = new TypeCheckStmt();
+                CoerceStmt *stmt = new CoerceStmt();
                 stmt->curPod = curPod;
-                stmt->isOrAs = false;
-                stmt->type = opObj.i1;
-                stmt->obj = block->pop();
-                
+                stmt->from = block->pop();
+                stmt->toType = opObj.i1;
                 Var &var = block->newVar(opObj.i1);
+                
                 Expr value = var.asRef();
                 block->push(value);
-                stmt->result = value;
+                stmt->to = value;
+                stmt->safe = false;
+                stmt->checked = false;
                 
                 block->stmts.push_back(stmt);
                 break;

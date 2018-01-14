@@ -16,6 +16,35 @@
 class IRMethod;
 class Block;
 
+struct TypeInfo {
+    std::string pod;
+    std::string name;
+    bool isNullable;
+    bool isValue;
+    
+    std::string getName() const;
+    
+    TypeInfo() : isNullable(false), isValue(false) {}
+    //TypeInfo(const std::string &pod, const std::string &name);
+    TypeInfo(FPod *curPod, uint16_t typeRefId) { setFromTypeRef(curPod, typeRefId); }
+    
+    void makeInt();
+    void makeBool();
+    
+    void setFromTypeRef(FPod *curPod, uint16_t typeRefId);
+    
+    bool isThis();
+    bool isVoid();
+    
+    bool operator==(const TypeInfo &other) const {
+        if (pod != other.pod) return false;
+        if (name != other.name) return false;
+        if (isNullable != other.isNullable) return false;
+        if (isValue != other.isValue) return false;
+        return true;
+    }
+};
+
 //Ref of var
 struct Expr {
     //index of parent
@@ -26,7 +55,8 @@ struct Expr {
     
     Expr() : block(nullptr), index(-1) {}
     
-    std::string getName();
+    std::string &getName();
+    TypeInfo &getType();
     std::string getTypeName();
     bool isValueType();
 };
@@ -44,8 +74,9 @@ struct Var {
     
     //name of var
     std::string name;
+    
     //type of var
-    std::string typeName;
+    TypeInfo type;
     
     Var() : index(-1), newIndex(-1), block(nullptr),
     isExport(false) {
@@ -68,7 +99,7 @@ public:
     FOpObj opObj;
     
     virtual void print(Printer& printer) override;
-    std::string getTypeName();
+    TypeInfo getType();
 };
 
 class StoreStmt : public Stmt {
@@ -105,7 +136,7 @@ public:
     bool isMixin;
     
     //for compare which no methodRef
-    std::vector<std::string> argsType;
+    //std::vector<std::string> argsType;
     
     CallStmt() : methodRef(NULL) {}
     
@@ -190,19 +221,21 @@ public:
     Expr from;
     Expr to;
     
-    uint16_t fromType;
-    uint16_t toType;
+    int fromType;
+    int toType;
     
+    //can direct cast
     bool safe;
+    //throw err if can't cast
+    bool checked;
     
-    CoerceStmt() : safe(true) {}
+    CoerceStmt() : safe(true), checked(true), fromType(-1), toType(-1) {}
     
     virtual void print(Printer& printer) override;
 };
 
 class TypeCheckStmt : public Stmt {
 public:
-    bool isOrAs;
     Expr obj;
     uint16_t type;
     Expr result;

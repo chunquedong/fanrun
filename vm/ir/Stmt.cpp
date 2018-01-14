@@ -8,6 +8,42 @@
 #include "Stmt.hpp"
 #include "IRMethod.h"
 #include "FCodeUtil.hpp"
+#include "escape.h"
+
+std::string TypeInfo::getName() const {
+    std::string typeName = pod + "_" + name;
+    if (isNullable) {
+        typeName += "_null";
+    }
+    escape(typeName);
+    return typeName;
+}
+
+void TypeInfo::setFromTypeRef(FPod *curPod, uint16_t typeRefId) {
+    FTypeRef &typeRef = curPod->typeRefs[typeRefId];
+    pod = curPod->names[typeRef.podName];
+    name = curPod->names[typeRef.typeName];
+    isNullable = FCodeUtil::isNullableTypeRef(curPod, typeRefId);
+    isValue = FCodeUtil::isValueTypeRef(curPod, typeRefId);
+}
+
+void TypeInfo::makeInt() {
+    pod = "sys";
+    name = "Int";
+    isValue = true;
+}
+void TypeInfo::makeBool() {
+    pod = "sys";
+    name = "Bool";
+    isValue = true;
+}
+
+bool TypeInfo::isThis() {
+    return pod == "sys" && name == "This";
+}
+bool TypeInfo::isVoid() {
+    return pod == "sys" && name == "Void";
+}
 
 Expr Var::asRef() {
     if (block == NULL || index == -1) {
@@ -85,18 +121,22 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
     }
 }
 
-std::string Expr::getName() {
+std::string &Expr::getName() {
     Var &var = block->locals[index];
     return var.name;
 }
 
-std::string Expr::getTypeName() {
+TypeInfo &Expr::getType() {
     Var &var = block->locals[index];
-    return var.typeName;
+    return var.type;
+}
+
+std::string Expr::getTypeName() {
+    return getType().getName();
 }
 
 bool Expr::isValueType() {
-    return FCodeUtil::isValType(getTypeName());
+    return getType().isValue;
 }
 
 void ConstStmt::print(Printer& printer) {
@@ -105,51 +145,56 @@ void ConstStmt::print(Printer& printer) {
     printer.printf(";");
 }
 
-std::string ConstStmt::getTypeName() {
-    std::string res;
+TypeInfo ConstStmt::getType() {
+    TypeInfo res;
+    res.pod = "sys";
     switch (opObj.opcode) {
         case FOp::LoadNull: {
-            res = "sys_Obj_ref";
+            res.name = "Obj";
             break;
         }
         case FOp::LoadFalse: {
-            res = "sys_Bool";
+            res.name = "Bool";
+            res.isValue = true;
             break;
         }
         case FOp::LoadTrue: {
-            res = "sys_Bool";
+            res.name = "Bool";
+            res.isValue = true;
             break;
         }
         case FOp::LoadInt: {
-            res = "sys_Int";
+            res.name = "Int";
+            res.isValue = true;
             break;
         }
         case FOp::LoadFloat: {
-            res = "sys_Float";
+            res.name = "Float";
+            res.isValue = true;
             break;
         }
         case FOp::LoadDecimal: {
-            res = "sys_Decimal";
+            res.name = "Decimal";
             break;
         }
         case FOp::LoadStr: {
-            res = "sys_Str";
+            res.name = "Str";
             break;
         }
         case FOp::LoadDuration: {
-            res = "sys_Duration";
+            res.name = "Duration";
             break;
         }
         case FOp::LoadUri: {
-            res = "sys_Uri";
+            res.name = "Uri";
             break;
         }
         case FOp::LoadType: {
-            res = "sys_Type";
+            res.name = "Type";
             break;
         }
         default: {
-            res = "sys_Obj";
+            res.name = "Obj";
             break;
         }
     }
@@ -165,16 +210,22 @@ void CallStmt::print(Printer& printer) {
         printer.printf("%s = ", retValue.getName().c_str());
     }
     
-    if (!isVirtual) {
-        printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
-    } else if (isMixin) {
+    bool isValueType = false;
+    if (!isStatic && params.at(0).isValueType()) {
+        isValueType = true;
+        printer.printf("%s_%s_val(__env", typeName.c_str(), mthName.c_str());
+    }
+    else if (isVirtual) {
+        printer.printf("FR_VCALL(%s, %s", typeName.c_str(), mthName.c_str());
+    }
+    else if (isMixin) {
         printer.printf("FR_ICALL(%s, %s", typeName.c_str(), mthName.c_str());
-    } else {
-        if (params.size() > 0 && params.at(0).isValueType()) {
-            printer.printf("%s_%s_val(__env", typeName.c_str(), mthName.c_str());
-        } else {
-            printer.printf("FR_VCALL(%s, %s", typeName.c_str(), mthName.c_str());
-        }
+    }
+    else if (isStatic) {
+        printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
+    }
+    else {
+        printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
     }
     
     for (int i=0; i<params.size(); ++i) {
@@ -191,25 +242,33 @@ void CallStmt::print(Printer& printer) {
 void FieldStmt::print(Printer& printer) {
     std::string typeName = FCodeUtil::getTypeRefName(curPod, fieldRef->parent, false);
     std::string name = FCodeUtil::getIdentifierName(curPod, fieldRef->name);
-    
+    bool isValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->parent);
     if (isLoad) {
         printer.printf("%s = ", value.getName().c_str());
         if (isStatic) {
             printer.printf("%s_%s", typeName.c_str(), name.c_str());
-        } else {
+        }
+        else if (isValueType) {
+            printer.printf("%s.%s", instance.getName().c_str(), name.c_str());
+        }
+        else {
             printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
         }
     } else {
         if (isStatic) {
             printer.printf("%s_%s", typeName.c_str(), name.c_str());
-        } else {
+        }
+        else if (isValueType) {
+            printer.printf("%s.%s", instance.getName().c_str(), name.c_str());
+        }
+        else {
             printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
         }
         printer.printf("= %s", value.getName().c_str());
     }
     
     printer.printf(";");
-    if (!isLoad && !isStatic) {
+    if (!isLoad && !isStatic && !isValueType) {
         printer.printf("FR_SET_DIRTY(%s)", instance.getName().c_str());
     }
 }
@@ -254,7 +313,11 @@ void JmpStmt::print(Printer& printer) {
 
 void AllocStmt::print(Printer& printer) {
     std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
-    printer.printf("%s = FR_ALLOC(%s);", obj.getName().c_str(), typeName.c_str());
+    if (FCodeUtil::isValueTypeRef(curPod, type)) {
+        printer.printf("FR_INIT_VAL(%s, %s);", obj.getName().c_str(), typeName.c_str());
+    } else {
+        printer.printf("%s = FR_ALLOC(%s);", obj.getName().c_str(), typeName.c_str());
+    }
 }
 
 void CmpStmt::print(Printer& printer) {
@@ -277,19 +340,12 @@ void CmpStmt::print(Printer& printer) {
     }
     
     if (opObj.i1 > 0 || opObj.i2 > 0) {
-        FTypeRef &typeRef1 = curPod->typeRefs[opObj.i1];
-        FTypeRef &typeRef2 = curPod->typeRefs[opObj.i2];
-        bool isNullable1 = false, isNullable2 = false;
-        FCodeUtil::getTypeInfo(curPod, typeRef1, isVal1, isNullable1);
-        FCodeUtil::getTypeInfo(curPod, typeRef2, isVal2, isNullable2);
-        if (isNullable1) isVal1 = false;
-        if (isNullable2) isVal2 = false;
+        isVal1 = TypeInfo(curPod, opObj.i1).isValue;
+        isVal2 = TypeInfo(curPod, opObj.i2).isValue;
     }
     else {
-        std::string name1 = param1.getTypeName();
-        std::string name2 = param2.getTypeName();
-        isVal1 = FCodeUtil::isValType(name1);
-        isVal2 = FCodeUtil::isValType(name2);
+        isVal1 = param1.getType().isValue;
+        isVal2 = param2.getType().isValue;
     }
     
     const char *op = "==";
@@ -361,9 +417,15 @@ void CmpStmt::print(Printer& printer) {
                 printer.printf("%s = false;", result.getName().c_str());
             }
             
-            printer.printf("else %s = FR_UNBOXING(%s, %s) %s %s;", result.getName().c_str()
+            if (FCodeUtil::isBuildinVal(param2.getTypeName())) {
+                printer.printf("else %s = FR_UNBOXING_VAL(%s, %s) %s %s;", result.getName().c_str()
+                               , param1.getName().c_str(), param2.getTypeName().c_str()
+                               , op, param2.getName().c_str());
+            } else {
+                printer.printf("else %s = FR_UNBOXING(%s, %s) %s %s;", result.getName().c_str()
                            , param1.getName().c_str(), param2.getTypeName().c_str()
                            , op, param2.getName().c_str());
+            }
         }
         else if (!isVal2) {
             printer.printf("if (%s == NULL) fr_throwNPE(__env);", param2.getName().c_str());
@@ -375,9 +437,15 @@ void CmpStmt::print(Printer& printer) {
                 printer.printf("%s = false;", result.getName().c_str());
             }
             
-            printer.printf("else %s = %s %s FR_UNBOXING(%s, %s);", result.getName().c_str()
+            if (FCodeUtil::isBuildinVal(param1.getTypeName())) {
+                printer.printf("else %s = %s %s FR_UNBOXING_VAL(%s, %s);", result.getName().c_str()
                            , param1.getName().c_str(), op
                            , param2.getName().c_str(), param1.getTypeName().c_str());
+            } else {
+                printer.printf("else %s = %s %s FR_UNBOXING(%s, %s);", result.getName().c_str()
+                               , param1.getName().c_str(), op
+                               , param2.getName().c_str(), param1.getTypeName().c_str());
+            }
         }
     }
     
@@ -530,10 +598,10 @@ void CoerceStmt::print(Printer& printer) {
     
     if (typeName1 == typeName2) return;
     
-    bool isVal1 = FCodeUtil::isValType(typeName1);
-    bool isVal2 = FCodeUtil::isValType(typeName2);
-    bool isNull1 = FCodeUtil::isNullableType(typeName1);
-    bool isNull2 = FCodeUtil::isNullableType(typeName2);
+    bool isVal1 = from.getType().isValue;
+    bool isVal2 = to.getType().isValue;
+    bool isNull1 = from.getType().isNullable;
+    bool isNull2 = to.getType().isNullable;
     
     if (!isVal1 && !isVal2) {
         if (isNull1 && !isNull2) {
@@ -543,8 +611,13 @@ void CoerceStmt::print(Printer& printer) {
         }
     }
     else if (!isVal1 && isVal2) {
-        printer.printf("%s = FR_UNBOXING(%s, %s);"
+        if (FCodeUtil::isBuildinVal(to.getTypeName())) {
+            printer.printf("%s = FR_UNBOXING_VAL(%s, %s);"
+                           , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
+        } else {
+            printer.printf("%s = FR_UNBOXING(%s, %s);"
                        , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
+        }
         return;
     }
     else if (isVal1 && !isVal2) {
@@ -574,18 +647,35 @@ void CoerceStmt::print(Printer& printer) {
                    , typeName2.c_str(), from.getName().c_str());
     } else {
         std::string toTypeName = FCodeUtil::getTypeRefName(curPod, toType, false);
-        printer.printf("%s = FR_SAFE_CAST(%s, %s, %s);", to.getName().c_str()
+        
+        if (checked) {
+            printer.printf("%s = FR_CAST(%s, %s, %s);", to.getName().c_str()
                        , from.getName().c_str() , toTypeName.c_str(), typeName2.c_str());
+        } else {
+            printer.printf("%s = FR_TYPE_AS(%s, %s);", to.getName().c_str()
+                           , from.getName().c_str() , toTypeName.c_str());
+        }
     }
 }
 
 void TypeCheckStmt::print(Printer& printer) {
-    std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
-    if (isOrAs) {
-        printer.printf("%s = FR_TYPE_IS(%s, %s);"
-                       , result.getName().c_str(), obj.getName().c_str(), typeName.c_str());
+    if (obj.getType().isValue) {
+        bool isFit = FCodeUtil::isInheriteOf(obj.getType().pod, obj.getType().name, curPod, type);
+        if (isFit) {
+            if (FCodeUtil::isValueTypeRef(curPod, type)) {
+                printer.printf("%s = %s;"
+                               , result.getName().c_str(), obj.getName().c_str());
+            }
+            else {
+                std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+                printer.printf("FR_BOXING(%s, %s, %s, %s);"
+                               , result.getName().c_str(), obj.getName().c_str()
+                               , typeName.c_str(), result.getTypeName().c_str());
+            }
+        }
     } else {
-        printer.printf("%s = FR_TYPE_AS(%s, %s);"
-                       , result.getName().c_str(), obj.getName().c_str(), typeName.c_str());
+        std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+        printer.printf("%s = FR_TYPE_IS(%s, %s);"
+                   , result.getName().c_str(), obj.getName().c_str(), typeName.c_str());
     }
 }

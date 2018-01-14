@@ -23,6 +23,7 @@ public:
     int c_sortFlag;
 public:
     std::string name;
+    bool isValueType;
 public:
     TypeGen(PodGen *podGen, FType *type);
     

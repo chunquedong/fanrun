@@ -16,14 +16,15 @@
 TypeGen::TypeGen(PodGen *podGen, FType *type)
 : podGen(podGen), type(type) {
     name = podGen->getTypeRefName(type->meta.self);
+    isValueType = FCodeUtil::isValueType(type);
 }
 
 void TypeGen::genTypeDeclare(Printer *printer) {
     printer->println("struct %s_struct;", name.c_str());
     printer->println("typedef struct %s_struct *%s_ref;", name.c_str(), name.c_str());
     printer->println("typedef %s_ref %s_null;", name.c_str(), name.c_str());
-    if (FCodeUtil::isValType(name)) {
-        if (podGen->podName != "sys") {
+    if (isValueType) {
+        if (!FCodeUtil::isBuildinValType(type)) {
             printer->println("typedef struct %s_struct %s_val;", name.c_str(), name.c_str());
         }
         printer->println("typedef %s_val %s;", name.c_str(), name.c_str());
@@ -34,7 +35,7 @@ void TypeGen::genTypeDeclare(Printer *printer) {
 
 void TypeGen::genStruct(Printer *printer) {
     
-    if (FCodeUtil::isValType(name) && podGen->podName == "sys") return;
+    if (FCodeUtil::isBuildinValType(type)) return;
     
     if ((type->meta.flags & FFlags::Native) != 0) {
         printer->println("//native struct %s_struct", name.c_str());
@@ -81,7 +82,7 @@ void TypeGen::genImple(Printer *printer) {
         
         gmethod.genImples(printer);
         
-        if (!gmethod.isStatic && FCodeUtil::isValType(name)) {
+        if (!gmethod.isStatic && isValueType) {
             gmethod.genImplesToVal(printer);
         }
         printer->newLine();
@@ -156,7 +157,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
         std::string typeName = podGen->getTypeRefName(field.type);
         printer->println("((fr_Class)vtable)->fieldList[%d].type = \"%s\";", i, typeName.c_str());
     
-        bool isValType = FCodeUtil::isValType(typeName);
+        bool isValType = isValueType;
         printer->println("((fr_Class)vtable)->fieldList[%d].isValType = %s;", i, isValType ? "true" : "false");
         
         if (field.flags & FFlags::Static) {
@@ -335,7 +336,7 @@ void TypeGen::genMethodDeclare(Printer *printer) {
         gmethod.genDeclares(printer, false, false);
         
         bool isStatic = (method->flags & FFlags::Static);
-        if (!isStatic && FCodeUtil::isValType(name)) {
+        if (!isStatic && isValueType) {
             gmethod.genDeclares(printer, false, true);
         }
         

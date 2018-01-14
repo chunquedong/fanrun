@@ -39,7 +39,9 @@ public:
     
     void print(IRMethod *method, Printer& printer, int pass);
     
-    Var &newVar(int typeRef);
+    Var &newVar(uint16_t typeRef);
+    
+    Var &newVarAs(const TypeInfo &type);
     
     void push(Expr &var) {
         stack.push_back(var);
