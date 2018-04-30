@@ -10,7 +10,7 @@
 
 int main(int argc, const char * argv[]) {
     
-    std::string libPath = "/Users/yangjiandong/workspace/soft/fantom-1.0.68";
+    std::string libPath = "/Users/yangjiandong/workspace/fantom/rel";
     std::string pod = "testlib";
     std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/vm/temp/";
   
