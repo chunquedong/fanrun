@@ -12,12 +12,12 @@
 //sys_Bool_null sys_Bool_fromStr1(fr_Env __env, sys_Str s){
 //    return sys_Bool_fromStr2(__env, s, true);
 //}
-sys_Bool_null sys_Bool_fromStr2(fr_Env __env, sys_Str s, sys_Bool checked){
+sys_Bool sys_Bool_fromStr2(fr_Env __env, sys_Str s, sys_Bool checked){
     if (wcsncmp(s->data, L"true", s->size) == 0) {
-        return (sys_Bool_null)fr_box_bool(__env, true);
+        return true;
     }
     else if (wcsncmp(s->data, L"false", s->size) == 0) {
-        return (sys_Bool_null)fr_box_bool(__env, false);
+        return false;
     }
     if (checked) {
         FR_ALLOC_THROW(sys_ParseErr);

@@ -9,13 +9,13 @@
 #include "runtime.h"
 
 //#if FR_RUN
-#include "testlib.h"
+#include "baseTest.h"
 
 int main() {
     fr_Env env = fr_getEnv();
-    testlib_init__(env);
+    baseTest_init__(env);
     
-    testlib_BoxingTest_main0(env);
+    baseTest_BoxingTest_main0(env);
     fr_releaseEnv(env);
 }
 

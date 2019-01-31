@@ -43,7 +43,7 @@ private:
     void genField(Printer *printer);
     void genTypeMetadata(Printer *printer);
     void genVTableInit(Printer *printer);
-    void genOverrideVTable(uint16_t tid, std::string &name
+    void genOverrideVTable(FType *type, std::string &name
                            , Printer *printer, MethodGen &gmethod, std::string from);
     
 };

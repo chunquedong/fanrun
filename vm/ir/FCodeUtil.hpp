@@ -14,6 +14,7 @@
 
 namespace FCodeUtil {
     std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable);
+    FType *getFTypeFromTypeRef(FPod *pod, uint16_t tid);
     
     bool isValueTypeRef(FPod *curPod, uint16_t typeRefId);
     bool isValueType(FType *type);

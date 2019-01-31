@@ -13,7 +13,7 @@ void sys_Func_make0(fr_Env __env, sys_Func_ref __self){ return; }
 sys_Type sys_Func_returns0(fr_Env __env, sys_Func_ref __self){ return 0; }
 sys_Int sys_Func_arity0(fr_Env __env, sys_Func_ref __self){ return 0; }
 sys_List sys_Func_params0(fr_Env __env, sys_Func_ref __self){ return 0; }
-sys_Method_null sys_Func_method0(fr_Env __env, sys_Func_ref __self){ return 0; }
+//sys_Method_null sys_Func_method0(fr_Env __env, sys_Func_ref __self){ return 0; }
 sys_Obj_null sys_Func_callList1(fr_Env __env, sys_Func_ref __self, sys_List_null args){ return 0; }
 sys_Obj_null sys_Func_callOn2(fr_Env __env, sys_Func_ref __self, sys_Obj_null target, sys_List_null args){ return 0; }
 sys_Obj_null sys_Func_call0(fr_Env __env, sys_Func_ref __self){

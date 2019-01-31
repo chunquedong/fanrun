@@ -23,6 +23,22 @@ void TypeInfo::setFromTypeRef(FPod *curPod, uint16_t typeRefId) {
     FTypeRef &typeRef = curPod->typeRefs[typeRefId];
     pod = curPod->names[typeRef.podName];
     name = curPod->names[typeRef.typeName];
+    
+    std::string::size_type pos = name.find("^");
+    if (pos != std::string::npos) {
+        std::string pname = name.substr(0, pos);
+        std::string cname = name.substr(pos+1);
+        curPod = curPod->c_loader->findPod(pod);
+        auto itr = curPod->c_typeMap.find(pname);
+        if (itr == curPod->c_typeMap.end()) {
+            throw std::string("Unknow Type:")+name;
+        }
+        FType *ftype = itr->second;
+        uint16_t ttid = ftype->findGenericParamBound(cname);
+        setFromTypeRef(curPod, ttid);
+        return;
+    }
+    
     isNullable = FCodeUtil::isNullableTypeRef(curPod, typeRefId);
     isValue = FCodeUtil::isValueTypeRef(curPod, typeRefId);
 }
@@ -207,7 +223,7 @@ void StoreStmt::print(Printer& printer) {
 
 void CallStmt::print(Printer& printer) {
     if (!isVoid) {
-        printer.printf("%s = ", retValue.getName().c_str());
+        printer.printf("%s = (%s)", retValue.getName().c_str(), retValue.getTypeName().c_str());
     }
     
     bool isValueType = false;

@@ -11,9 +11,9 @@
 sys_Float sys_Float_makeBits1(fr_Env __env, sys_Int bits){ return 0; }
 sys_Float sys_Float_makeBits321(fr_Env __env, sys_Int bits){ return 0; }
 //sys_Float_null sys_Float_fromStr1(fr_Env __env, sys_Str s){ return 0; }
-sys_Float_null sys_Float_fromStr2(fr_Env __env, sys_Str s, sys_Bool checked){ return 0; }
+sys_Float sys_Float_fromStr2(fr_Env __env, sys_Str s, sys_Bool checked){ return 0; }
 sys_Float sys_Float_random0(fr_Env __env){ return 0; }
-sys_Float_null sys_Float_privateMake0(fr_Env __env){ return 0; }
+sys_Float sys_Float_privateMake0(fr_Env __env){ return 0; }
 sys_Bool sys_Float_equals1_val(fr_Env __env, sys_Float_val __self, sys_Obj_null obj){ return 0; }
 //sys_Bool sys_Float_approx1_val(fr_Env __env, sys_Float_val __self, sys_Float r){ return 0; }
 sys_Bool sys_Float_approx2_val(fr_Env __env, sys_Float_val __self, sys_Float r, sys_Float_null tolerance){ return 0; }

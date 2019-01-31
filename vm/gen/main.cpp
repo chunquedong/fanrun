@@ -21,8 +21,8 @@ int main(int argc, const char * argv[]) {
     PodGen gen(&podMgr, "sys");
     gen.gen(outPath);
     
-    PodGen gen1(&podMgr, "std");
-    gen1.gen(outPath);
+    //PodGen gen1(&podMgr, "std");
+    //gen1.gen(outPath);
     
     PodGen gen2(&podMgr, "baseTest");
     gen2.gen(outPath);

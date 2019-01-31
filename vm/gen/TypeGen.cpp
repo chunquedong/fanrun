@@ -142,8 +142,13 @@ void TypeGen::genTypeMetadata(Printer *printer) {
     printer->println("((fr_Class)vtable)->allocSize = sizeof(struct %s_struct);", name.c_str());
     
     std::string baseName = podGen->getTypeRefName(type->meta.base);
-    printer->println("((fr_Class)vtable)->base = (fr_Class)%s_class__;", baseName.c_str());
-    
+    //sys::Obj's base class is NULL
+    if (baseName.size() == 0) {
+        printer->println("((fr_Class)vtable)->base = (fr_Class)NULL;");
+    }
+    else {
+        printer->println("((fr_Class)vtable)->base = (fr_Class)%s_class__;", baseName.c_str());
+    }
     printer->println("((fr_Class)vtable)->fieldCount = %d;", type->fields.size());
     printer->println("((fr_Class)vtable)->fieldList = (struct fr_Field*)malloc(sizeof(struct fr_Field)*%d);", type->fields.size());
     //int offset = 0;
@@ -249,7 +254,7 @@ void TypeGen::genVTableInit(Printer *printer) {
             }
             
             MethodGen gmethod(this, method);
-            genOverrideVTable(type->meta.base, rawMethodName, printer, gmethod, "vtable->");
+            genOverrideVTable(type, rawMethodName, printer, gmethod, "vtable->");
         }
     }
     
@@ -292,13 +297,20 @@ void TypeGen::genTypeInit(Printer *printer) {
      */
 }
 
-void TypeGen::genOverrideVTable(uint16_t tid, std::string &rawMethodName
+void TypeGen::genOverrideVTable(FType *type, std::string &rawMethodName
                                 , Printer *printer, MethodGen &gmethod, std::string from) {
-    FTypeRef &typeRef = podGen->pod->typeRefs[tid];
-    std::string &podName = podGen->pod->names[typeRef.podName];
-    std::string &typeName = podGen->pod->names[typeRef.typeName];
+    /*
+    uint16_t tid = type->meta.base;
+    FPod *pod = type->c_pod;
+    FTypeRef &typeRef = pod->typeRefs[tid];
+    std::string &podName = pod->names[typeRef.podName];
+    std::string &typeName = pod->names[typeRef.typeName];
+    
     FPod *tpod = podGen->podMgr->findPod(podName);
     FType *ttype = tpod->c_typeMap[typeName];
+    */
+    FType *ttype = FCodeUtil::getFTypeFromTypeRef(type->c_pod, type->meta.base);
+    if (ttype == NULL) return;
     
     auto found = ttype->c_methodMap.find(rawMethodName);
     
@@ -317,15 +329,17 @@ void TypeGen::genOverrideVTable(uint16_t tid, std::string &rawMethodName
                              , name.c_str(), gmethod.name.c_str(), j);
         }
     }
-    if (podName == "sys" && typeName == "Obj") return;
-    genOverrideVTable(ttype->meta.base, rawMethodName, printer, gmethod, from + "super__.");
+    //if (podName == "sys" && typeName == "Obj") return;
+    genOverrideVTable(ttype, rawMethodName, printer, gmethod, from + "super__.");
     
     for (int i=0; i<type->meta.mixin.size(); ++i) {
         uint16_t mixin = type->meta.mixin[i];
-        if (mixin == tid) continue;
-        std::string base = podGen->getTypeRefName(mixin);
-        from  = from + base + "_";
-        genOverrideVTable(mixin, rawMethodName, printer, gmethod, from);
+        if (mixin == type->meta.base) continue;
+        
+        //from  = from + base + "_";
+        FType *mixinType = FCodeUtil::getFTypeFromTypeRef(type->c_pod, mixin);
+        std::string base = mixinType->c_name;
+        genOverrideVTable(mixinType, rawMethodName, printer, gmethod, from + base + "_");
     }
 }
 

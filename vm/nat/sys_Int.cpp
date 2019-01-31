@@ -9,14 +9,14 @@
 //sys_Int_null sys_Int_fromStr2(fr_Env __env, sys_Str s, sys_Int radix){
 //    return sys_Int_fromStr3(__env, s, 10, true);
 //}
-sys_Int_null sys_Int_fromStr3(fr_Env __env, sys_Str s, sys_Int radix, sys_Bool checked){
+sys_Int sys_Int_fromStr3(fr_Env __env, sys_Str s, sys_Int radix, sys_Bool checked){
     wchar_t *str_end;
     sys_Int res = wcstoll(s->data, &str_end, (int)radix);
     if (checked && str_end == s->data) {
         sys_ParseErr e = FR_ALLOC(sys_ParseErr);
         FR_THROW(e);
     }
-    return (sys_Int_null)fr_box_int(__env, res);
+    return res;
 }
 //sys_Int sys_Int_random0(fr_Env __env){
 //    return sys_Int_random1(__env, NULL);
@@ -35,7 +35,7 @@ sys_Int sys_Int_random1(fr_Env __env, sys_Range_null r){
         return res;
     }
 }
-sys_Int_null sys_Int_privateMake0(fr_Env __env){ return 0; }
+sys_Int sys_Int_privateMake0(fr_Env __env){ return 0; }
 sys_Bool sys_Int_equals1_val(fr_Env __env, sys_Int_val __self, sys_Obj_null obj){
     if (!obj) return false;
     if (FR_TYPE_IS(obj, sys_Int)) {

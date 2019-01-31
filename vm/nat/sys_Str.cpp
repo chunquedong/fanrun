@@ -234,12 +234,12 @@ sys_Str sys_Str_localeUpper0(fr_Env __env, sys_Str_ref __self){ return 0; }
 sys_Str sys_Str_localeCapitalize0(fr_Env __env, sys_Str_ref __self){ return 0; }
 sys_Str sys_Str_localeDecapitalize0(fr_Env __env, sys_Str_ref __self){ return 0; }
 //sys_Bool_null sys_Str_toBool0(fr_Env __env, sys_Str_ref __self){ return 0; }
-sys_Bool_null sys_Str_toBool1(fr_Env __env, sys_Str_ref __self, sys_Bool checked){ return 0; }
+sys_Bool sys_Str_toBool1(fr_Env __env, sys_Str_ref __self, sys_Bool checked){ return 0; }
 //sys_Int_null sys_Str_toInt0(fr_Env __env, sys_Str_ref __self){ return 0; }
 //sys_Int_null sys_Str_toInt1(fr_Env __env, sys_Str_ref __self, sys_Int radix){ return 0; }
-sys_Int_null sys_Str_toInt2(fr_Env __env, sys_Str_ref __self, sys_Int radix, sys_Bool checked){ return 0; }
+sys_Int sys_Str_toInt2(fr_Env __env, sys_Str_ref __self, sys_Int radix, sys_Bool checked){ return 0; }
 //sys_Float_null sys_Str_toFloat0(fr_Env __env, sys_Str_ref __self){ return 0; }
-sys_Float_null sys_Str_toFloat1(fr_Env __env, sys_Str_ref __self, sys_Bool checked){ return 0; }
+sys_Float sys_Str_toFloat1(fr_Env __env, sys_Str_ref __self, sys_Bool checked){ return 0; }
 //sys_Str sys_Str_toCode0(fr_Env __env, sys_Str_ref __self){ return 0; }
 //sys_Str sys_Str_toCode1(fr_Env __env, sys_Str_ref __self, sys_Int_null quote){ return 0; }
 sys_Str sys_Str_toCode2(fr_Env __env, sys_Str_ref __self, sys_Int_null quote, sys_Bool escapeUnicode){ return 0; }
