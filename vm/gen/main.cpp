@@ -10,8 +10,8 @@
 
 int main(int argc, const char * argv[]) {
     
-    std::string libPath = "/Users/yangjiandong/workspace/fantom/rel";
-    std::string pod = "testlib";
+    std::string libPath = "/Users/yangjiandong/workspace/code/fanCore/devEnv";
+    std::string pod = "baseTest";
     std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/vm/temp/";
   
     PodLoader podMgr;
@@ -21,7 +21,10 @@ int main(int argc, const char * argv[]) {
     PodGen gen(&podMgr, "sys");
     gen.gen(outPath);
     
-    PodGen gen2(&podMgr, "testlib");
+    PodGen gen1(&podMgr, "std");
+    gen1.gen(outPath);
+    
+    PodGen gen2(&podMgr, "baseTest");
     gen2.gen(outPath);
     
     puts("DONE!");

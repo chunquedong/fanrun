@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		320544622203196300ECB5F2 /* baseTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 320544612203196300ECB5F2 /* baseTest.cpp */; };
 		324A54B42000EE130083C73E /* sys.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 324A54B22000EE130083C73E /* sys.cpp */; };
-		324A54B52000EE130083C73E /* testlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 324A54B32000EE130083C73E /* testlib.cpp */; };
 		326165501FF8A578002174D6 /* Vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3261654F1FF8A578002174D6 /* Vm.cpp */; };
 		326165561FF8B97E002174D6 /* runtime_native.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 326165551FF8B97E002174D6 /* runtime_native.cpp */; };
 		3291F92F1F6D416C00F12438 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9221F6D416C00F12438 /* Env.cpp */; };
@@ -74,8 +74,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		320544602203196300ECB5F2 /* baseTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseTest.h; sourceTree = "<group>"; };
+		320544612203196300ECB5F2 /* baseTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseTest.cpp; sourceTree = "<group>"; };
 		324A54B22000EE130083C73E /* sys.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys.cpp; sourceTree = "<group>"; };
-		324A54B32000EE130083C73E /* testlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testlib.cpp; sourceTree = "<group>"; };
 		3261654E1FF8A578002174D6 /* Vm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Vm.hpp; sourceTree = "<group>"; };
 		3261654F1FF8A578002174D6 /* Vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vm.cpp; sourceTree = "<group>"; };
 		326165551FF8B97E002174D6 /* runtime_native.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime_native.cpp; sourceTree = "<group>"; };
@@ -87,7 +88,6 @@
 		3291F9281F6D416C00F12438 /* Class.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Class.cpp; sourceTree = "<group>"; };
 		3291F9291F6D416C00F12438 /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Class.h; sourceTree = "<group>"; };
 		3291F92C1F6D416C00F12438 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys.h; sourceTree = "<group>"; };
-		3291F92E1F6D416C00F12438 /* testlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testlib.h; sourceTree = "<group>"; };
 		3291F9361F6D418600F12438 /* Gc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Gc.cpp; sourceTree = "<group>"; };
 		3291F9371F6D418600F12438 /* Gc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gc.h; sourceTree = "<group>"; };
 		3291F9381F6D418600F12438 /* gcobj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gcobj.h; sourceTree = "<group>"; };
@@ -222,10 +222,10 @@
 		3291F92A1F6D416C00F12438 /* temp */ = {
 			isa = PBXGroup;
 			children = (
+				320544602203196300ECB5F2 /* baseTest.h */,
+				320544612203196300ECB5F2 /* baseTest.cpp */,
 				324A54B22000EE130083C73E /* sys.cpp */,
-				324A54B32000EE130083C73E /* testlib.cpp */,
 				3291F92C1F6D416C00F12438 /* sys.h */,
-				3291F92E1F6D416C00F12438 /* testlib.h */,
 			);
 			path = temp;
 			sourceTree = "<group>";
@@ -415,7 +415,6 @@
 				3291F98A1F6D41DE00F12438 /* infback.c in Sources */,
 				32C106E71FE6ADCB006248C6 /* sys_Err.cpp in Sources */,
 				326165561FF8B97E002174D6 /* runtime_native.cpp in Sources */,
-				324A54B52000EE130083C73E /* testlib.cpp in Sources */,
 				3291F98D1F6D41DE00F12438 /* inftrees.c in Sources */,
 				3291F9791F6D41DE00F12438 /* system.c in Sources */,
 				3291F98E1F6D41DE00F12438 /* trees.c in Sources */,
@@ -457,6 +456,7 @@
 				32C106FD1FE6B392006248C6 /* sys_Pod.cpp in Sources */,
 				3291F98C1F6D41DE00F12438 /* inflate.c in Sources */,
 				3291F9811F6D41DE00F12438 /* miniunz.c in Sources */,
+				320544622203196300ECB5F2 /* baseTest.cpp in Sources */,
 				3291F9851F6D41DE00F12438 /* zip.c in Sources */,
 				32C106FB1FE6B263006248C6 /* sys_Method.cpp in Sources */,
 				3291F9861F6D41DE00F12438 /* adler32.c in Sources */,

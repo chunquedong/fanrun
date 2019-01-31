@@ -62,14 +62,14 @@ static void parseMeta(Buffer &file, std::unordered_map<std::string,std::string> 
     }
 }
 
-void FPod::load(ZipFile &zip, bool isSpecial) {
-    read(zip, isSpecial);
+void FPod::load(ZipFile &zip) {
+    read(zip);
     
     types.resize(typeMetas.size());
     for (size_t i=0,n=typeMetas.size(); i<n; ++i) {
         FTypeRef ref = typeRefs[typeMetas[i].self];
         std::string &name = names[ref.typeName];
-        readType(zip, name, typeMetas[i], types[i], isSpecial);
+        readType(zip, name, typeMetas[i], types[i]);
     }
     
     ssize_t bufSize;
@@ -89,14 +89,14 @@ void FPod::load(ZipFile &zip, bool isSpecial) {
         depends = props["pod.depends"];
         fcodeVersion = props["fcode.version"];
         
-        if (fcodeVersion != "1.0.51") {
+        if (fcodeVersion != "1.1.1") {
             printf("ERROR: fcodeVersion error %s, expected 1.0.51", fcodeVersion.c_str());
         }
     }
     c_wrappedPod = NULL;
 }
 
-void FPod::read(ZipFile &zip, bool isSpecial) {
+void FPod::read(ZipFile &zip) {
     {
         ssize_t bufSize;
         unsigned char *data = zip.getFileData("fcode/names.def", &bufSize);
@@ -106,7 +106,7 @@ void FPod::read(ZipFile &zip, bool isSpecial) {
             std::string name;
             for (int i=0; i<size; ++i) {
                 name = buf.readString();
-                if (isSpecial) {
+                /*if (isSpecial) {
                     if (name == "syslib") {
                         name = "sys";
                     }
@@ -116,7 +116,7 @@ void FPod::read(ZipFile &zip, bool isSpecial) {
                     else if (name.find("Fan") == 0) {
                         name = name.substr(3, name.size()-3);
                     }
-                }
+                }*/
                 names.push_back(name);
             }
         }
@@ -248,18 +248,30 @@ void FPod::read(ZipFile &zip, bool isSpecial) {
                     ref.mixin.push_back(buf.readUInt16());
                 }
                 ref.flags = buf.readUInt32();
+                
+#ifndef FCODE_1_0
+                ref.genericCount = buf.readUInt8();
+                ref.genericParams.resize(ref.genericCount);
+                ref.genericParamBounds.resize(ref.genericCount);
+                for (int i=0; i<ref.genericCount; ++i) {
+                    ref.genericParams[i] = buf.readUInt16();
+                }
+                for (int i=0; i<ref.genericCount; ++i) {
+                    ref.genericParamBounds[i] = buf.readUInt16();
+                }
+#endif
                 typeMetas.push_back(ref);
             }
         }
     }
 }
 
-void FPod::readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &type, bool isSpecial) {
+void FPod::readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &type) {
     ssize_t bufSize;
     std::string path = ("fcode/");
-    if (isSpecial) {
-        path += "Fan";
-    }
+    //if (isSpecial) {
+    //    path += "Fan";
+    //}
     path += name;
     path += ".fcode";
     
@@ -269,9 +281,11 @@ void FPod::readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &typ
         type.read(this, meta, buf);
         
         c_typeMap[name] = &type;
-    } else if (isSpecial) {
-        readType(zip, name, meta, type, false);
-    } else {
+    }
+    //else if (isSpecial) {
+    //    readType(zip, name, meta, type, false);
+    //}
+    else {
         printf("ERROR: can't read type %s\n", name.c_str());
     }
     

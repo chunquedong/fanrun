@@ -46,8 +46,31 @@ void FType::readMethod(FMethod &method, Buffer &buffer) {
             method.attrs.push_back(attr);
         }
     }
+    
+#ifndef FCODE_1_0
+    method.genericCount = buffer.readUInt8();
+    method.genericParams.resize(method.genericCount);
+    method.genericParamBounds.resize(method.genericCount);
+    for (int i=0; i<method.genericCount; ++i) {
+        method.genericParams[i] = buffer.readUInt16();
+    }
+    for (int i=0; i<method.genericCount; ++i) {
+        method.genericParamBounds[i] = buffer.readUInt16();
+    }
+#endif
 
     method.c_parent = this;
+}
+
+uint16_t FType::findGenericParamBound(const std::string &name) {
+    for (int i =0; i<meta.genericCount; ++i) {
+        uint16_t nameId = meta.genericParams[i];
+        const std::string &tname = c_pod->names[nameId];
+        if (tname == name) {
+            return meta.genericParamBounds[i];
+        }
+    }
+    return -1;
 }
 
 void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {

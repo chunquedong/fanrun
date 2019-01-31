@@ -12,9 +12,29 @@
 namespace FCodeUtil {
 
     std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable) {
+        //Obj's base class
+        if (tid == 0xFFFF) {
+            return "";
+        }
+        
         FTypeRef &typeRef = pod->typeRefs[tid];
         std::string &podName = pod->names[typeRef.podName];
         std::string &typeName = pod->names[typeRef.typeName];
+        
+        std::string::size_type pos = typeName.find("^");
+        if (pos != std::string::npos) {
+            std::string pname = typeName.substr(0, pos);
+            std::string cname = typeName.substr(pos+1);
+            FPod *curPod = pod->c_loader->findPod(podName);
+            auto itr = curPod->c_typeMap.find(pname);
+            if (itr == curPod->c_typeMap.end()) {
+                throw std::string("Unknow Type:")+typeName;
+            }
+            FType *ftype = itr->second;
+            uint16_t ttid = ftype->findGenericParamBound(cname);
+            return getTypeRefName(curPod, ttid, checkNullable);
+        }
+        
         std::string &sig = typeRef.signature;
         
         std::string res = podName + "_" + typeName;
@@ -43,6 +63,7 @@ namespace FCodeUtil {
     }
 
     bool isValueType(FType *type) {
+        /*
         if (type->c_pod->name == "sys") {
             if (type->c_name == "Str"
                 || type->c_name == "Pod"
@@ -66,6 +87,8 @@ namespace FCodeUtil {
             return true;
         }
         return false;
+         */
+        return (type->meta.flags & FFlags::Struct) != 0;
     }
     
     bool isNullableTypeRef(FPod *pod, uint16_t tid) {
@@ -85,6 +108,11 @@ namespace FCodeUtil {
         FTypeRef &typeRef = pod->typeRefs[tid];
         std::string &podName = pod->names[typeRef.podName];
         std::string &typeName = pod->names[typeRef.typeName];
+        
+        std::string::size_type pos = typeName.find("^");
+        if (pos != std::string::npos) {
+            return false;
+        }
         
         FPod *curPod = pod->c_loader->findPod(podName);
         auto itr = curPod->c_typeMap.find(typeName);

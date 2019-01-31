@@ -67,6 +67,7 @@ FOpArg OpArgList[] =
     FOpArg::None,         //  53 CatchEnd
     FOpArg::None,         //  54 FinallyStart
     FOpArg::None,         //  55 FinallyEnd
+    FOpArg::MethodRef,   //  56 CallSuper
 };
 
 Code::Code() {

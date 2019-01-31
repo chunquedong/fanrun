@@ -36,6 +36,12 @@ namespace FFlags {
     const uint32_t Storage    = 0x00010000;
     const uint32_t Synthetic  = 0x00020000;
     const uint32_t Virtual    = 0x00040000;
+    
+    const uint32_t Struct     = 0x00080000;
+    const uint32_t Extension  = 0x00100000;
+    const uint32_t RuntimeConst=0x00200000;
+    const uint32_t Readonly   = 0x00400000;
+    const uint32_t Async      = 0x00800000;
     const uint32_t FlagsMask  = 0x0007ffff;
 }
 
@@ -100,12 +106,12 @@ public:
     std::vector< std::string > c_dependPods;
     PodLoader *c_loader;
     
-    void load(ZipFile &zip, bool isSpecial);
+    void load(ZipFile &zip);
     
 private:
-    void read(ZipFile &zip, bool isSpecial);
+    void read(ZipFile &zip);
     
-    void readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &type, bool isSpecial);
+    void readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &type);
     
 };
 

@@ -46,6 +46,10 @@ struct FMethod : public FSlot {
     std::vector<FMethodVar> vars;
     Code code;
     
+    uint8_t genericCount;
+    std::vector<uint16_t> genericParams;
+    std::vector<uint16_t> genericParamBounds;
+    
     //cache
     FType *c_parent;
     void (*c_native)(void *env, void *param, void *ret);
@@ -60,6 +64,9 @@ struct FTypeMeta {
     uint16_t mixinCount;
     std::vector<uint16_t> mixin;// (typeRefs.def)
     uint32_t flags;
+    uint8_t genericCount;
+    std::vector<uint16_t> genericParams;
+    std::vector<uint16_t> genericParamBounds;
 };
 
 class FMethodRef;
@@ -94,6 +101,8 @@ public:
     void read(FPod *pod, FTypeMeta &meta, Buffer &buffer);
     
     ~FType();
+    
+    uint16_t findGenericParamBound(const std::string &name);
   
 private:
     void readMethod(FMethod &method, Buffer &buffer);

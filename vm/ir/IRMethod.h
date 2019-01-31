@@ -43,6 +43,8 @@ public:
     
     Var &newVarAs(const TypeInfo &type);
     
+    void addStmt(Stmt *stmt);
+    
     void push(Expr &var) {
         stack.push_back(var);
     }

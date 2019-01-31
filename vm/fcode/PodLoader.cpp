@@ -36,16 +36,9 @@ static void string_split(std::string& s, std::string delim,std::vector< std::str
 
 bool PodLoader::load(std::string path, std::string name) {
     
-    if (name == "syslib") {
-        name = "sys";
-    }
     if (podMap.find(name) != podMap.end()) {
         return true;
     }
-    if (name == "sys") {
-        name = "syslib";
-    }
-
     std::string file = path + name + ".pod";
     ZipFile *zip = ZipFile::createWithFile(file);
     
@@ -63,9 +56,8 @@ bool PodLoader::load(std::string path, std::string name) {
     
     FPod *fpod = new FPod();
     fpod->c_loader = this;
-    bool isSpecial = name == "syslib";
     
-    fpod->load(*zip, isSpecial);
+    fpod->load(*zip);
     podMap[fpod->name] = fpod;
     
     delete zip;

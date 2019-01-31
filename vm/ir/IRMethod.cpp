@@ -8,6 +8,10 @@
 #include "IRMethod.h"
 #include "FCodeUtil.hpp"
 
+void Block::addStmt(Stmt *stmt) {
+    stmts.push_back(stmt);
+}
+
 Var &Block::newVar(uint16_t typeRefId) {
     Var var;
     var.index = (int)locals.size();

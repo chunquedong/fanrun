@@ -63,12 +63,13 @@ enum class FOp {
     Switch          =  47, // ()        switch jump table 2 count + 2*count
     Throw           =  48, // ()        throw Err on top of stack
     Leave           =  49, // (jmp)     jump out of a try or catch block
-    JumpFinally     =  50, // (jmp)     jump to a finally block
+    _JumpFinally     =  50, // (jmp)     jump to a finally block
     CatchAllStart   =  51, // ()        start catch all block - do not leave Err on stack
     CatchErrStart   =  52, // (type)    start catch block - leave typed Err on stack
-    CatchEnd        =  53, // ()        start catch block - leave typed Err on stack
+    _CatchEnd        =  53, // ()        start catch block - leave typed Err on stack
     FinallyStart    =  54, // ()        starting instruction of a finally block
     FinallyEnd      =  55, // ()        ending instruction of a finally block
+    CallSuper       =  56, // (method) call super method
 };
 
 enum class FOpArg

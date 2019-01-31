@@ -7,6 +7,7 @@
 
 #include "MBuilder.hpp"
 #include "FCodeUtil.hpp"
+#include <stdlib.h>
 
 MBuilder::MBuilder(Code &code, IRMethod &irMethod) :
         curPod(irMethod.curPod), code(code)
@@ -201,7 +202,7 @@ void MBuilder::initJumpTarget() {
             case FOp::JumpTrue:
             case FOp::JumpFalse:
             case FOp::Leave:
-            case FOp::JumpFinally: {
+            case FOp::_JumpFinally: {
                 int16_t pos = opObj.i1;
                 FOpObj *op = posToOp[pos];
                 if (op) {
@@ -255,13 +256,8 @@ void MBuilder::linkBlock() {
             }
                 break;
             case FOp::Jump:
-            case FOp::Leave:{
-                Block *target = posToBlock[lastOp.i1];
-                b->branchs.push_back(target);
-                target->incoming.push_back(b);
-            }
-                break;
-            case FOp::JumpFinally: {
+            case FOp::Leave:
+            case FOp::_JumpFinally:{
                 Block *target = posToBlock[lastOp.i1];
                 b->branchs.push_back(target);
                 target->incoming.push_back(b);
@@ -440,6 +436,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
                 if (newVar.index == -1 && newVar.block == nullptr) {
                     printf("ERROR\n");
+                    abort();
                 }
                 
                 StoreStmt *stmt = new StoreStmt();
@@ -459,15 +456,16 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                     coerceStmt->to = var.asRef();
                     stmt->src = var.asRef();
                 }
+                
             
                 //insert stmt to previous block
                 if (previous->stmts.size() == 0 || previous->isForward) {
                     if (coerceStmt) previous->stmts.push_back(coerceStmt);
                     previous->stmts.push_back(stmt);
                 } else {
-                    auto insertPoint = previous->stmts.begin()
-                    + previous->stmts.size()-1;
+                    auto insertPoint = previous->stmts.begin() + previous->stmts.size()-1;
                     previous->stmts.insert(insertPoint, stmt);
+                    insertPoint = previous->stmts.begin() + previous->stmts.size()-1;
                     if (coerceStmt) previous->stmts.insert(insertPoint, coerceStmt);
                 }
             }
@@ -633,7 +631,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
                 
             case FOp::CallCtor:
-            case FOp::CallNonVirtual: {
+            case FOp::CallNonVirtual:
+            case FOp::CallSuper: {
                 call(block, opObj, false, false, false);
                 break;
             }
@@ -826,7 +825,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 block->stmts.push_back(stmt);
                 break;
             }
-            case FOp::JumpFinally:{
+            case FOp::_JumpFinally:{
                 JmpStmt *stmt = new JmpStmt();
                 stmt->curPod = curPod;
                 stmt->jmpType = JmpStmt::finallyJmp;
@@ -864,7 +863,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 block->stmts.push_back(estmt);
             }
                 break;
-            case FOp::CatchEnd: {
+            case FOp::_CatchEnd: {
                 ExceptionStmt *stmt = new ExceptionStmt();
                 stmt->curPod = curPod;
                 stmt->etype = ExceptionStmt::CatchEnd;
