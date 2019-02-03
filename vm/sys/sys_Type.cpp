@@ -58,3 +58,4 @@ sys_Str_null sys_Type_doc0(fr_Env __env, sys_Type_ref __self){ return 0; }
 sys_Str sys_Type_toStr0(fr_Env __env, sys_Type_ref __self){ return 0; }
 sys_Str sys_Type_toLocale0(fr_Env __env, sys_Type_ref __self){ return 0; }
 
+sys_Bool sys_Type_isJava0(fr_Env __env, sys_Type_ref __self) { return false; }

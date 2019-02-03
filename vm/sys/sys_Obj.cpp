@@ -37,3 +37,9 @@ void sys_Obj_echo1(fr_Env __env, sys_Obj_null x){
     const char *utf8 = fr_getStrUtf8(__env, str);
     printf("%s\n", utf8);
 }
+
+void sys_Obj_assert2(fr_Env __env, sys_Bool condition, sys_Str msg) {
+    if (!condition) {
+        //TODO throw AsertErr
+    }
+}

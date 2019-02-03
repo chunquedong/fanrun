@@ -21,6 +21,8 @@ sys_Int sys_Float_compare1_val(fr_Env __env, sys_Float_val __self, sys_Obj obj){
 sys_Bool sys_Float_isNaN0_val(fr_Env __env, sys_Float_val __self){ return 0; }
 sys_Int sys_Float_hash0_val(fr_Env __env, sys_Float_val __self){ return 0; }
 sys_Float sys_Float_negate0_val(fr_Env __env, sys_Float_val __self){ return 0; }
+sys_Bool sys_Float_isNegZero0_val(fr_Env __env, sys_Float_val __self) { return 0; }
+sys_Float sys_Float_normNegZero0_val(fr_Env __env, sys_Float_val __self) { return 0; }
 sys_Float sys_Float_increment0_val(fr_Env __env, sys_Float_val __self){ return 0; }
 sys_Float sys_Float_decrement0_val(fr_Env __env, sys_Float_val __self){ return 0; }
 sys_Float sys_Float_mult1_val(fr_Env __env, sys_Float_val __self, sys_Float b){ return 0; }
@@ -61,3 +63,4 @@ sys_Int sys_Float_bits320_val(fr_Env __env, sys_Float_val __self){ return 0; }
 sys_Str sys_Float_toStr0_val(fr_Env __env, sys_Float_val __self){ return 0; }
 sys_Str sys_Float_toCode0_val(fr_Env __env, sys_Float_val __self){ return 0; }
 void sys_Float_make0_val(fr_Env __env, sys_Float_val __self){ return; }
+sys_Str sys_Float_toLocale1_val(fr_Env __env, sys_Float_val __self, sys_Str_null pattern) { return NULL; }

@@ -16,3 +16,6 @@ sys_Int sys_ByteArray_size0(fr_Env __env, sys_ByteArray_ref __self){ return 0; }
 sys_ByteArray sys_ByteArray_realloc1(fr_Env __env, sys_ByteArray_ref __self, sys_Int newSize){ return 0; }
 sys_ByteArray sys_ByteArray_copyFrom4(fr_Env __env, sys_ByteArray_ref __self, sys_ByteArray that, sys_Int thatOffset, sys_Int thisOffset, sys_Int length){ return 0; }
 void sys_ByteArray_finalize0(fr_Env __env, sys_ByteArray_ref __self){ return; }
+sys_ByteArray sys_ByteArray_fill2(fr_Env __env, sys_ByteArray_ref __self, sys_Int byte, sys_Int times) {
+    return __self;
+}

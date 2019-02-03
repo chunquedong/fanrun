@@ -342,5 +342,13 @@ sys_Obj_null sys_Func_call8(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
 }
 sys_Func sys_Func_bind1(fr_Env __env, sys_Func_ref __self, sys_List args){ return 0; }
 sys_Func sys_Func_retype1(fr_Env __env, sys_Func_ref __self, sys_Type t){ return 0; }
-void sys_Func_enterCtor0(fr_Env __env, sys_Func_ref __self){ return; }
-void sys_Func_exitCtor0(fr_Env __env, sys_Func_ref __self){ return; }
+
+void sys_Func_enterCtor1(fr_Env __env, sys_Func_ref __self, sys_Obj obj) {
+    
+}
+void sys_Func_exitCtor0(fr_Env __env, sys_Func_ref __self) {
+    
+}
+void sys_Func_checkInCtor1(fr_Env __env, sys_Func_ref __self, sys_Obj obj) {
+    
+}

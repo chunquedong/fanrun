@@ -101,7 +101,7 @@ void sys_Str_privateMake0(fr_Env __env, sys_Str_ref __self){
     __self->hashCode = 0;
     __self->utf8 = NULL;
 }
-sys_Str sys_Str_fromChars1(fr_Env __env, sys_List chars){ return 0; }
+
 sys_Bool sys_Str_equals1(fr_Env __env, sys_Str_ref __self, sys_Obj_null obj){
     if (!obj) return false;
     if (FR_TYPE_IS(obj, sys_Str)) {
@@ -153,6 +153,20 @@ sys_Int_null sys_Str_index2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int
     if (!found) return NULL;
     sys_Int diff = (found - __self->data);
     return (sys_Int_null)fr_box_int(__env, diff);
+}
+sys_Int sys_Str_find2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int offset) {
+    if (offset >= __self->size) {
+        return -1;
+    }
+    wchar_t *str = __self->data + offset;
+    wchar_t *found = wcsstr(str, s->data);
+    if (!found) return -1;
+    sys_Int diff = (found - __self->data);
+    return diff;
+}
+//TODO
+sys_Int sys_Str_findr2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int offset) {
+    return 0;
 }
 //sys_Int_null sys_Str_indexr1(fr_Env __env, sys_Str_ref __self, sys_Str s){ return 0; }
 sys_Int_null sys_Str_indexr2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int offset){ return 0; }
@@ -255,4 +269,20 @@ void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){
 }
 void sys_Str_static__init0(fr_Env __env){
     sys_Str_defVal = (sys_Str)fr_newStrUtf8(__env, "");
+}
+//TODO
+sys_Str sys_Str_fromChars3(fr_Env __env, sys_List chars, sys_Int offset, sys_Int len) {
+    return NULL;
+}
+//TODO
+sys_Str sys_Str_toCode2(fr_Env __env, sys_Str_ref __self, sys_Int quote, sys_Bool escapeUnicode) {
+    return NULL;
+}
+//TODO
+sys_ByteArray sys_Str_toUtf80(fr_Env __env, sys_Str_ref __self) {
+    return NULL;
+}
+//TODO
+sys_Str sys_Str_fromUtf83(fr_Env __env, sys_ByteArray ba, sys_Int offset, sys_Int len) {
+    return NULL;
 }

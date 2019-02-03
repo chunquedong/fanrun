@@ -119,6 +119,10 @@ sys_Int sys_Int_shiftl1_val(fr_Env __env, sys_Int_val __self, sys_Int b){
 sys_Int sys_Int_shiftr1_val(fr_Env __env, sys_Int_val __self, sys_Int b){
     return __self >> b;
 }
+//TODO
+sys_Int sys_Int_shifta1_val(fr_Env __env, sys_Int_val __self, sys_Int b) {
+    return __self >> b;
+}
 sys_Int sys_Int_abs0_val(fr_Env __env, sys_Int_val __self){
     return llabs(__self);
 }
@@ -306,4 +310,15 @@ void sys_Int_times1_val(fr_Env __env, sys_Int_val __self, sys_Func c){
 void sys_Int_make0_val(fr_Env __env, sys_Int_val __self){
     __self = 0;
 }
-
+//TODO
+sys_Str sys_Int_toHex1_val(fr_Env __env, sys_Int_val __self, sys_Int width) {
+    return NULL;
+}
+//TODO
+sys_Str sys_Int_toRadix2_val(fr_Env __env, sys_Int_val __self, sys_Int radix, sys_Int width) {
+    return NULL;
+}
+//TODO
+sys_Str sys_Int_toLocale1_val(fr_Env __env, sys_Int_val __self, sys_Str_null pattern) {
+    return NULL;
+}

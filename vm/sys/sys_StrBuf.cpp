@@ -100,6 +100,24 @@ sys_StrBuf sys_StrBuf_add1(fr_Env __env, sys_StrBuf_ref __self, sys_Obj_null x){
     __self->size += str->size;
     return __self;
 }
+
+sys_StrBuf sys_StrBuf_addStr3(fr_Env __env, sys_StrBuf_ref __self, sys_Str str, sys_Int off, sys_Int len) {
+    if (len > str->size) {
+        len = str->size;
+    }
+    else if (len <= 0) {
+        return __self;
+    }
+    
+    if (len + __self->size > __self->capacity) {
+        sys_Int newSize = (len + __self->size)*.15 + 8;
+        sys_StrBuf_capacity1(__env, __self, newSize);
+    }
+    wcsncpy(__self->data+__self->size, str->data+off, len);
+    __self->size += len;
+    return __self;
+}
+
 sys_StrBuf sys_StrBuf_addChar1(fr_Env __env, sys_StrBuf_ref __self, sys_Int ch){
     if (1 + __self->size > __self->capacity) {
         sys_Int newSize = (1 + __self->size)*.15 + 8;

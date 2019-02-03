@@ -324,9 +324,15 @@ void TypeGen::genOverrideVTable(FType *type, std::string &rawMethodName
             //FMethodVar methVar = parentMethod->vars.at(j-1);
             //std::string varType = FCodeUtil::getTypeRefName(podGen->pod
             //                                                , methVar.type, true);
-            printer->println("*((int**)(&(%ssuper__.%s%d))) = (int*)%s_%s%d;", from.c_str()
+            if (gmethod.method->flags & FFlags::Abstract) {
+                printer->println("*((int**)(&(%ssuper__.%s%d))) = NULL;", from.c_str()
+                                 , gmethod.name.c_str(), j);
+            }
+            else {
+                printer->println("*((int**)(&(%ssuper__.%s%d))) = (int*)%s_%s%d;", from.c_str()
                              , gmethod.name.c_str(), j
                              , name.c_str(), gmethod.name.c_str(), j);
+            }
         }
     }
     //if (podName == "sys" && typeName == "Obj") return;
