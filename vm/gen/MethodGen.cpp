@@ -34,6 +34,7 @@ MethodGen::MethodGen(TypeGen *parent, FMethod *method) : parent(parent), method(
     beginDefaultParam = -1;
     for (int j=0; j<method->paramCount; ++j) {
         FMethodVar &var = method->vars[j];
+        /*
         for (FAttr *attr : var.attrs) {
             if (dynamic_cast<FParamDefault*>(attr)) {
                 beginDefaultParam = j;
@@ -41,6 +42,11 @@ MethodGen::MethodGen(TypeGen *parent, FMethod *method) : parent(parent), method(
             }
         }
         if (beginDefaultParam != -1) break;
+         */
+        if ((var.flags & FFlags::ParamDefault) != 0) {
+            beginDefaultParam = j;
+            break;
+        }
     }
     if (beginDefaultParam == -1) {
         beginDefaultParam = method->paramCount;

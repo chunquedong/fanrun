@@ -110,13 +110,19 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
         int methodCount = buffer.readUInt16();
         methods.resize(methodCount);
         for (int i=0; i<methodCount; ++i) {
-            readMethod(methods[i], buffer);
+            FMethod &method = methods[i];
+            readMethod(method, buffer);
             
-            std::string name = pod->names[methods[i].name];
-            if (methods[i].flags & FFlags::Setter) {
+            std::string name = pod->names[method.name];
+            if (method.flags & FFlags::Setter) {
                 name += "$";
+                name += std::to_string(method.paramCount);
             }
-            c_methodMap[name] = &methods[i];
+            else if (method.flags & FFlags::Overload) {
+                name += "$";
+                name += std::to_string(method.paramCount);
+            }
+            c_methodMap[name] = &method;
         }
     }
     {

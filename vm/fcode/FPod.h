@@ -42,7 +42,18 @@ namespace FFlags {
     const uint32_t RuntimeConst=0x00200000;
     const uint32_t Readonly   = 0x00400000;
     const uint32_t Async      = 0x00800000;
-    const uint32_t FlagsMask  = 0x0007ffff;
+    const uint32_t Overload   = 0x01000000;
+    const uint32_t FlagsMask  = 0x0fffffff;
+    
+    
+    const uint32_t Param       = 0x0001;  // parameter or local variable
+    const uint32_t ParamDefault= 0x0002; //the param has default
+    
+    //////////////////////////////////////////////////////////////////////////
+    // MethodRefFlags
+    //////////////////////////////////////////////////////////////////////////
+    const uint32_t RefOverload = 0x0001;
+    const uint32_t RefSetter   = 0x0002;
 }
 
 struct FConstantas {
@@ -77,6 +88,7 @@ struct FMethodRef {
     uint16_t retType;//typeRefs.def
     uint8_t paramCount;
     std::vector<uint16_t> params;//typeRefs.def
+    uint8_t flags;
     
     FMethod *c_method;
     FMethod *c_virtualMethod;

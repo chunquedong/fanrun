@@ -89,8 +89,8 @@ void FPod::load(ZipFile &zip) {
         depends = props["pod.depends"];
         fcodeVersion = props["fcode.version"];
         
-        if (fcodeVersion != "1.1.1") {
-            printf("ERROR: fcodeVersion error %s, expected 1.0.51", fcodeVersion.c_str());
+        if (fcodeVersion != "1.1.3") {
+            printf("ERROR: fcodeVersion error %s, expected 1.1.3", fcodeVersion.c_str());
         }
     }
     c_wrappedPod = NULL;
@@ -164,7 +164,10 @@ void FPod::read(ZipFile &zip) {
             Buffer buf(data, bufSize, true);
             int size = buf.readUInt16();
             for (int i=0; i<size; ++i) {
-                constantas.durations.push_back(buf.readInt64());
+                int64_t sec = buf.readInt64();
+                int32_t nanos = buf.readInt32();
+                int64_t mills = (sec * 1000) + (nanos / 1000000);
+                constantas.durations.push_back(mills);
             }
         }
     }
@@ -228,6 +231,7 @@ void FPod::read(ZipFile &zip) {
                 for (int i=0; i<ref.paramCount; ++i) {
                     ref.params.push_back(buf.readUInt16());
                 }
+                ref.flags = buf.readUInt8();
                 methodRefs.push_back(ref);
             }
         }
