@@ -19,7 +19,6 @@ struct MethodGen {
     FMethod *method;
     std::string name;
     
-    int beginDefaultParam;
     bool isStatic;
     
     MethodGen(TypeGen *parent, FMethod *method);
@@ -32,9 +31,8 @@ struct MethodGen {
     void genRegisterWrap(Printer *printer);
     void genRegister(Printer *printer);
 private:
-    bool genPrototype(Printer *printer, bool funcPtr, bool isValType, int i);
-    FParamDefault *getParamDefault(int i);
-    void genMethodStub(Printer *printer, bool isValType, int i);
+    bool genPrototype(Printer *printer, bool funcPtr, bool isValType);
+    void genMethodStub(Printer *printer, bool isValType);
 };
 
 #endif /* MethodGen_h */

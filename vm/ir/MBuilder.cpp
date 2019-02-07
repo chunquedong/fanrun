@@ -39,7 +39,7 @@ void MBuilder::rewriteLocals() {
         }
     }
 }
-
+/*
 bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
     if (paramNum < 0 || paramNum >= method->paramCount) {
         printf("ERROR paramNum out of index\n");
@@ -132,6 +132,7 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
     irMethod.blocks.swap(this->blocks);
     return true;
 }
+*/
 
 bool MBuilder::buildMethod(FMethod *method) {
     for (FAttr *itr : method->attrs) {

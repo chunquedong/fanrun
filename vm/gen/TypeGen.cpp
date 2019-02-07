@@ -230,14 +230,12 @@ void TypeGen::genVTableInit(Printer *printer) {
             continue;
         }
         MethodGen gmethod(this, method);
-        for (int j=gmethod.beginDefaultParam; j<=method->paramCount; ++j) {
-            
-            if ((method->flags & FFlags::Abstract) != 0) {
-                printer->println("vtable->%s%d = NULL;", gmethod.name.c_str(),j);
-            } else {
-                printer->println("vtable->%s%d = %s_%s%d;", gmethod.name.c_str(),
-                                 j, name.c_str(), gmethod.name.c_str(), j);
-            }
+        int j = method->paramCount;
+        if ((method->flags & FFlags::Abstract) != 0) {
+            printer->println("vtable->%s%d = NULL;", gmethod.name.c_str(),j);
+        } else {
+            printer->println("vtable->%s%d = %s_%s%d;", gmethod.name.c_str(),
+                             j, name.c_str(), gmethod.name.c_str(), j);
         }
     }
     
@@ -318,21 +316,16 @@ void TypeGen::genOverrideVTable(FType *type, std::string &rawMethodName
         if ((found->second->flags & FFlags::Private)) {
             return;
         }
-        
+        int j = gmethod.method->paramCount;
         //FMethod *parentMethod = found->second;
-        for (int j=gmethod.beginDefaultParam; j<=gmethod.method->paramCount; ++j) {
-            //FMethodVar methVar = parentMethod->vars.at(j-1);
-            //std::string varType = FCodeUtil::getTypeRefName(podGen->pod
-            //                                                , methVar.type, true);
-            if (gmethod.method->flags & FFlags::Abstract) {
-                printer->println("*((int**)(&(%ssuper__.%s%d))) = NULL;", from.c_str()
-                                 , gmethod.name.c_str(), j);
-            }
-            else {
-                printer->println("*((int**)(&(%ssuper__.%s%d))) = (int*)%s_%s%d;", from.c_str()
+        if (gmethod.method->flags & FFlags::Abstract) {
+            printer->println("*((int**)(&(%ssuper__.%s%d))) = NULL;", from.c_str()
+                             , gmethod.name.c_str(), j);
+        }
+        else {
+            printer->println("*((int**)(&(%ssuper__.%s%d))) = (int*)%s_%s%d;", from.c_str()
                              , gmethod.name.c_str(), j
                              , name.c_str(), gmethod.name.c_str(), j);
-            }
         }
     }
     //if (podName == "sys" && typeName == "Obj") return;
@@ -389,9 +382,18 @@ void TypeGen::genMethodRegister(Printer *printer) {
 void TypeGen::genMethodStub(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
+        /*
         if ((type->meta.flags & FFlags::Native) != 0
             || (method->flags & FFlags::Native) != 0
             || (method->flags & FFlags::Abstract) != 0) {
+            continue;
+        }
+         */
+        if ((method->flags & FFlags::Native) != 0) {
+            continue;
+        }
+        if ((type->meta.flags & FFlags::Native) != 0
+            && (method->flags & FFlags::Overload) == 0) {
             continue;
         }
         MethodGen gmethod(this, method);
@@ -416,6 +418,7 @@ void TypeGen::genField(Printer *printer) {
         auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
         std::string typeName = podGen->getTypeRefName(field->type);
         if (typeName == "sys_Int") {
+            /*TODO
             for (FAttr *attr : field->attrs) {
                 FFacets *facets = dynamic_cast<FFacets*>(attr);
                 if (facets) {
@@ -440,6 +443,7 @@ void TypeGen::genField(Printer *printer) {
                     }
                 }
             }
+             */
         }
         printer->println("%s %s;", typeName.c_str(), name.c_str());
     }

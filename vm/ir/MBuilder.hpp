@@ -32,7 +32,7 @@ public:
     //parse code to basic block graph, and flat temp var to stack for gc
     bool buildMethod(FMethod *method);
     
-    bool buildDefParam(FMethod *method, int paramNum, bool isVal);
+    //bool buildDefParam(FMethod *method, int paramNum, bool isVal);
     
 private:
     
