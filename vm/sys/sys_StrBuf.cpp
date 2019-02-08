@@ -53,15 +53,15 @@ sys_Int sys_StrBuf_get1(fr_Env __env, sys_StrBuf_ref __self, sys_Int index){
     return __self->data[index];
 }
 sys_Str sys_StrBuf_getRange1(fr_Env __env, sys_StrBuf_ref __self, sys_Range range){
-    sys_Int start = range._start;
-    sys_Int end = range._end;
+    sys_Int start = range->_start;
+    sys_Int end = range->_end;
     if (start < 0) {
         start += __self->size;
     }
     if (end < 0) {
         end += __self->size;
     }
-    if (!range._exclusive) ++end;
+    if (!range->_exclusive) ++end;
     
     if (start < 0 || start > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
@@ -170,15 +170,15 @@ sys_StrBuf sys_StrBuf_remove1(fr_Env __env, sys_StrBuf_ref __self, sys_Int index
     return __self;
 }
 sys_StrBuf sys_StrBuf_removeRange1(fr_Env __env, sys_StrBuf_ref __self, sys_Range range){
-    sys_Int start = range._start;
-    sys_Int end = range._end;
+    sys_Int start = range->_start;
+    sys_Int end = range->_end;
     if (start < 0) {
         start += __self->size;
     }
     if (end < 0) {
         end += __self->size;
     }
-    if (!range._exclusive) ++end;
+    if (!range->_exclusive) ++end;
     
     if (start < 0 || start > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);
@@ -198,15 +198,15 @@ sys_StrBuf sys_StrBuf_removeRange1(fr_Env __env, sys_StrBuf_ref __self, sys_Rang
     return __self;
 }
 sys_StrBuf sys_StrBuf_replaceRange2(fr_Env __env, sys_StrBuf_ref __self, sys_Range range, sys_Str str){
-    sys_Int start = range._start;
-    sys_Int end = range._end;
+    sys_Int start = range->_start;
+    sys_Int end = range->_end;
     if (start < 0) {
         start += __self->size;
     }
     if (end < 0) {
         end += __self->size;
     }
-    if (!range._exclusive) ++end;
+    if (!range->_exclusive) ++end;
     
     if (start < 0 || start > __self->size) {
         sys_IndexErr e = FR_ALLOC(sys_IndexErr);

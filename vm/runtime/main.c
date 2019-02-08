@@ -12,11 +12,11 @@
 #include "../temp/baseTest.h"
 
 int main() {
-    fr_Env env = fr_getEnv();
+    fr_Env env = fr_getEnv(NULL);
     baseTest_init__(env);
     
     baseTest_BoxingTest_main0(env);
-    fr_releaseEnv(env);
+    fr_releaseEnv(NULL, env);
 }
 
 //#endif

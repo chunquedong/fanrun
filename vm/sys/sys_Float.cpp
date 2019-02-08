@@ -7,6 +7,15 @@
 //
 
 #include "sys.h"
+#include <float.h>
+#include <math.h>
+
+sys_Float sys_Float_defVal = 0;
+sys_Float sys_Float_posInf = INFINITY;
+sys_Float sys_Float_negInf = -INFINITY;
+sys_Float sys_Float_nan = NAN;
+sys_Float sys_Float_e = 2.718281828459045;
+sys_Float sys_Float_pi= 3.141592653589793;
 
 sys_Float sys_Float_makeBits1(fr_Env __env, sys_Int bits){ return 0; }
 sys_Float sys_Float_makeBits321(fr_Env __env, sys_Int bits){ return 0; }

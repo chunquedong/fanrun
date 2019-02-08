@@ -11,20 +11,21 @@
 
 #include <stdio.h>
 #include "PodManager.h"
-#include "vm.h"
+#include "runtime.h"
 #include "Gc.h"
 #include <unordered_map>
 #include <thread>
 #include "LinkedList.h"
 #include "../vm/ExeEngine.h"
+#include <assert.h>
 
 class Env;
 
 class Fvm : public GcSupport {
     std::unordered_map<std::thread::id, Env*> threads;
-    LinkedList globalRefList;
+    //LinkedList globalRefList;
     std::vector<fr_Obj> staticFieldRef;
-    mtx_t lock;
+    std::recursive_mutex lock;
 public:
     Gc gc;
     PodManager *podManager;
@@ -41,14 +42,18 @@ public:
     
     void registerMethod(const char *name, fr_NativeFunc func);
     
-    virtual void walkNodeChildren(Gc *gc, FObj* obj);
+    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::vector<GcObj*> *list);
     virtual void walkRoot(Gc *gc);
-    virtual void finalizeObj(FObj* obj);
-    virtual void puaseWorld();
-    virtual void resumeWorld();
+    virtual void onStartGc();
     
-    fr_Obj newGlobalRef(FObj * obj);
-    void deleteGlobalRef(fr_Obj obj);
+    virtual void finalizeObj(GcObj *obj);
+    virtual void puaseWorld(bool bloking);
+    virtual void resumeWorld();
+    virtual void printObj(GcObj *obj);
+    virtual int allocSize(void *type);
+    
+    //fr_Obj newGlobalRef(FObj * obj);
+    //void deleteGlobalRef(fr_Obj obj);
     void addStaticRef(fr_Obj obj);
 };
 

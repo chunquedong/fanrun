@@ -60,7 +60,7 @@ struct sys_FloatArray_struct {
 };
 
 struct sys_ObjArray_struct {
-    //struct sys_Obj_struct super__;
+    struct sys_Obj_struct super__;
     sys_Int size;
     fr_Obj *data;
 };

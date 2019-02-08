@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include "Env.h"
-#include "NativeGen.h"
 #include "Fvm.h"
 #include <string.h>
 
@@ -16,7 +15,7 @@
 
 CF_BEGIN
 
-void register_sys(fr_Fvm vm);
+void sys_register(fr_Fvm vm);
 
 CF_END
 
@@ -137,14 +136,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    if (nativeOutPath) {
-        NativeGen nativeGen;
-        //nativeGen.genStub = true;
-        nativeGen.genNative(nativeOutPath, "sys", &podMgr);
-        puts("------------------");
-    }
-    
-    register_sys(&vm);
+    sys_register(&vm);
     
     vm.start();
     env->trace = debug;

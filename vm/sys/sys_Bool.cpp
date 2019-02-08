@@ -9,6 +9,8 @@
 #include "sys.h"
 #include <wchar.h>
 
+sys_Bool sys_Bool_defVal = false;
+
 //sys_Bool_null sys_Bool_fromStr1(fr_Env __env, sys_Str s){
 //    return sys_Bool_fromStr2(__env, s, true);
 //}

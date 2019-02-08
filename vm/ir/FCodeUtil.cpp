@@ -7,7 +7,7 @@
 //
 
 #include "FCodeUtil.hpp"
-#include "../gen/escape.h"
+#include "escape.h"
 
 namespace FCodeUtil {
 
@@ -93,32 +93,8 @@ namespace FCodeUtil {
     }
 
     bool isValueType(FType *type) {
-        /*
-        if (type->c_pod->name == "sys") {
-            if (type->c_name == "Str"
-                || type->c_name == "Pod"
-                || type->c_name == "Param"
-                || type->c_name == "Method"
-                || type->c_name == "Field"
-                || type->c_name == "Func") {
-                return false;
-            }
-        }
-        
-        if ((type->meta.flags & FFlags::Const) && (type->meta.flags & FFlags::Final)) {
-            int count = 0;
-            for (FField &field : type->fields) {
-                if (field.flags & FFlags::Static) {
-                    continue;
-                }
-                ++count;
-                if (count > 5) return false;
-            }
-            return true;
-        }
-        return false;
-         */
-        return (type->meta.flags & FFlags::Struct) != 0;
+        return isBuildinValType(type);
+        //return (type->meta.flags & FFlags::Struct) != 0;
     }
     
     bool isNullableTypeRef(FPod *pod, uint16_t tid) {

@@ -182,7 +182,7 @@ void MethodGen::genMethodStub(Printer *printer, bool isValType) {
     if (retTypeName != "sys_Void") {
         printer->println("fr_Value __ret;");
     }
-    printer->println("if (!method) method = fr_findMethod(__env, \"%s_%s\");"
+    printer->println("if (!method) method = fr_findMethod(__env, \"%s\", \"%s\");"
                     , parent->name.c_str(), name.c_str());
     
     if (!isStatic) {
@@ -204,16 +204,21 @@ void MethodGen::genMethodStub(Printer *printer, bool isValType) {
             printer->println("args[%d].%s = %s;", j+1, tag, var_name.c_str());
         }
     }
-    printer->println("__ret = fr_callMethod(__env, method, args, %d);", paramNum);
     
     if (retTypeName != "sys_Void") {
-        printer->println("return __ret.%s;", getUnionTagName(retTypeName));
+        printer->println("fr_callMethod(__env, method, args, %d, &__ret);", paramNum);
+        printer->println("return (%s)__ret.%s;", retTypeName.c_str(), getUnionTagName(retTypeName));
+    } else {
+        printer->println("fr_callMethod(__env, method, args, %d, NULL);", paramNum);
     }
     printer->unindent();
     printer->println("}");
 }
 
 void MethodGen::genStub(Printer *printer) {
+    
+    if (parent->name == "sys_Func") return;
+    
     genMethodStub(printer, false);
     if (!isStatic && parent->isValueType) {
         genMethodStub(printer, true);
@@ -224,29 +229,40 @@ void MethodGen::genStub(Printer *printer) {
  ** gen register native to VM
  **/
 void MethodGen::genRegister(Printer *printer) {
-    printer->println("fr_registerMethod(vm, \"%s_%s\", %s_%s_wrap__);"
-                     , parent->name.c_str(), name.c_str()
-                     , parent->name.c_str(), name.c_str());
+    if (!isStatic && FCodeUtil::isBuildinValType(method->c_parent)) {
+        printer->println("fr_registerMethod(vm, \"%s_%s%d_val\", %s_%s%d_val_wrap__);"
+                         , parent->name.c_str(), name.c_str(), method->paramCount
+                         , parent->name.c_str(), name.c_str(), method->paramCount);
+
+    }
+    else {
+        printer->println("fr_registerMethod(vm, \"%s_%s%d\", %s_%s%d_wrap__);"
+                     , parent->name.c_str(), name.c_str(), method->paramCount
+                     , parent->name.c_str(), name.c_str(), method->paramCount);
+    }
 }
 /**
  ** gen wrap to call native code for VM
  ** 
-   void foo_wrap(__env, args, paramCount, fr_Value *__retVal) {
+   void foo_wrap(__env, args, fr_Value *__retVal) {
       Type __self = args[0].o;
       Type2 arg1 = args[1].o;
       Type3 arg2 = args[2].o;
       __retVal.o = foo(__env, __self, arg1, arg2);
    }
  **/
-void MethodGen::genRegisterWrap(Printer *printer) {
-    printer->println("void %s_%s_wrap__(fr_Env __env, fr_Value *args, int paramCount, fr_Value *__retVal) {"
-                     , parent->name.c_str(), name.c_str());
+void MethodGen::genRegisterWrap(Printer *printer, bool isValType) {
+    const char *valFlag = "";
+    if (isValType) valFlag = "_val";
+    
+    printer->println("void %s_%s%d%s_wrap__(fr_Env __env, fr_Value *__args, fr_Value *__retVal) {"
+                     , parent->name.c_str(), name.c_str(), method->paramCount, valFlag);
     printer->indent();
     int paramNum = method->paramCount;
     auto retTypeName = parent->podGen->getTypeRefName(method->returnType);
     
     if (!isStatic) {
-        printer->println("%s __self = args[0].%s;", parent->name.c_str(), getUnionTagName(parent->name));
+        printer->println("%s __self = __args[0].%s;", parent->name.c_str(), getUnionTagName(parent->name));
     }
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
@@ -254,19 +270,19 @@ void MethodGen::genRegisterWrap(Printer *printer) {
         auto var_typeName = parent->podGen->getTypeRefName(var.type);
         
         if (isStatic) {
-            printer->println("%s %s = args[%d].%s;"
+            printer->println("%s %s = __args[%d].%s;"
                     , var_typeName.c_str(), var_name.c_str(), j, getUnionTagName(var_typeName));
         } else {
-            printer->println("%s %s = args[%d].%s;"
+            printer->println("%s %s = __args[%d].%s;"
                     , var_typeName.c_str(), var_name.c_str(), j+1, getUnionTagName(var_typeName));
         }
     }
     
     if (retTypeName != "sys_Void") {
-        printer->printf("*__retVal.%s = ", getUnionTagName(retTypeName));
+        printer->printf("__retVal->%s = ", getUnionTagName(retTypeName));
     }
     
-    printer->printf("%s_%s(__env", parent->name.c_str(), name.c_str());
+    printer->printf("%s_%s%d%s(__env", parent->name.c_str(), name.c_str(), method->paramCount, valFlag);
     if (!isStatic) {
         printer->printf(", __self");
     }

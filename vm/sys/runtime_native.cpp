@@ -51,7 +51,7 @@ fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data) {
     size_t size = wcslen(data);
     return fr_newStr(__env, data, size);
 }
-const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj) {
+const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
     size_t size;
     size_t realSize;
     sys_Str str = (sys_Str)obj;
@@ -65,7 +65,8 @@ const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj) {
 }
 
 ////////////////////////////////////////////////////////////////
-fr_Obj fr_sysType(fr_Env __env, fr_Class clz) {
+#ifdef GEN
+fr_Obj fr_toSysType(fr_Env __env, fr_Class clz) {
     if (!clz->sysType) {
         sys_Type type = FR_ALLOC(sys_Type);
         type->rawClass = clz;
@@ -73,6 +74,21 @@ fr_Obj fr_sysType(fr_Env __env, fr_Class clz) {
     }
     return clz->sysType;
 }
+
+fr_Class fr_fromSysType(fr_Env __env, fr_Obj clz) {
+    //return clz->sysType;
+    return NULL;
+}
+#else
+fr_Obj fr_toSysType(fr_Env __env, fr_Class clz) {
+    //;
+    return NULL;
+}
+
+fr_Class fr_fromSysType(fr_Env __env, fr_Obj clz) {
+    return NULL;
+}
+#endif
 
 ////////////////////////////////////////////////////////////////
 void fr_throwNPE(fr_Env __env) {
@@ -100,7 +116,7 @@ fr_Obj fr_box_int(fr_Env __env, sys_Int_val val) {
         }
         
         FR_BOXING_VAL(obj, val, sys_Int, sys_Obj);
-        fr_addGlobalRef(__env, obj);
+        obj = fr_addGlobalRef(__env, obj);
         map[val] = obj;
         return obj;
     }
@@ -124,7 +140,7 @@ fr_Obj fr_box_float(fr_Env __env, sys_Float_val val) {
         }
         
         FR_BOXING_VAL(obj, val, sys_Int, sys_Obj);
-        fr_addGlobalRef(__env, obj);
+        obj = fr_addGlobalRef(__env, obj);
         map[val] = obj;
         return obj;
     }
@@ -138,8 +154,8 @@ fr_Obj fr_box_bool(fr_Env __env, sys_Bool_val val) {
         std::lock_guard<std::mutex> lock(pool_mutex);
         FR_BOXING_VAL(trueObj, true, sys_Bool, sys_Obj);
         FR_BOXING_VAL(falseObj, false, sys_Bool, sys_Obj);
-        fr_addGlobalRef(__env, trueObj);
-        fr_addGlobalRef(__env, falseObj);
+        trueObj = fr_addGlobalRef(__env, trueObj);
+        falseObj = fr_addGlobalRef(__env, falseObj);
     }
     return val ? trueObj : falseObj;
 }

@@ -15,6 +15,7 @@
 #include "FType.h"
 #include "Env.h"
 #include "../vm/ExeEngine.h"
+#include <assert.h>
 
 //class Env;
 struct InterStackFrame;

@@ -10,7 +10,6 @@
 #include <assert.h>
 #include "Interpreter.h"
 #include "Gc.h"
-#include "DefaultParam.h"
 
 Env::Env(Fvm *vm)
     : vm(vm)
@@ -19,9 +18,9 @@ Env::Env(Fvm *vm)
     , trace(false)
     , curFrame(nullptr)
     , blockingFrame(nullptr)
-    , isStoped(false)
-    , needStop(false)
 {
+    isStoped = (false);
+    needStop = (false);
     Interpreter *interpreter = new Interpreter();
     interpreter->context = this;
     this->interpreter = interpreter;
@@ -80,7 +79,7 @@ void printValue(fr_TagValue *val) {
             break;
         case fr_vtObj:
             if (val->any.o) {
-                printf("%s(%p)", ((FObj*)val->any.o)->type->c_name.c_str(), val->any.o);
+                printf("%s(%p)", getTypeName(NULL, val->any.o), val->any.o);
             } else {
                 printf("null");
             }
@@ -98,9 +97,7 @@ void Env::printOperandStack() {
     }
     else {
         val = (fr_TagValue*)(((char*)(curFrame+1)) + curFrame->paddingSize);
-        if (curFrame->paramDefault == nullptr) {
-            val = val + curFrame->method->localCount;
-        }
+        val = val + curFrame->method->localCount;
     }
     
     printf("operand[");
@@ -133,17 +130,14 @@ bool Env::popFrame() {
     
     stackTop = (char*)nextFrame;
     
-    if (nextFrame->paramDefault == nullptr) {
-        this->popAll(nextFrame->paramCount);
-    }
+    this->popAll(nextFrame->paramCount);
     
-    if (this->trace && nextFrame->paramDefault == nullptr) {
+    if (this->trace) {
         //int frameSize = sizeof(StackFrame) + (curFrame->localCount * sizeof(fr_TagValue));
         FMethod *method = nextFrame->method;
         std::string &name = method->c_parent->c_pod->names[method->name];
         std::string &typeName = method->c_parent->c_name;
-        printf("<<<<<<<<< end %s#%s,paramDefault:%p ", typeName.c_str(), name.c_str()
-               , nextFrame->paramDefault);
+        printf("<<<<<<<<< end %s#%s ", typeName.c_str(), name.c_str());
         printf("\n");
     }
     return true;
@@ -239,11 +233,12 @@ void Env::deleteLocalRef(fr_Obj objRef) {
 }
 
 fr_Obj Env::newGlobalRef(FObj * obj) {
-    return vm->newGlobalRef(obj);
+    vm->gc.pinObj((GcObj*)obj);
+    return obj;
 }
 
 void Env::deleteGlobalRef(fr_Obj obj) {
-    vm->deleteGlobalRef(obj);
+    vm->gc.unpinObj((GcObj*)obj);
 }
 
 FObj * Env::allocObj(FType *type, int addRef, int size) {
@@ -309,8 +304,7 @@ bool Env::fitType(FType * a, FType * b) {
 // call
 ////////////////////////////
 
-void Env::call(FMethod *method, int paramCount/*without self*/
-               , FParamDefault *paramDefault) {
+void Env::call(FMethod *method, int paramCount/*without self*/) {
     assert(method);
     //assert(curFrame->operandStack.size() >= paramCount);
     
@@ -329,30 +323,16 @@ void Env::call(FMethod *method, int paramCount/*without self*/
     if (!isStatic) {
         paramCountWithSelf++;
     }
-    
-    //init param and make default param
-    if (paramDefault == nullptr) {
-        DefaultParam::initDefaultParam(this, paramCount, method);
-    }
+ 
     //push frame
     StackFrame *frameInfo = (StackFrame*)(stackTop);
     frameInfo->method = method;
-    frameInfo->paramDefault = paramDefault;
+    //frameInfo->paramDefault = paramDefault;
     frameInfo->preFrame = curFrame;
     frameInfo->paddingSize = 0;
     frameInfo->paramCount = paramCountWithSelf;
     curFrame = frameInfo;
     stackTop = (char*)((StackFrame*)(stackTop) + 1);
-    
-    //run load default param
-    if (paramDefault != nullptr) {
-        frameInfo->paramCount = paramCount;
-        if (!isStatic) {
-            frameInfo->paramCount++;
-        }
-        interpreter->run(this);
-        return;
-    }
     
     //print opstack info
     if (trace) {
@@ -435,7 +415,7 @@ FMethod * Env::findMethod(const char *pod, const char *type, const char *name) {
     return podManager->findMethod(this, pod, type, name);
 }
 void Env::callNonVirtual(FMethod * method, int paramCount) {
-    call(method, paramCount, nullptr);
+    call(method, paramCount);
 }
 void Env::newObj(FType *type, FMethod * method, int paramCount) {
     FObj * obj = allocObj(type, 1);
@@ -453,7 +433,7 @@ void Env::callVirtual(FMethod * method, int paramCount) {
     fr_TagValue *entry = peek(-paramCount-1);
     FType *type = this->podManager->getInstanceType(this, *entry);
     method = podManager->toVirtualMethod(this, type, method);
-    call(method, paramCount, nullptr);
+    call(method, paramCount);
 }
 void Env::callVirtualByName(const char *name, int paramCount) {
     FMethod *method = nullptr;
@@ -461,7 +441,7 @@ void Env::callVirtualByName(const char *name, int paramCount) {
     FType *type = this->podManager->getInstanceType(this, *entry);
     method = this->podManager->findVirtualMethod(this, type, name);
     
-    call(method, paramCount, nullptr);
+    call(method, paramCount);
 }
 void Env::newObjByName(const char * pod, const char * type, const char * name, int paramCount) {
     FMethod *method = nullptr;
@@ -491,7 +471,7 @@ void Env::setStaticField(FField *field, fr_Value *val) {
             *sfield = *val;
             
             if (sfield->o) {
-                ((FObj*)(sfield->o))->dirty = true;
+                gc_setDirty(sfield->o, 1);
             }
         } else {
             *sfield = *val;
@@ -526,7 +506,7 @@ void Env::setInstanceField(fr_Value &bottom, FField *field, fr_Value *val) {
         if (vtype == fr_vtObj) {
             *sfield = *val;
             if (sfield->o) {
-                ((FObj*)sfield->o)->dirty = true;
+                gc_setDirty(sfield->o, 1);
             }
         } else {
             *sfield = *val;
@@ -576,7 +556,7 @@ void Env::throwError(FObj * err) {
 }
 
 void Env::printError(FObj * err) {
-    FType *ftype = (FType*)(err->type);
+    FType *ftype = fr_getFType(this, err);
     std::string &name = ftype->c_name;
     printf("error: %s\n", name.c_str());
     //TODO call Err.trace

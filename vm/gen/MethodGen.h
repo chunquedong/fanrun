@@ -28,7 +28,7 @@ struct MethodGen {
     void genImplesToVal(Printer *printer);
     void genStub(Printer *printer);
     
-    void genRegisterWrap(Printer *printer);
+    void genRegisterWrap(Printer *printer, bool isValType);
     void genRegister(Printer *printer);
 private:
     bool genPrototype(Printer *printer, bool funcPtr, bool isValType);

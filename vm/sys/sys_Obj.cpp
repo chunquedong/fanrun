@@ -34,7 +34,7 @@ void sys_Obj_echo1(fr_Env __env, sys_Obj_null x){
         printf("ERROR:null\n");
         return;
     }
-    const char *utf8 = fr_getStrUtf8(__env, str);
+    const char *utf8 = fr_getStrUtf8(__env, str, NULL);
     printf("%s\n", utf8);
 }
 

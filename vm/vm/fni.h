@@ -43,7 +43,7 @@ typedef bool fr_Bool;
 /**
  * user client handle type
  */
-typedef FObj **fr_Obj;
+typedef void *fr_Obj;
 
 struct FType;
 typedef struct FType *fr_Type;
@@ -77,7 +77,8 @@ typedef struct fr_TagValue_ {
 /**
  * fr_Env is a API per thread
  */
-typedef void *fr_Env;
+struct fr_Env_;
+typedef struct fr_Env_ *fr_Env;
 
 /**
  * Fantom VM
@@ -166,6 +167,9 @@ fr_Obj fr_getTypeObj(fr_Env self, fr_Type type);
 ////////////////////////////
 
 fr_Method fr_findMethod(fr_Env self, fr_Type type, const char *name);
+
+void fr_callMethod(fr_Env self, fr_Method method, fr_Value *arg, int argCount, fr_Value *ret);
+
 void fr_callNonVirtualM(fr_Env self, fr_Method method
                        , int argCount, fr_Value *arg, fr_Value *ret);
 void fr_newObjM(fr_Env self, fr_Type type, fr_Method method

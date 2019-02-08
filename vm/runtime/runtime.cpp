@@ -13,7 +13,7 @@
 
 Vm *fvm = nullptr;
 
-fr_Env fr_getEnv() {
+fr_Env fr_getEnv(fr_Fvm vm) {
     void *statckVar = 0;
     if (fvm == nullptr) {
         fvm = new Vm();
@@ -25,9 +25,13 @@ fr_Env fr_getEnv() {
     return env;
 }
 
-void fr_releaseEnv(fr_Env env) {
+void fr_releaseEnv(fr_Fvm vm, fr_Env env) {
     if (!env || !fvm) return;
     fvm->releaseEnv((Env*)env);
+}
+
+int fr_getFuncArity(fr_Env, fr_Class clz) {
+    return clz->funcArity;
 }
 
 //////////////////////////////////////////
@@ -80,9 +84,10 @@ void fr_gc(fr_Env self) {
     env->vm->getGc()->collect();
 }
 
-void fr_addGlobalRef(fr_Env self, fr_Obj obj) {
+fr_Obj fr_addGlobalRef(fr_Env self, fr_Obj obj) {
     Env *env = (Env*)self;
     env->vm->getGc()->pinObj(fr_toGcObj(obj));
+    return obj;
 }
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj) {
     Env *env = (Env*)self;

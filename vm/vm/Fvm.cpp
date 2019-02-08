@@ -18,16 +18,16 @@ Fvm::Fvm(PodManager *podManager)
     : podManager(podManager), executeEngine(nullptr)
 {
     gc.gcSupport = this;
-    mtx_init(&lock, mtx_recursive);
-    LinkedList_make(&globalRefList);
+    //mtx_init(&lock, mtx_recursive);
+    //LinkedList_make(&globalRefList);
 #ifdef FR_LLVM
     executeEngine = new SimpleLLVMJIT();
 #endif
 }
 
 Fvm::~Fvm() {
-    mtx_destroy(&lock);
-    LinkedList_release(&globalRefList);
+    //mtx_destroy(&lock);
+    //LinkedList_release(&globalRefList);
     delete executeEngine;
 }
 
@@ -60,15 +60,27 @@ void Fvm::registerMethod(const char *name, fr_NativeFunc func) {
 }
 
 struct sys_ObjArray_{
-    struct fr_ObjHeader super;
+    struct GcObj_ super;
     FObj ** data;
     size_t size;
 };
 
-void Fvm::walkNodeChildren(Gc *gc, FObj* obj) {
+void Fvm::onStartGc() {
+    
+}
+
+void Fvm::printObj(GcObj *obj) {
+    printf("%p", obj);
+}
+
+int Fvm::allocSize(void *type) {
+    return 1;
+}
+
+void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::vector<GcObj*> *list) {
     Env *env = nullptr;
     
-    FType *ftype = obj->type;
+    FType *ftype = fr_getObjType(env, obj);
     for (int i=0; i<ftype->fields.size(); ++i) {
         FField &f = ftype->fields[i];
         if (f.flags & FFlags::Static) {
@@ -77,7 +89,7 @@ void Fvm::walkNodeChildren(Gc *gc, FObj* obj) {
             fr_Value *val = podManager->getInstanceFieldValue(obj, &f);
             fr_ValueType vtype = podManager->getValueType(env, ftype->c_pod, f.type);
             if (vtype == fr_vtObj) {
-                gc->onChild((FObj*)val->o);
+                list->push_back((FObj*)val->o);
             }
         }
     }
@@ -88,18 +100,18 @@ void Fvm::walkNodeChildren(Gc *gc, FObj* obj) {
         sys_ObjArray_ *array = (sys_ObjArray_ *)obj;
         for (size_t i=0; i<array->size; ++i) {
             FObj * obj = array->data[i];
-            gc->onChild((FObj*)obj);
+            list->push_back((FObj*)obj);
         }
     }
 }
 void Fvm::walkRoot(Gc *gc) {
     //global ref
-    LinkedListElem *it = LinkedList_first(&globalRefList);
-    LinkedListElem *end = LinkedList_end(&globalRefList);
-    while (it != end) {
-        gc->onRoot(reinterpret_cast<FObj*>(it->data));
-        it = it->next;
-    }
+    //LinkedListElem *it = LinkedList_first(&globalRefList);
+    //LinkedListElem *end = LinkedList_end(&globalRefList);
+    //while (it != end) {
+    //    gc->onRoot(reinterpret_cast<FObj*>(it->data));
+    //    it = it->next;
+    //}
     
     //static field
     for (auto it = staticFieldRef.begin(); it != staticFieldRef.end(); ++it) {
@@ -124,19 +136,20 @@ void Fvm::finalizeObj(FObj* obj) {
     env->callVirtual(m, 0);
     //env->callVirtualMethod("finalize", 0);
 }
-void Fvm::puaseWorld() {
+void Fvm::puaseWorld(bool bloking) {
     for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;
         env->needStop = true;
     }
     
     System_barrier();
-    
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
+    if (bloking) {
+      for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;
         while (!env->isStoped) {
             System_sleep(5);
         }
+      }
     }
 }
 void Fvm::resumeWorld() {
@@ -146,23 +159,6 @@ void Fvm::resumeWorld() {
     }
 }
 
-fr_Obj Fvm::newGlobalRef(FObj * obj) {
-    mtx_lock(&lock);
-    LinkedListElem *elem = LinkedList_newElem(&globalRefList, 0);
-    elem->data = obj;
-    LinkedList_add(&globalRefList, elem);
-    fr_Obj objRef = (fr_Obj)(&elem->data);
-    mtx_unlock(&lock);
-    return objRef;
-}
-
-void Fvm::deleteGlobalRef(fr_Obj objRef) {
-    mtx_lock(&lock);
-    LinkedListElem *elem =  reinterpret_cast<LinkedListElem *>((char*)(objRef) - offsetof(LinkedListElem, data));
-    elem->data = NULL;
-    LinkedList_remove(&globalRefList, elem);
-    mtx_unlock(&lock);
-}
 void Fvm::addStaticRef(fr_Obj obj) {
     staticFieldRef.push_back(obj);
 }

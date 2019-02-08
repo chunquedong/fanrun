@@ -179,11 +179,14 @@ void PodGen::genStaticInit(Printer *printer) {
 }
 
 void PodGen::genRegister(Printer *printer) {
+    printer->println("#include \"%s.h\"", podName.c_str());
+    printer->newLine();
+    
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
         gtype->genMethodWrap(printer);
     }
-    printer->println("void %s_register(fr_FVM vm) {", podName.c_str());
+    printer->println("void %s_register(fr_Fvm vm) {", podName.c_str());
     printer->indent();
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
@@ -194,6 +197,10 @@ void PodGen::genRegister(Printer *printer) {
 }
 
 void PodGen::genStub(Printer *printer) {
+    printer->println("#include \"%s.h\"", podName.c_str());
+    //printer->println("#include \"fni.h\"");
+    printer->newLine();
+    
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
         gtype->genMethodStub(printer);

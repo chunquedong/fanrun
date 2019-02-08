@@ -122,16 +122,11 @@ bool Interpreter::run(Env *env) {
         iframe->curPod = nullptr;
     }
     
-    if (frame->paramDefault) {
-        iframe->code = &frame->paramDefault->opcodes.buf;
-        iframe->code->seek(0);
-    } else {
-        iframe->code = &frame->method->code.buf;
-        iframe->code->seek(0);
-        
-        //init local vars
-        this->initVars();
-    }
+    iframe->code = &frame->method->code.buf;
+    iframe->code->seek(0);
+    
+    //init local vars
+    this->initVars();
 
     this->runCode();
     return true;
@@ -438,6 +433,9 @@ bool Interpreter::exeStep() {
         case FOp::CallNonVirtual:
             callMethod(i1, false);
             break;
+        case FOp::CallSuper:
+            callMethod(i1, false);
+            break;
         case FOp::CallMixinNonVirtual:
             callMethod(i1, false);
             break;
@@ -627,7 +625,7 @@ bool Interpreter::exeStep() {
             goto Step_jump;
             break;
         }
-        case FOp::JumpFinally:{
+        case FOp::_JumpFinally:{
             frame()->pc = i1;
             goto Step_jump;
             break;
@@ -644,7 +642,7 @@ bool Interpreter::exeStep() {
         case FOp::CatchErrStart: {
             break;
         }
-        case FOp::CatchEnd:
+        case FOp::_CatchEnd:
             break;
             
         case FOp::FinallyStart:

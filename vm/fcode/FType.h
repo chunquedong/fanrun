@@ -36,6 +36,7 @@ struct FMethodVar : public FSlot {
 };
 
 class Code;
+typedef void (*FNativeFunc)(void *env, void *param, void *ret);
 
 struct FMethod : public FSlot {
     uint16_t returnType;
@@ -52,7 +53,8 @@ struct FMethod : public FSlot {
     
     //cache
     FType *c_parent;
-    void (*c_native)(void *env, void *param, void *ret);
+    
+    FNativeFunc c_native;
     void *c_wrappedMethod;
     void (*c_jit)(void *env);
     uint16_t c_jitLocalCount;

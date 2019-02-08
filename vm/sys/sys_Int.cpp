@@ -3,6 +3,12 @@
 #include <wchar.h>
 #include <math.h>
 
+
+sys_Int sys_Int_defVal = 0;
+sys_Int sys_Int_maxVal = INT64_MAX;
+sys_Int sys_Int_minVal = INT64_MIN;
+
+
 //sys_Int_null sys_Int_fromStr1(fr_Env __env, sys_Str s) {
 //    return sys_Int_fromStr2(__env, s, 10);
 //}

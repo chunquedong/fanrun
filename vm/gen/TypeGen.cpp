@@ -360,22 +360,37 @@ void TypeGen::genMethodDeclare(Printer *printer) {
 void TypeGen::genMethodWrap(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Abstract) != 0) {
+        
+        if ((method->flags & FFlags::Abstract) != 0 || (method->flags & FFlags::Overload) != 0) {
             continue;
         }
-        MethodGen gmethod(this, method);
-        gmethod.genRegisterWrap(printer);
+        
+        if ((method->flags & FFlags::Native) != 0 ||
+            (type->meta.flags & FFlags::Native) != 0) {
+            MethodGen gmethod(this, method);
+            
+            if (!gmethod.isStatic && FCodeUtil::isBuildinValType(method->c_parent)) {
+                gmethod.genRegisterWrap(printer, true);
+            }
+            else {
+                gmethod.genRegisterWrap(printer, false);
+            }
+        }
     }
 }
 
 void TypeGen::genMethodRegister(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Abstract) != 0) {
+        if ((method->flags & FFlags::Abstract) != 0 || (method->flags & FFlags::Overload) != 0) {
             continue;
         }
-        MethodGen gmethod(this, method);
-        gmethod.genRegister(printer);
+        if ((method->flags & FFlags::Native) != 0 ||
+            (type->meta.flags & FFlags::Native) != 0) {
+            MethodGen gmethod(this, method);
+            gmethod.genRegister(printer);
+            
+        }
     }
 }
 

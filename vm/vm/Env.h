@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include "Fvm.h"
 #include <vector>
-#include "vm.h"
 #include <set>
 #include "tinycthread.h"
 #include "system.h"
@@ -20,19 +19,16 @@
 struct StackFrame {
     StackFrame *preFrame;
     FMethod *method;
-    FParamDefault *paramDefault;
     int paddingSize;
     int paramCount;
 };
 
-class Env {
+class Env : public fr_Env_ {
     ExeEngine *interpreter;
 public:
     PodManager *podManager;
 //private:
     StackFrame *blockingFrame;
-    bool needStop;
-    bool isStoped;
     
     FObj *error;
     FObj *thread;
@@ -107,7 +103,7 @@ public:
     ////////////////////////////
 public:
 
-    void call(FMethod *method, int paramCount, FParamDefault *paramDefault = nullptr);
+    void call(FMethod *method, int paramCount);
     
     FMethod * findMethod(const char *pod, const char *type, const char *name);
     void callNonVirtual(FMethod * method, int paramCount);

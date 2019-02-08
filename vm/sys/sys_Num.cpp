@@ -18,3 +18,6 @@ sys_Str sys_Num_localePercent0(fr_Env __env){ return 0; }
 sys_Str sys_Num_localePosInf0(fr_Env __env){ return 0; }
 sys_Str sys_Num_localeNegInf0(fr_Env __env){ return 0; }
 sys_Str sys_Num_localeNaN0(fr_Env __env){ return 0; }
+sys_Enum_null sys_Enum_doFromStr3(fr_Env __env, sys_Str type, sys_Str name, sys_Bool checked) {
+    return NULL;
+}

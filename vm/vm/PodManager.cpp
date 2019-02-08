@@ -30,7 +30,7 @@ void PodManager::loadNativeMethod(FMethod *method) {
     if (!method->c_native
         && ((method->flags & FFlags::Native) || (method->c_parent->meta.flags & FFlags::Native))) {
         std::string fullName = pod->name + "_" + type->c_name + "_"+methodName;
-        method->c_native = nativeFuncMap[fullName];
+        method->c_native = (FNativeFunc)nativeFuncMap[fullName];
         if (method->c_native == nullptr) {
             printf("ERROR: not found native func %s\n", fullName.c_str());
         }
@@ -217,7 +217,7 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
     
     //init super
     if (isRootType(env, type)) {
-        size = sizeof(struct fr_ObjHeader);
+        size = sizeof(struct GcObj_);
     } else {
         FType *base = getType(env, type->c_pod, type->meta.base);
         initTypeAllocSize(env, base);
@@ -279,7 +279,7 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
                 std::string fullName = pod->name + "_" + type->c_name + "_static$init";
                 fr_NativeFunc func = nativeFuncMap[fullName];
                 if (func) {
-                    method->c_native = func;
+                    method->c_native = (FNativeFunc)func;
                 }
             }
             env->call(method, 0);
@@ -417,7 +417,7 @@ FType *PodManager::getInstanceType(Env *env, fr_TagValue &val) {
             type = boolType;
             break;
         case fr_vtObj:
-            type = ((FObj*)val.any.o)->type;
+            type = fr_getFType(env, val.any.o);
             break;
         default:
             type = objType;

@@ -95,6 +95,8 @@ size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
 }//extern "C" {
 /////////////////////////////////////////////////////////////
 
+sys_Str sys_Str_defVal = (sys_Str)fr_newStr(NULL, L"", 0);
+
 void sys_Str_privateMake0(fr_Env __env, sys_Str_ref __self){
     __self->data = NULL;
     __self->size = 0;
@@ -284,5 +286,8 @@ sys_ByteArray sys_Str_toUtf80(fr_Env __env, sys_Str_ref __self) {
 }
 //TODO
 sys_Str sys_Str_fromUtf83(fr_Env __env, sys_ByteArray ba, sys_Int offset, sys_Int len) {
+    return NULL;
+}
+sys_Str sys_Str_format2(fr_Env __env, sys_Str format, sys_List args) {
     return NULL;
 }

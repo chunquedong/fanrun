@@ -7,7 +7,4 @@
    <FileRef
       location = "group:vm/gen.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:vm/vm.xcodeproj">
-   </FileRef>
 </Workspace>

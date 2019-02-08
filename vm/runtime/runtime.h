@@ -30,13 +30,16 @@ struct fr_Env_ {
     bool isStoped;
 };
 typedef struct fr_Env_ *fr_Env;
+typedef void *fr_Fvm;
 
 ////////////////////////////
 // VM
 ////////////////////////////
 
-fr_Env fr_getEnv();
-void fr_releaseEnv(fr_Env env);
+fr_Env fr_getEnv(fr_Fvm vm);
+void fr_releaseEnv(fr_Fvm vm, fr_Env env);
+    
+int fr_getFuncArity(fr_Env, fr_Class clz);
 
 ////////////////////////////
 // Exception
@@ -55,7 +58,7 @@ void fr_clearErr(fr_Env self);
 // GC
 ////////////////////////////
 
-void fr_addGlobalRef(fr_Env self, fr_Obj obj);
+fr_Obj fr_addGlobalRef(fr_Env self, fr_Obj obj);
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
 void fr_addStaticRef(fr_Env self, fr_Obj *obj);
     
@@ -73,7 +76,7 @@ fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size);
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
 //NullTerminated
 fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data);
-const char *fr_getStrUtf8(fr_Env env__, fr_Obj str);
+const char *fr_getStrUtf8(fr_Env env__, fr_Obj str, bool *isCopy);
     
 fr_Obj fr_sysType(fr_Env env, fr_Class);
 void fr_throwNPE(fr_Env __env);
