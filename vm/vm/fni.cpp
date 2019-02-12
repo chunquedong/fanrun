@@ -6,7 +6,7 @@
 //  Copyright (c) 2015, yangjiandong. All rights reserved.
 //
 
-#include "runtime.h"
+#include "vm.h"
 #include "Env.h"
 #include "Fvm.h"
 #include <assert.h>
@@ -75,18 +75,16 @@ bool fr_getParam(fr_Env env, void *param, fr_Value *val, int pos) {
 // Type
 ////////////////////////////
 
-fr_Class fr_getClass(fr_Env env, fr_Obj obj) {
-    return NULL;
-}
-int fr_getFuncArity(fr_Env env, fr_Class clz) {
+int fr_getFuncArity(fr_Env env, fr_Type clz) {
     return 0;
 }
-const char *getTypeName(fr_Env env, fr_Obj obj) {
-    return fr_getFType(env, obj)->c_name.c_str();
-}
 
-struct FType *fr_getFType(fr_Env env, fr_Obj obj) {
-    return NULL;
+struct FType *fr_getFType(fr_Env self, FObj *obj) {
+    return (struct FType *)gc_getType(obj);
+}
+//struct FType *fr_toFType(fr_Env self, FObj *obj);
+const char *fr_getTypeName(fr_Env self, FObj *obj) {
+    return fr_getFType(self, obj)->c_name.c_str();
 }
 
 ////////////////////////////
@@ -127,14 +125,6 @@ fr_Obj fr_newGlobalRef(fr_Env self, fr_Obj obj) {
     return obj;
 }
 
-fr_Obj fr_addGlobalRef(fr_Env self, fr_Obj obj) {
-    Env *e = (Env*)self;
-    //fr_lock(self);
-    obj = e->newGlobalRef(fr_getPtr(self, obj));
-    //fr_unlock(self);
-    return obj;
-}
-
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj) {
     Env *e = (Env*)self;
     //fr_lock(self);
@@ -158,10 +148,6 @@ fr_Obj fr_allocObj(fr_Env self, fr_Type type, int size) {
     fr_Obj objRef = fr_toHandle(self, obj);
     //e->unlock();
     return objRef;
-}
-//TODO
-fr_Obj fr_malloc(fr_Env self, fr_Class vtable) {
-    return NULL;
 }
 
 FObj *fr_allocObj_internal(fr_Env self, fr_Type type, int size) {
@@ -517,13 +503,6 @@ void fr_throw(fr_Env self, fr_Obj err) {
     //fr_unlock(self);
 }
 
-void fr_setErr(fr_Env self, fr_Obj err) {
-    Env *e = (Env*)self;
-    //fr_lock(self);
-    e->throwError(fr_getPtr(self, err));
-    //fr_unlock(self);
-}
-
 void fr_clearError(fr_Env self) {
     Env *e = (Env*)self;
     //fr_lock(self);
@@ -535,6 +514,13 @@ void fr_throwNew(fr_Env self, const char *pod, const char *type, const char *msg
     Env *e = (Env*)self;
     //e->lock();
     e->throwNew(pod, type, msg, 2);
+    //e->unlock();
+}
+
+void fr_throwNPE(fr_Env self) {
+    Env *e = (Env*)self;
+    //e->lock();
+    e->throwNPE();
     //e->unlock();
 }
 
@@ -573,6 +559,26 @@ bool fr_unbox(fr_Env self, fr_Obj obj, fr_Value *value) {
 ////////////////////////////
 // Str
 ////////////////////////////
+
+fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes) {
+    Env *e = (Env*)self;
+    //e->lock();
+    FObj *str = e->podManager->objFactory.newString(e, bytes);
+    fr_Obj objRef = fr_toHandle(self, str);
+    //e->unlock();
+    return objRef;
+}
+
+const char *fr_getStrUtf8(fr_Env self, fr_Obj str, bool *isCopy) {
+    Env *e = (Env*)self;
+    //e->lock();
+    const char *cstr = e->podManager->objFactory.getStrUtf8(e, fr_getPtr(self, str));
+    //e->unlock();
+    if (isCopy) {
+        *isCopy = false;
+    }
+    return cstr;
+}
 
 void fr_releaseStrUtf8(fr_Env self, fr_Obj str, const char *bytes) {
     //pass;

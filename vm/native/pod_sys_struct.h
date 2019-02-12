@@ -3,7 +3,7 @@
 CF_BEGIN
 
 struct sys_Obj_{
-    struct fr_ObjHeader super;
+    fr_ObjHeader super;
 };
 
 struct sys_Bool_{

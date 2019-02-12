@@ -9,23 +9,29 @@
 /* Begin PBXBuildFile section */
 		321248D3220D22FD00EF1830 /* MBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248CF220D22FD00EF1830 /* MBuilder.cpp */; };
 		321248D4220D22FD00EF1830 /* FCodeUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248D1220D22FD00EF1830 /* FCodeUtil.cpp */; };
-		321248E5220D257400EF1830 /* sys_Str.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248D7220D257400EF1830 /* sys_Str.cpp */; };
-		321248E6220D257400EF1830 /* runtime_native.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248D8220D257400EF1830 /* runtime_native.cpp */; };
-		321248E7220D257400EF1830 /* sys_Obj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248D9220D257400EF1830 /* sys_Obj.cpp */; };
-		321248E8220D257400EF1830 /* sys_Type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248DA220D257400EF1830 /* sys_Type.cpp */; };
-		321248E9220D257400EF1830 /* sys_ByteArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248DB220D257400EF1830 /* sys_ByteArray.cpp */; };
-		321248EA220D257400EF1830 /* sys_Bool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248DC220D257400EF1830 /* sys_Bool.cpp */; };
-		321248EB220D257400EF1830 /* sys_Float.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248DD220D257400EF1830 /* sys_Float.cpp */; };
-		321248EC220D257400EF1830 /* sys_Func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248DE220D257400EF1830 /* sys_Func.cpp */; };
-		321248ED220D257400EF1830 /* sys_Int.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248DF220D257400EF1830 /* sys_Int.cpp */; };
-		321248EE220D257400EF1830 /* sys_Err.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248E1220D257400EF1830 /* sys_Err.cpp */; };
-		321248EF220D257400EF1830 /* sys_StrBuf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248E2220D257400EF1830 /* sys_StrBuf.cpp */; };
-		321248F0220D257400EF1830 /* sys_Num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248E3220D257400EF1830 /* sys_Num.cpp */; };
-		321248F1220D257400EF1830 /* sys_ObjArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248E4220D257400EF1830 /* sys_ObjArray.cpp */; };
-		321248F4220D258D00EF1830 /* sys_register.c in Sources */ = {isa = PBXBuildFile; fileRef = 321248F2220D258D00EF1830 /* sys_register.c */; };
-		321248F7220D278900EF1830 /* sys_stub.c in Sources */ = {isa = PBXBuildFile; fileRef = 321248F6220D278900EF1830 /* sys_stub.c */; };
-		3212490E220D41E400EF1830 /* escape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212490D220D41E400EF1830 /* escape.cpp */; };
-		32124914220D6BBE00EF1830 /* sys_Void.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32124912220D6BBE00EF1830 /* sys_Void.cpp */; };
+		321249382213028700EF1830 /* sys_Field.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249212213028700EF1830 /* sys_Field.c */; };
+		321249392213028700EF1830 /* sys_Void.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249222213028700EF1830 /* sys_Void.c */; };
+		3212493A2213028700EF1830 /* sys_StrBuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249232213028700EF1830 /* sys_StrBuf.c */; };
+		3212493B2213028700EF1830 /* pod_sys_register.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249242213028700EF1830 /* pod_sys_register.c */; };
+		3212493C2213028700EF1830 /* sys_This.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249252213028700EF1830 /* sys_This.c */; };
+		3212493D2213028700EF1830 /* sys_Int.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249262213028700EF1830 /* sys_Int.c */; };
+		3212493E2213028700EF1830 /* sys_ObjArray.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249272213028700EF1830 /* sys_ObjArray.c */; };
+		3212493F2213028700EF1830 /* sys_Num.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249282213028700EF1830 /* sys_Num.c */; };
+		321249402213028700EF1830 /* sys_Obj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212492A2213028700EF1830 /* sys_Obj.cpp */; };
+		321249412213028700EF1830 /* sys_Method.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212492B2213028700EF1830 /* sys_Method.cpp */; };
+		321249422213028700EF1830 /* sys_Err.c in Sources */ = {isa = PBXBuildFile; fileRef = 3212492C2213028700EF1830 /* sys_Err.c */; };
+		321249432213028700EF1830 /* sys_Float.c in Sources */ = {isa = PBXBuildFile; fileRef = 3212492D2213028700EF1830 /* sys_Float.c */; };
+		321249442213028700EF1830 /* sys_Type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212492E2213028700EF1830 /* sys_Type.cpp */; };
+		321249452213028700EF1830 /* sys_Bool.c in Sources */ = {isa = PBXBuildFile; fileRef = 3212492F2213028700EF1830 /* sys_Bool.c */; };
+		321249462213028700EF1830 /* pod_sys_native.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249302213028700EF1830 /* pod_sys_native.c */; };
+		321249472213028700EF1830 /* sys_Pod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321249312213028700EF1830 /* sys_Pod.cpp */; };
+		321249482213028700EF1830 /* sys_Str.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249322213028700EF1830 /* sys_Str.c */; };
+		321249492213028700EF1830 /* sys_ByteArray.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249332213028700EF1830 /* sys_ByteArray.c */; };
+		3212494A2213028700EF1830 /* sys_Param.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249342213028700EF1830 /* sys_Param.c */; };
+		3212494B2213028700EF1830 /* sys_Slot.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249352213028700EF1830 /* sys_Slot.c */; };
+		3212494C2213028700EF1830 /* sys_IntArray.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249362213028700EF1830 /* sys_IntArray.c */; };
+		3212494D2213028700EF1830 /* sys_Func.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249372213028700EF1830 /* sys_Func.c */; };
+		32124950221305CF00EF1830 /* NativeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212494E221305CF00EF1830 /* NativeGen.cpp */; };
 		323668F61BB64DE60030F788 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 323668F51BB64DE60030F788 /* main.cpp */; };
 		3236694D1BB64F1A0030F788 /* PodManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3236694B1BB64F1A0030F788 /* PodManager.cpp */; };
 		323669501BB64F470030F788 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3236694E1BB64F470030F788 /* Env.cpp */; };
@@ -90,28 +96,33 @@
 		321248D0220D22FD00EF1830 /* MBuilder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MBuilder.hpp; sourceTree = "<group>"; };
 		321248D1220D22FD00EF1830 /* FCodeUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FCodeUtil.cpp; sourceTree = "<group>"; };
 		321248D2220D22FD00EF1830 /* FCodeUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FCodeUtil.hpp; sourceTree = "<group>"; };
-		321248D5220D230E00EF1830 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		321248D7220D257400EF1830 /* sys_Str.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Str.cpp; sourceTree = "<group>"; };
-		321248D8220D257400EF1830 /* runtime_native.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime_native.cpp; sourceTree = "<group>"; };
-		321248D9220D257400EF1830 /* sys_Obj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Obj.cpp; sourceTree = "<group>"; };
-		321248DA220D257400EF1830 /* sys_Type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Type.cpp; sourceTree = "<group>"; };
-		321248DB220D257400EF1830 /* sys_ByteArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_ByteArray.cpp; sourceTree = "<group>"; };
-		321248DC220D257400EF1830 /* sys_Bool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Bool.cpp; sourceTree = "<group>"; };
-		321248DD220D257400EF1830 /* sys_Float.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Float.cpp; sourceTree = "<group>"; };
-		321248DE220D257400EF1830 /* sys_Func.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Func.cpp; sourceTree = "<group>"; };
-		321248DF220D257400EF1830 /* sys_Int.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Int.cpp; sourceTree = "<group>"; };
-		321248E0220D257400EF1830 /* sys_native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys_native.h; sourceTree = "<group>"; };
-		321248E1220D257400EF1830 /* sys_Err.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Err.cpp; sourceTree = "<group>"; };
-		321248E2220D257400EF1830 /* sys_StrBuf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_StrBuf.cpp; sourceTree = "<group>"; };
-		321248E3220D257400EF1830 /* sys_Num.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Num.cpp; sourceTree = "<group>"; };
-		321248E4220D257400EF1830 /* sys_ObjArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_ObjArray.cpp; sourceTree = "<group>"; };
-		321248F2220D258D00EF1830 /* sys_register.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_register.c; sourceTree = "<group>"; };
-		321248F6220D278900EF1830 /* sys_stub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_stub.c; sourceTree = "<group>"; };
-		321248F8220D27A200EF1830 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys.h; sourceTree = "<group>"; };
-		3212490C220D41E400EF1830 /* escape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = escape.h; sourceTree = "<group>"; };
-		3212490D220D41E400EF1830 /* escape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = escape.cpp; sourceTree = "<group>"; };
-		32124912220D6BBE00EF1830 /* sys_Void.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Void.cpp; sourceTree = "<group>"; };
-		321FE9DC1D941AAC00357AFB /* runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
+		321249202213028700EF1830 /* pod_sys_native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pod_sys_native.h; sourceTree = "<group>"; };
+		321249212213028700EF1830 /* sys_Field.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Field.c; sourceTree = "<group>"; };
+		321249222213028700EF1830 /* sys_Void.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Void.c; sourceTree = "<group>"; };
+		321249232213028700EF1830 /* sys_StrBuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_StrBuf.c; sourceTree = "<group>"; };
+		321249242213028700EF1830 /* pod_sys_register.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pod_sys_register.c; sourceTree = "<group>"; };
+		321249252213028700EF1830 /* sys_This.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_This.c; sourceTree = "<group>"; };
+		321249262213028700EF1830 /* sys_Int.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Int.c; sourceTree = "<group>"; };
+		321249272213028700EF1830 /* sys_ObjArray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_ObjArray.c; sourceTree = "<group>"; };
+		321249282213028700EF1830 /* sys_Num.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Num.c; sourceTree = "<group>"; };
+		321249292213028700EF1830 /* pod_sys_struct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pod_sys_struct.h; sourceTree = "<group>"; };
+		3212492A2213028700EF1830 /* sys_Obj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Obj.cpp; sourceTree = "<group>"; };
+		3212492B2213028700EF1830 /* sys_Method.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Method.cpp; sourceTree = "<group>"; };
+		3212492C2213028700EF1830 /* sys_Err.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Err.c; sourceTree = "<group>"; };
+		3212492D2213028700EF1830 /* sys_Float.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Float.c; sourceTree = "<group>"; };
+		3212492E2213028700EF1830 /* sys_Type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Type.cpp; sourceTree = "<group>"; };
+		3212492F2213028700EF1830 /* sys_Bool.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Bool.c; sourceTree = "<group>"; };
+		321249302213028700EF1830 /* pod_sys_native.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pod_sys_native.c; sourceTree = "<group>"; };
+		321249312213028700EF1830 /* sys_Pod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Pod.cpp; sourceTree = "<group>"; };
+		321249322213028700EF1830 /* sys_Str.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Str.c; sourceTree = "<group>"; };
+		321249332213028700EF1830 /* sys_ByteArray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_ByteArray.c; sourceTree = "<group>"; };
+		321249342213028700EF1830 /* sys_Param.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Param.c; sourceTree = "<group>"; };
+		321249352213028700EF1830 /* sys_Slot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Slot.c; sourceTree = "<group>"; };
+		321249362213028700EF1830 /* sys_IntArray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_IntArray.c; sourceTree = "<group>"; };
+		321249372213028700EF1830 /* sys_Func.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Func.c; sourceTree = "<group>"; };
+		3212494E221305CF00EF1830 /* NativeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NativeGen.cpp; sourceTree = "<group>"; };
+		3212494F221305CF00EF1830 /* NativeGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeGen.h; sourceTree = "<group>"; };
+		321249512213067B00EF1830 /* vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vm.h; sourceTree = "<group>"; };
 		323668F21BB64DE60030F788 /* vm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vm; sourceTree = BUILT_PRODUCTS_DIR; };
 		323668F51BB64DE60030F788 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3236694B1BB64F1A0030F788 /* PodManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PodManager.cpp; sourceTree = "<group>"; };
@@ -341,34 +352,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		321248D6220D257400EF1830 /* sys */ = {
+		3212491F2213028700EF1830 /* native */ = {
 			isa = PBXGroup;
 			children = (
-				321248D7220D257400EF1830 /* sys_Str.cpp */,
-				321248D8220D257400EF1830 /* runtime_native.cpp */,
-				321248D9220D257400EF1830 /* sys_Obj.cpp */,
-				321248DA220D257400EF1830 /* sys_Type.cpp */,
-				321248DB220D257400EF1830 /* sys_ByteArray.cpp */,
-				321248DC220D257400EF1830 /* sys_Bool.cpp */,
-				321248DD220D257400EF1830 /* sys_Float.cpp */,
-				321248DE220D257400EF1830 /* sys_Func.cpp */,
-				321248DF220D257400EF1830 /* sys_Int.cpp */,
-				321248E0220D257400EF1830 /* sys_native.h */,
-				321248E1220D257400EF1830 /* sys_Err.cpp */,
-				321248E2220D257400EF1830 /* sys_StrBuf.cpp */,
-				321248E3220D257400EF1830 /* sys_Num.cpp */,
-				321248E4220D257400EF1830 /* sys_ObjArray.cpp */,
-				32124912220D6BBE00EF1830 /* sys_Void.cpp */,
+				321249202213028700EF1830 /* pod_sys_native.h */,
+				321249212213028700EF1830 /* sys_Field.c */,
+				321249222213028700EF1830 /* sys_Void.c */,
+				321249232213028700EF1830 /* sys_StrBuf.c */,
+				321249242213028700EF1830 /* pod_sys_register.c */,
+				321249252213028700EF1830 /* sys_This.c */,
+				321249262213028700EF1830 /* sys_Int.c */,
+				321249272213028700EF1830 /* sys_ObjArray.c */,
+				321249282213028700EF1830 /* sys_Num.c */,
+				321249292213028700EF1830 /* pod_sys_struct.h */,
+				3212492A2213028700EF1830 /* sys_Obj.cpp */,
+				3212492B2213028700EF1830 /* sys_Method.cpp */,
+				3212492C2213028700EF1830 /* sys_Err.c */,
+				3212492D2213028700EF1830 /* sys_Float.c */,
+				3212492E2213028700EF1830 /* sys_Type.cpp */,
+				3212492F2213028700EF1830 /* sys_Bool.c */,
+				321249302213028700EF1830 /* pod_sys_native.c */,
+				321249312213028700EF1830 /* sys_Pod.cpp */,
+				321249322213028700EF1830 /* sys_Str.c */,
+				321249332213028700EF1830 /* sys_ByteArray.c */,
+				321249342213028700EF1830 /* sys_Param.c */,
+				321249352213028700EF1830 /* sys_Slot.c */,
+				321249362213028700EF1830 /* sys_IntArray.c */,
+				321249372213028700EF1830 /* sys_Func.c */,
 			);
-			path = sys;
+			path = native;
 			sourceTree = "<group>";
 		};
 		323668E91BB64DE60030F788 = {
 			isa = PBXGroup;
 			children = (
-				321248D6220D257400EF1830 /* sys */,
-				32C1072F1FEFDF7E006248C6 /* temp */,
-				327845E21F49630A00481704 /* common */,
+				3212491F2213028700EF1830 /* native */,
 				327845E41F49630A00481704 /* ir */,
 				327845F21F49630A00481704 /* thirdparty */,
 				327846251F49630A00481704 /* gc */,
@@ -406,8 +424,10 @@
 				3237F7761BB773B500A58B54 /* fni.h */,
 				323C30B61BC0AC0600F15091 /* ObjFactory.cpp */,
 				323C30B71BC0AC0600F15091 /* ObjFactory.h */,
-				321FE9DC1D941AAC00357AFB /* runtime.h */,
 				325231111DAC88940044DBF8 /* ExeEngine.h */,
+				3212494E221305CF00EF1830 /* NativeGen.cpp */,
+				3212494F221305CF00EF1830 /* NativeGen.h */,
+				321249512213067B00EF1830 /* vm.h */,
 			);
 			path = vm;
 			sourceTree = "<group>";
@@ -433,16 +453,6 @@
 				323868451BBFF0E800EE9FEB /* ZipFile.h */,
 			);
 			path = fcode;
-			sourceTree = "<group>";
-		};
-		327845E21F49630A00481704 /* common */ = {
-			isa = PBXGroup;
-			children = (
-				3212490C220D41E400EF1830 /* escape.h */,
-				3212490D220D41E400EF1830 /* escape.cpp */,
-				321248D5220D230E00EF1830 /* common.h */,
-			);
-			path = common;
 			sourceTree = "<group>";
 		};
 		327845E41F49630A00481704 /* ir */ = {
@@ -556,16 +566,6 @@
 				327846321F49630A00481704 /* utf8.h */,
 			);
 			path = util;
-			sourceTree = "<group>";
-		};
-		32C1072F1FEFDF7E006248C6 /* temp */ = {
-			isa = PBXGroup;
-			children = (
-				321248F8220D27A200EF1830 /* sys.h */,
-				321248F6220D278900EF1830 /* sys_stub.c */,
-				321248F2220D258D00EF1830 /* sys_register.c */,
-			);
-			path = temp;
 			sourceTree = "<group>";
 		};
 		32FF46FE1D8593A000724EB6 /* llvm */ = {
@@ -747,67 +747,73 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				321248E6220D257400EF1830 /* runtime_native.cpp in Sources */,
+				321249432213028700EF1830 /* sys_Float.c in Sources */,
 				3237F7741BB76D3600A58B54 /* Fvm.cpp in Sources */,
 				327846481F49630A00481704 /* inffast.c in Sources */,
 				3278463D1F49630A00481704 /* Makefile in Sources */,
 				3278463C1F49630A00481704 /* iowin32.c in Sources */,
-				321248EA220D257400EF1830 /* sys_Bool.cpp in Sources */,
-				321248F7220D278900EF1830 /* sys_stub.c in Sources */,
-				32124914220D6BBE00EF1830 /* sys_Void.cpp in Sources */,
-				321248EB220D257400EF1830 /* sys_Float.cpp in Sources */,
 				327846471F49630A00481704 /* infback.c in Sources */,
 				323868491BBFF0E800EE9FEB /* FPod.cpp in Sources */,
-				321248EC220D257400EF1830 /* sys_Func.cpp in Sources */,
 				327846341F49630A00481704 /* Stmt.cpp in Sources */,
+				321249402213028700EF1830 /* sys_Obj.cpp in Sources */,
 				327846411F49630A00481704 /* unzip.c in Sources */,
+				3212494B2213028700EF1830 /* sys_Slot.c in Sources */,
 				3278463F1F49630A00481704 /* minizip.c in Sources */,
 				327846431F49630A00481704 /* adler32.c in Sources */,
 				323868471BBFF0E800EE9FEB /* Code.cpp in Sources */,
+				321249422213028700EF1830 /* sys_Err.c in Sources */,
+				321249382213028700EF1830 /* sys_Field.c in Sources */,
 				3278464A1F49630A00481704 /* inftrees.c in Sources */,
 				3278463B1F49630A00481704 /* ioapi_mem.c in Sources */,
 				323868461BBFF0E800EE9FEB /* Buffer.cpp in Sources */,
 				3278464F1F49630A00481704 /* LinkedList.c in Sources */,
+				3212494D2213028700EF1830 /* sys_Func.c in Sources */,
 				3278464C1F49630A00481704 /* uncompr.c in Sources */,
 				327846491F49630A00481704 /* inflate.c in Sources */,
+				3212493D2213028700EF1830 /* sys_Int.c in Sources */,
 				3238684B1BBFF0E800EE9FEB /* Printer.cpp in Sources */,
-				321248F1220D257400EF1830 /* sys_ObjArray.cpp in Sources */,
+				3212494A2213028700EF1830 /* sys_Param.c in Sources */,
 				3278464B1F49630A00481704 /* trees.c in Sources */,
-				321248F0220D257400EF1830 /* sys_Num.cpp in Sources */,
 				323669501BB64F470030F788 /* Env.cpp in Sources */,
 				327846391F49630A00481704 /* ioapi.c in Sources */,
 				327846401F49630A00481704 /* README.md in Sources */,
 				321248D4220D22FD00EF1830 /* FCodeUtil.cpp in Sources */,
+				321249472213028700EF1830 /* sys_Pod.cpp in Sources */,
+				3212493A2213028700EF1830 /* sys_StrBuf.c in Sources */,
+				321249482213028700EF1830 /* sys_Str.c in Sources */,
+				321249412213028700EF1830 /* sys_Method.cpp in Sources */,
 				327846521F49630A00481704 /* utf8.c in Sources */,
 				3238684A1BBFF0E800EE9FEB /* FType.cpp in Sources */,
-				321248E7220D257400EF1830 /* sys_Obj.cpp in Sources */,
 				323669831BB675730030F788 /* Interpreter.cpp in Sources */,
+				3212493E2213028700EF1830 /* sys_ObjArray.c in Sources */,
 				327846461F49630A00481704 /* deflate.c in Sources */,
 				327846511F49630A00481704 /* tinycthread.c in Sources */,
+				32124950221305CF00EF1830 /* NativeGen.cpp in Sources */,
 				323C30B81BC0AC0600F15091 /* ObjFactory.cpp in Sources */,
+				3212493B2213028700EF1830 /* pod_sys_register.c in Sources */,
+				3212493C2213028700EF1830 /* sys_This.c in Sources */,
 				327846501F49630A00481704 /* system.c in Sources */,
+				321249442213028700EF1830 /* sys_Type.cpp in Sources */,
 				3278463E1F49630A00481704 /* miniunz.c in Sources */,
 				3237F7771BB773B500A58B54 /* fni.cpp in Sources */,
-				3212490E220D41E400EF1830 /* escape.cpp in Sources */,
-				321248E8220D257400EF1830 /* sys_Type.cpp in Sources */,
+				321249462213028700EF1830 /* pod_sys_native.c in Sources */,
 				327846421F49630A00481704 /* zip.c in Sources */,
 				327846DD1F49649300481704 /* PodLoader.cpp in Sources */,
+				3212494C2213028700EF1830 /* sys_IntArray.c in Sources */,
 				323868481BBFF0E800EE9FEB /* FAttr.cpp in Sources */,
 				3278463A1F49630A00481704 /* ioapi_buf.c in Sources */,
-				321248ED220D257400EF1830 /* sys_Int.cpp in Sources */,
-				321248E5220D257400EF1830 /* sys_Str.cpp in Sources */,
-				321248E9220D257400EF1830 /* sys_ByteArray.cpp in Sources */,
 				3238684C1BBFF0E800EE9FEB /* ZipFile.cpp in Sources */,
-				321248EF220D257400EF1830 /* sys_StrBuf.cpp in Sources */,
 				3236694D1BB64F1A0030F788 /* PodManager.cpp in Sources */,
+				321249392213028700EF1830 /* sys_Void.c in Sources */,
 				327846451F49630A00481704 /* crc32.c in Sources */,
+				3212493F2213028700EF1830 /* sys_Num.c in Sources */,
 				327846331F49630A00481704 /* IRMethod.cpp in Sources */,
+				321249452213028700EF1830 /* sys_Bool.c in Sources */,
+				321249492213028700EF1830 /* sys_ByteArray.c in Sources */,
 				323668F61BB64DE60030F788 /* main.cpp in Sources */,
-				321248EE220D257400EF1830 /* sys_Err.cpp in Sources */,
 				3278464E1F49630A00481704 /* Gc.cpp in Sources */,
 				321248D3220D22FD00EF1830 /* MBuilder.cpp in Sources */,
 				327846441F49630A00481704 /* compress.c in Sources */,
-				321248F4220D258D00EF1830 /* sys_register.c in Sources */,
 				3278464D1F49630A00481704 /* zutil.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

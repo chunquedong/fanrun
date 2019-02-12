@@ -413,7 +413,7 @@ void sys_Type_doc(fr_Env env, void *param, void *ret);
 void sys_Type_toStr(fr_Env env, void *param, void *ret);
 void sys_Type_toLocale(fr_Env env, void *param, void *ret);
 
-void register_sys(fr_Fvm vm) {
+void sys_register(fr_Fvm vm) {
     fr_registerMethod(vm, "sys_Bool__allocSize__", (fr_NativeFunc)sys_Bool__allocSize__);
     fr_registerMethod(vm, "sys_Bool_static$init", (fr_NativeFunc)sys_Bool_static__init);
     fr_registerMethod(vm, "sys_Bool_fromStr", sys_Bool_fromStr);

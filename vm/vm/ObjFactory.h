@@ -10,7 +10,7 @@
 #define __vm__ObjFactory__
 
 #include <stdio.h>
-#include "runtime.h"
+#include "fni.h"
 #include <unordered_map>
 
 class Env;

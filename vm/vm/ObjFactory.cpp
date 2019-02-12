@@ -8,9 +8,21 @@
 
 #include "ObjFactory.h"
 #include "Env.h"
-#include <assert.h>
 //#include "StackFrame.h"
 
+extern  "C"  {
+#if 0
+    FObj * sys_Str_fromUtf8(fr_Env env__, const char *cstr) { return 0; }
+    char *sys_Str_getUtf8(fr_Env env__, FObj * self__) { return 0; }
+    FObj * sys_Type_fromFType(fr_Env env__, FType * ftype) { return 0; }
+    FType * sys_Type_toFType(fr_Env env__, FObj*) { return 0; }
+#else
+    FObj * sys_Str_fromUtf8(fr_Env env__, const char *cstr);// { return 0; }
+    char *sys_Str_getUtf8(fr_Env env__, FObj * self__);// { return 0; }
+    FObj * sys_Type_fromFType(fr_Env env__, FType * ftype);// { return 0; }
+    FType * sys_Type_toFType(fr_Env env__, FObj*);
+#endif
+}
 
 ObjFactory::ObjFactory()
     : trueObj(NULL), falseObj(NULL)
@@ -62,54 +74,54 @@ CF_END
 FObj * sys_Int_box__(fr_Env self, fr_Int i, int addRef) {
     Env *e = (Env*)self;
     FType *type = e->getSysType(fr_vtInt);
-    int size = sizeof(struct GcObj_) + sizeof(fr_Int);
+    int size = sizeof(fr_ObjHeader) + sizeof(fr_Int);
     
     FObj * obj = e->allocObj(type, addRef, size);
     //FObj * obj = fr_allocObj(self, type, addRef, size);
     
-    fr_Int *val = (fr_Int*)(((char*)obj) + sizeof(struct GcObj_));
+    fr_Int *val = (fr_Int*)(((char*)obj) + sizeof(fr_ObjHeader));
     *val = i;
     return obj;
 }
 fr_Int sys_Int_unbox__(fr_Env self, FObj * i) {
     assert(i);
-    fr_Int *val = (fr_Int*)(((char*)i) + sizeof(struct GcObj_));
+    fr_Int *val = (fr_Int*)(((char*)i) + sizeof(fr_ObjHeader));
     return *val;
 }
 
 FObj * sys_Float_box__(fr_Env self, fr_Float i, int addRef) {
     Env *e = (Env*)self;
     FType *type = e->getSysType(fr_vtFloat);
-    int size = sizeof(struct GcObj_) + sizeof(fr_Float);
+    int size = sizeof(fr_ObjHeader) + sizeof(fr_Float);
     
     FObj * obj = e->allocObj(type, addRef, size);
     //FObj * obj = fr_allocObj(self, type, addRef, size);
     
-    fr_Float *val = (fr_Float*)(((char*)obj) + sizeof(struct GcObj_));
+    fr_Float *val = (fr_Float*)(((char*)obj) + sizeof( fr_ObjHeader));
     *val = i;
     return obj;
 }
 fr_Float sys_Float_unbox__(fr_Env self, FObj * i) {
     assert(i);
-    fr_Float *val = (fr_Float*)(((char*)i) + sizeof(struct GcObj_));
+    fr_Float *val = (fr_Float*)(((char*)i) + sizeof( fr_ObjHeader));
     return *val;
 }
 
 FObj * sys_Bool_box__(fr_Env self, fr_Bool i, int addRef) {
     Env *e = (Env*)self;
     FType *type = e->getSysType(fr_vtBool);
-    int size = sizeof(struct GcObj_) + sizeof(fr_Bool);
+    int size = sizeof( fr_ObjHeader) + sizeof(fr_Bool);
     
     FObj * obj = e->allocObj(type, addRef, size);
     //FObj * obj = fr_allocObj(self, type, addRef, size);
     
-    fr_Bool *val = (fr_Bool*)(((char*)obj) + sizeof(struct GcObj_));
+    fr_Bool *val = (fr_Bool*)(((char*)obj) + sizeof( fr_ObjHeader));
     *val = i;
     return obj;
 }
 fr_Bool sys_Bool_unbox__(fr_Env self, FObj * i) {
     assert(i);
-    fr_Bool *val = (fr_Bool*)(((char*)i) + sizeof(struct GcObj_));
+    fr_Bool *val = (fr_Bool*)(((char*)i) + sizeof( fr_ObjHeader));
     return *val;
 }
 #endif
@@ -186,7 +198,7 @@ FObj *ObjFactory::getString(Env *env, FPod *curPod, uint16_t sid) {
     }
     
     std::string utf8 = curPod->constantas.strings[sid];
-    FObj *obj = (FObj *)fr_newStrUtf8(env, utf8.c_str());
+    FObj *obj = (FObj *)sys_Str_fromUtf8(env, utf8.c_str());
     objRef = env->newGlobalRef(obj);
     curPod->constantas.c_strings[sid] = (void*)objRef;
     
@@ -194,23 +206,23 @@ FObj *ObjFactory::getString(Env *env, FPod *curPod, uint16_t sid) {
 }
 
 FObj * ObjFactory::newString(Env *env, const char *utf8) {
-    FObj * obj = (FObj *)fr_newStrUtf8(env, utf8);
+    FObj * obj = (FObj *)sys_Str_fromUtf8(env, utf8);
     return obj;
 }
 
 const char *ObjFactory::getStrUtf8(Env *env, FObj *obj) {
-    return fr_getStrUtf8(env, obj, NULL);
+    return sys_Str_getUtf8(env, obj);
 }
 
 FObj *ObjFactory::getWrappedType(Env *env, FType *type) {
     if (!type->c_wrappedType) {
-        fr_Obj obj = fr_toSysType(env, type);
-        //fr_Obj objRef = env->newGlobalRef(obj);
-        type->c_wrappedType = (void*)obj;
+        FObj *obj = sys_Type_fromFType(env, type);
+        fr_Obj objRef = env->newGlobalRef(obj);
+        type->c_wrappedType = (void*)objRef;
     }
     return fr_getPtr(env, (fr_Obj)type->c_wrappedType);
 }
-//TODO
+
 FType *ObjFactory::getFType(Env *env, FObj *otype) {
-    return fr_fromSysType(env, (fr_Obj)otype);
+    return sys_Type_toFType(env, otype);
 }

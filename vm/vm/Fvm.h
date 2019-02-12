@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include "PodManager.h"
-#include "runtime.h"
+#include "vm.h"
 #include "Gc.h"
 #include <unordered_map>
 #include <thread>
@@ -23,7 +23,7 @@ class Env;
 
 class Fvm : public GcSupport {
     std::unordered_map<std::thread::id, Env*> threads;
-    //LinkedList globalRefList;
+    LinkedList globalRefList;
     std::vector<fr_Obj> staticFieldRef;
     std::recursive_mutex lock;
 public:
@@ -52,8 +52,8 @@ public:
     virtual void printObj(GcObj *obj);
     virtual int allocSize(void *type);
     
-    //fr_Obj newGlobalRef(FObj * obj);
-    //void deleteGlobalRef(fr_Obj obj);
+    fr_Obj newGlobalRef(FObj * obj);
+    void deleteGlobalRef(fr_Obj obj);
     void addStaticRef(fr_Obj obj);
 };
 

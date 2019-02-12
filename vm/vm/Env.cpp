@@ -79,7 +79,7 @@ void printValue(fr_TagValue *val) {
             break;
         case fr_vtObj:
             if (val->any.o) {
-                printf("%s(%p)", getTypeName(NULL, val->any.o), val->any.o);
+                printf("%s(%p)", fr_getTypeName(NULL, val->any.o), val->any.o);
             } else {
                 printf("null");
             }
@@ -233,12 +233,11 @@ void Env::deleteLocalRef(fr_Obj objRef) {
 }
 
 fr_Obj Env::newGlobalRef(FObj * obj) {
-    vm->gc.pinObj((GcObj*)obj);
-    return obj;
+    return vm->newGlobalRef(obj);
 }
 
 void Env::deleteGlobalRef(fr_Obj obj) {
-    vm->gc.unpinObj((GcObj*)obj);
+    vm->deleteGlobalRef(obj);
 }
 
 FObj * Env::allocObj(FType *type, int addRef, int size) {

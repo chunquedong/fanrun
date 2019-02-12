@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "FPod.h"
 #include <unordered_map>
-#include "runtime.h"
+#include "fni.h"
 #include "ObjFactory.h"
 #include "PodLoader.h"
 

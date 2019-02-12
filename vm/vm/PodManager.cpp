@@ -217,7 +217,7 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
     
     //init super
     if (isRootType(env, type)) {
-        size = sizeof(struct GcObj_);
+        size = sizeof( fr_ObjHeader);
     } else {
         FType *base = getType(env, type->c_pod, type->meta.base);
         initTypeAllocSize(env, base);

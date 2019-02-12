@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "Env.h"
+#include "NativeGen.h"
 #include "Fvm.h"
 #include <string.h>
 
@@ -134,6 +135,13 @@ int main(int argc, const char * argv[]) {
             const char *testPos = argv[i+1];
             podMgr.load(libPath, testPos);
         }
+    }
+    
+    if (nativeOutPath) {
+        NativeGen nativeGen;
+        //nativeGen.genStub = true;
+        nativeGen.genNative(nativeOutPath, "sys", &podMgr);
+        puts("------------------");
     }
     
     sys_register(&vm);

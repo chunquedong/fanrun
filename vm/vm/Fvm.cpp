@@ -18,16 +18,14 @@ Fvm::Fvm(PodManager *podManager)
     : podManager(podManager), executeEngine(nullptr)
 {
     gc.gcSupport = this;
-    //mtx_init(&lock, mtx_recursive);
-    //LinkedList_make(&globalRefList);
+    LinkedList_make(&globalRefList);
 #ifdef FR_LLVM
     executeEngine = new SimpleLLVMJIT();
 #endif
 }
 
 Fvm::~Fvm() {
-    //mtx_destroy(&lock);
-    //LinkedList_release(&globalRefList);
+    LinkedList_release(&globalRefList);
     delete executeEngine;
 }
 
@@ -60,7 +58,7 @@ void Fvm::registerMethod(const char *name, fr_NativeFunc func) {
 }
 
 struct sys_ObjArray_{
-    struct GcObj_ super;
+    fr_ObjHeader super;
     FObj ** data;
     size_t size;
 };
@@ -80,7 +78,7 @@ int Fvm::allocSize(void *type) {
 void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::vector<GcObj*> *list) {
     Env *env = nullptr;
     
-    FType *ftype = fr_getObjType(env, obj);
+    FType *ftype = fr_getFType(env, obj);
     for (int i=0; i<ftype->fields.size(); ++i) {
         FField &f = ftype->fields[i];
         if (f.flags & FFlags::Static) {
@@ -106,12 +104,12 @@ void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::vector<GcObj*> *list) {
 }
 void Fvm::walkRoot(Gc *gc) {
     //global ref
-    //LinkedListElem *it = LinkedList_first(&globalRefList);
-    //LinkedListElem *end = LinkedList_end(&globalRefList);
-    //while (it != end) {
-    //    gc->onRoot(reinterpret_cast<FObj*>(it->data));
-    //    it = it->next;
-    //}
+    LinkedListElem *it = LinkedList_first(&globalRefList);
+    LinkedListElem *end = LinkedList_end(&globalRefList);
+    while (it != end) {
+        gc->onRoot(reinterpret_cast<FObj*>(it->data));
+        it = it->next;
+    }
     
     //static field
     for (auto it = staticFieldRef.begin(); it != staticFieldRef.end(); ++it) {
@@ -157,6 +155,24 @@ void Fvm::resumeWorld() {
         Env *env = it->second;
         env->needStop = false;
     }
+}
+
+fr_Obj Fvm::newGlobalRef(FObj * obj) {
+    lock.lock();
+    LinkedListElem *elem = LinkedList_newElem(&globalRefList, 0);
+    elem->data = obj;
+    LinkedList_add(&globalRefList, elem);
+    fr_Obj objRef = (fr_Obj)(&elem->data);
+    lock.unlock();
+    return objRef;
+}
+
+void Fvm::deleteGlobalRef(fr_Obj objRef) {
+    lock.lock();
+    LinkedListElem *elem =  reinterpret_cast<LinkedListElem *>((char*)(objRef) - offsetof(LinkedListElem, data));
+    elem->data = NULL;
+    LinkedList_remove(&globalRefList, elem);
+    lock.unlock();
 }
 
 void Fvm::addStaticRef(fr_Obj obj) {

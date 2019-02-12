@@ -23,9 +23,12 @@ struct StackFrame {
     int paramCount;
 };
 
-class Env : public fr_Env_ {
+class Env {
     ExeEngine *interpreter;
 public:
+    bool needStop;
+    bool isStoped;
+    
     PodManager *podManager;
 //private:
     StackFrame *blockingFrame;

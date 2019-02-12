@@ -43,7 +43,7 @@ typedef bool fr_Bool;
 /**
  * user client handle type
  */
-typedef void *fr_Obj;
+typedef FObj **fr_Obj;
 
 struct FType;
 typedef struct FType *fr_Type;
@@ -77,8 +77,8 @@ typedef struct fr_TagValue_ {
 /**
  * fr_Env is a API per thread
  */
-struct fr_Env_;
-typedef struct fr_Env_ *fr_Env;
+//struct fr_Env_;
+typedef void *fr_Env;
 
 /**
  * Fantom VM
