@@ -77,12 +77,13 @@ FMethod *PodManager::toVirtualMethod(Env *env, FType *instanceType, FMethod *met
 }
 
 FMethod *PodManager::getVirtualMethod(Env *env, FType *instanceType, FPod *curPod, uint16_t mid, bool isSetter) {
-    auto fr = instanceType->c_virtualMethodMap.find(mid);
+    FMethodRef *methodRef = &curPod->methodRefs[mid];
+    auto fr = instanceType->c_virtualMethodMap.find(methodRef);
     if (fr == instanceType->c_virtualMethodMap.end()) {
         FMethod *method = nullptr;
         
-        FMethodRef &methodRef = curPod->methodRefs[mid];
-        std::string methodName = curPod->names[methodRef.name];
+        //FMethodRef &methodRef = curPod->methodRefs[mid];
+        std::string methodName = curPod->names[methodRef->name];
         if (isSetter) {
             methodName += "$";
         }
@@ -90,11 +91,10 @@ FMethod *PodManager::getVirtualMethod(Env *env, FType *instanceType, FPod *curPo
         method = findVirtualMethod(env, instanceType, methodName);
         assert(method);
         
-        methodRef.c_virtualMethod = method;
-        instanceType->c_virtualMethodMap[mid] = &methodRef;
+        instanceType->c_virtualMethodMap[methodRef] = method;
         return method;
     }
-    return fr->second->c_virtualMethod;
+    return fr->second;
 }
 
 FMethod *PodManager::findMethodInType(Env *env, FType *type, std::string name) {

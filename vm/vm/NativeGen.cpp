@@ -7,71 +7,10 @@
 //
 
 #include "NativeGen.h"
+#include "escape.h"
 
 NativeGen::NativeGen() : genStub(false) {
     
-}
-
-void escape(std::string &str) {
-    long pos = 0;
-    
-    while (pos < str.length()) {
-        if (str[pos] == '$') {
-            str.replace(pos, 1, "__");
-            ++pos;
-        }
-        ++pos;
-    }
-}
-
-typedef const char *cstr;
-cstr keyword[] = {
-    "auto",
-    //"break",
-    //"case",
-    "char",
-    //"const",
-    //"continue",
-    //"default",
-    //"do",
-    "double",
-    //"else",
-    "enum",
-    "extern",
-    "float",
-    //"for",
-    "goto",
-    //"if",
-    "inline",
-    "int",
-    "long",
-    "register",
-    "restrict",
-    //"return",
-    "short",
-    "signed",
-    "sizeof",
-    //"static",
-    "struct",
-    "switch",
-    "typedef",
-    "union",
-    "unsigned",
-    "void",
-    "volatile",
-    //"while",
-    "typeof",
-};
-
-const int keywordCount = 23;
-
-void escapeKeyword(std::string &astr) {
-    for (int i=0; i<keywordCount; ++i) {
-        if (astr == keyword[i]) {
-            astr += "_";
-            return;
-        }
-    }
 }
 
 static void getValueTypeName(fr_ValueType vtype, std::string &name, std::string &tagName, std::string &typeName) {

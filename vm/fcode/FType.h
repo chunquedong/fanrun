@@ -95,7 +95,7 @@ public:
     int c_allocStaticSize;
     char *c_staticData;
     std::unordered_map<std::string, FMethod*> c_virtualMethodMapByName;
-    std::unordered_map<uint16_t, FMethodRef*> c_virtualMethodMap;
+    std::unordered_map<FMethodRef*, FMethod*> c_virtualMethodMap;
     std::unordered_map<FMethod*, FMethod*> c_virtualMethodMapByMethod;
     void *c_wrappedType;
     

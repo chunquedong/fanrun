@@ -91,7 +91,6 @@ struct FMethodRef {
     uint8_t flags;
     
     FMethod *c_method;
-    FMethod *c_virtualMethod;
 };
 
 class PodLoader;

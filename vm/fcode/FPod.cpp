@@ -227,7 +227,6 @@ void FPod::read(ZipFile &zip) {
                 ref.retType = buf.readUInt16();
                 ref.paramCount = buf.readUInt8();
                 ref.c_method = NULL;
-                ref.c_virtualMethod = NULL;
                 for (int i=0; i<ref.paramCount; ++i) {
                     ref.params.push_back(buf.readUInt16());
                 }

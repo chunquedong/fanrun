@@ -32,6 +32,7 @@
 		3212494C2213028700EF1830 /* sys_IntArray.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249362213028700EF1830 /* sys_IntArray.c */; };
 		3212494D2213028700EF1830 /* sys_Func.c in Sources */ = {isa = PBXBuildFile; fileRef = 321249372213028700EF1830 /* sys_Func.c */; };
 		32124950221305CF00EF1830 /* NativeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212494E221305CF00EF1830 /* NativeGen.cpp */; };
+		321249572217109F00EF1830 /* escape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321249542217109F00EF1830 /* escape.cpp */; };
 		323668F61BB64DE60030F788 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 323668F51BB64DE60030F788 /* main.cpp */; };
 		3236694D1BB64F1A0030F788 /* PodManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3236694B1BB64F1A0030F788 /* PodManager.cpp */; };
 		323669501BB64F470030F788 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3236694E1BB64F470030F788 /* Env.cpp */; };
@@ -123,6 +124,9 @@
 		3212494E221305CF00EF1830 /* NativeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NativeGen.cpp; sourceTree = "<group>"; };
 		3212494F221305CF00EF1830 /* NativeGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeGen.h; sourceTree = "<group>"; };
 		321249512213067B00EF1830 /* vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vm.h; sourceTree = "<group>"; };
+		321249542217109F00EF1830 /* escape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = escape.cpp; sourceTree = "<group>"; };
+		321249552217109F00EF1830 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		321249562217109F00EF1830 /* escape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = escape.h; sourceTree = "<group>"; };
 		323668F21BB64DE60030F788 /* vm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vm; sourceTree = BUILT_PRODUCTS_DIR; };
 		323668F51BB64DE60030F788 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3236694B1BB64F1A0030F788 /* PodManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PodManager.cpp; sourceTree = "<group>"; };
@@ -383,9 +387,20 @@
 			path = native;
 			sourceTree = "<group>";
 		};
+		321249532217109F00EF1830 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				321249542217109F00EF1830 /* escape.cpp */,
+				321249552217109F00EF1830 /* common.h */,
+				321249562217109F00EF1830 /* escape.h */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
 		323668E91BB64DE60030F788 = {
 			isa = PBXGroup;
 			children = (
+				321249532217109F00EF1830 /* common */,
 				3212491F2213028700EF1830 /* native */,
 				327845E41F49630A00481704 /* ir */,
 				327845F21F49630A00481704 /* thirdparty */,
@@ -770,6 +785,7 @@
 				3212494D2213028700EF1830 /* sys_Func.c in Sources */,
 				3278464C1F49630A00481704 /* uncompr.c in Sources */,
 				327846491F49630A00481704 /* inflate.c in Sources */,
+				321249572217109F00EF1830 /* escape.cpp in Sources */,
 				3212493D2213028700EF1830 /* sys_Int.c in Sources */,
 				3238684B1BBFF0E800EE9FEB /* Printer.cpp in Sources */,
 				3212494A2213028700EF1830 /* sys_Param.c in Sources */,
