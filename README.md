@@ -4,8 +4,8 @@
 
 gen
 ---
-generate C code from fcode and runtime.
+A translator from fcode to C
 
 vm
 ---
-the interpreter/JIT VM
+The interpreter/JIT VM
