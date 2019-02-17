@@ -2,8 +2,8 @@
 #include "pod_sys_struct.h"
 #include "pod_sys_native.h"
 
-fr_Obj sys_Bool_fromStr_f(fr_Env env, fr_Obj s, fr_Bool checked) {
-    return 0;
+fr_Bool sys_Bool_fromStr_f(fr_Env env, fr_Obj s, fr_Bool checked) {
+    return false;
 }
 void sys_Bool_privateMake_f(fr_Env env, fr_Bool self) {
     return;

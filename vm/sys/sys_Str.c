@@ -87,7 +87,7 @@ size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
 
 //////////////////////////////////////////////////////////
 
-FObj * sys_Str_fromUtf8(fr_Env env__, const char *cstr) {
+FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) {
     size_t len;
     struct sys_Str_* str;
     FObj *obj;
@@ -162,7 +162,7 @@ void sys_Str_privateMake_f(fr_Env env, fr_Obj self) {
     //fr_unlock(env);
     return;
 }
-fr_Obj sys_Str_fromChars_f(fr_Env env, fr_Obj chars) {
+fr_Obj sys_Str_fromChars_f(fr_Env env, fr_Obj chars, fr_Int offset, fr_Int len) {
     return 0;
 }
 fr_Bool sys_Str_equals_f(fr_Env env, fr_Obj self, fr_Obj obj) {
@@ -299,10 +299,9 @@ fr_Bool sys_Str_startsWith_f(fr_Env env, fr_Obj self, fr_Obj s) {
 fr_Bool sys_Str_endsWith_f(fr_Env env, fr_Obj self, fr_Obj s) {
     return 0;
 }
-fr_Obj sys_Str_index_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
+fr_Int sys_Str_find_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
     struct sys_Str_ *str;
     struct sys_Str_ *src;
-    fr_Value val;
     
     //fr_lock(env);
     str = (struct sys_Str_ *)fr_getPtr(env, self);
@@ -310,20 +309,30 @@ fr_Obj sys_Str_index_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
     
     if (offset >= str->size) {
         //fr_unlock(env);
-        return NULL;
+        return -1;
     }
     
     wchar_t *pos = wcsstr(str->data + offset, src->data);
     if (pos == NULL) {
         //fr_unlock(env);
-        return NULL;
+        return -1;
     }
     
-    val.i = pos - str->data;
+    return pos - str->data;
+}
+fr_Obj sys_Str_index_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
+    fr_Int i = sys_Str_find_f(env, self, s, offset);
+    if (i < 0) return NULL;
+    fr_Value val;
+    val.i = i;
     //val.type = fr_vtInt;
     
     //fr_unlock(env);
     return fr_box(env, &val, fr_vtInt);
+}
+//TODO
+fr_Int sys_Str_findr_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
+    return -1;
 }
 fr_Obj sys_Str_indexr_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
     return 0;
@@ -520,20 +529,30 @@ fr_Obj sys_Str_localeCapitalize_f(fr_Env env, fr_Obj self) {
 fr_Obj sys_Str_localeDecapitalize_f(fr_Env env, fr_Obj self) {
     return 0;
 }
-fr_Obj sys_Str_toBool_f(fr_Env env, fr_Obj self, fr_Bool checked) {
+fr_Bool sys_Str_toBool_f(fr_Env env, fr_Obj self, fr_Bool checked) {
     return 0;
 }
-fr_Obj sys_Str_toInt_f(fr_Env env, fr_Obj self, fr_Int radix, fr_Bool checked) {
+fr_Int sys_Str_toInt_f(fr_Env env, fr_Obj self, fr_Int radix, fr_Bool checked) {
     return 0;
 }
-fr_Obj sys_Str_toFloat_f(fr_Env env, fr_Obj self, fr_Bool checked) {
+fr_Float sys_Str_toFloat_f(fr_Env env, fr_Obj self, fr_Bool checked) {
     return 0;
 }
-fr_Obj sys_Str_toCode_f(fr_Env env, fr_Obj self, fr_Obj quote, fr_Bool escapeUnicode) {
+fr_Obj sys_Str_toCode_f(fr_Env env, fr_Obj self, fr_Int quote, fr_Bool escapeUnicode) {
     return 0;
 }
 fr_Obj sys_Str_toXml_f(fr_Env env, fr_Obj self) {
     return 0;
+}
+//TODO
+fr_Obj sys_Str_format_f(fr_Env env, fr_Obj format, fr_Obj args) {
+    return NULL;
+}
+fr_Obj sys_Str_toUtf8_f(fr_Env env, fr_Obj self) {
+    return NULL;
+}
+fr_Obj sys_Str_fromUtf8_f(fr_Env env, fr_Obj ba, fr_Int offset, fr_Int len) {
+    return NULL;
 }
 void sys_Str_finalize_f(fr_Env env, fr_Obj self) {
     struct sys_Str_ *str;

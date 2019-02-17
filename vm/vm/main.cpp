@@ -22,20 +22,22 @@ CF_END
 
 FObj *makeArgArray(Env *env, int start, int argc, const char * argv[]) {
     FType *listType = env->podManager->findType(env, "sys", "List");
-    FMethod *listMake = env->podManager->findMethodInType(env, listType, "make");
+    FMethod *listMake = env->podManager->findMethodInType(env, listType, "make", -1);
     fr_TagValue val;
-    val.type = fr_vtObj;
-    FType *strType = env->podManager->findType(env, "sys", "Str");
-    val.any.o = env->podManager->getWrappedType(env, strType);
-    env->push(&val);
     
     val.type = fr_vtInt;
     val.any.i = 2;
     env->push(&val);
     
+    val.type = fr_vtObj;
+    FType *strType = env->podManager->findType(env, "sys", "Str");
+    val.any.o = env->podManager->getWrappedType(env, strType);
+    env->push(&val);
+    
+    
     env->newObj(listType, listMake, 2);
     
-    FMethod *listAdd = env->podManager->findMethodInType(env, listType, "add");
+    FMethod *listAdd = env->podManager->findMethodInType(env, listType, "add", -1);
     fr_TagValue param;
     param.type = fr_vtObj;
     
@@ -50,7 +52,7 @@ FObj *makeArgArray(Env *env, int start, int argc, const char * argv[]) {
     return val.any.o;
 }
 
-//-p/Users/yangjiandong/workspace/soft/fantom-1.0.68 -d testlib::Main#main
+//-p/Users/yangjiandong/workspace/code/fanCore/devEnv/ -d baseTest::BoxingTest#main
 int main(int argc, const char * argv[]) {
     char buf[256] = {0};
     const char *libPath = NULL;
@@ -69,7 +71,7 @@ int main(int argc, const char * argv[]) {
                 break;
             case 'p': {
                 strncpy(buf, op+1, 256);
-                strncat(buf, "/lib/fan/", 256);
+                strncat(buf, "lib/fan/", 256);
                 libPath = buf;
             }
                 break;

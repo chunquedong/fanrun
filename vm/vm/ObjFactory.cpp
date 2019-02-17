@@ -12,12 +12,12 @@
 
 extern  "C"  {
 #if 0
-    FObj * sys_Str_fromUtf8(fr_Env env__, const char *cstr) { return 0; }
+    FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) { return 0; }
     char *sys_Str_getUtf8(fr_Env env__, FObj * self__) { return 0; }
     FObj * sys_Type_fromFType(fr_Env env__, FType * ftype) { return 0; }
     FType * sys_Type_toFType(fr_Env env__, FObj*) { return 0; }
 #else
-    FObj * sys_Str_fromUtf8(fr_Env env__, const char *cstr);// { return 0; }
+    FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr);// { return 0; }
     char *sys_Str_getUtf8(fr_Env env__, FObj * self__);// { return 0; }
     FObj * sys_Type_fromFType(fr_Env env__, FType * ftype);// { return 0; }
     FType * sys_Type_toFType(fr_Env env__, FObj*);
@@ -198,7 +198,7 @@ FObj *ObjFactory::getString(Env *env, FPod *curPod, uint16_t sid) {
     }
     
     std::string utf8 = curPod->constantas.strings[sid];
-    FObj *obj = (FObj *)sys_Str_fromUtf8(env, utf8.c_str());
+    FObj *obj = (FObj *)sys_Str_fromUtf8_(env, utf8.c_str());
     objRef = env->newGlobalRef(obj);
     curPod->constantas.c_strings[sid] = (void*)objRef;
     
@@ -206,7 +206,7 @@ FObj *ObjFactory::getString(Env *env, FPod *curPod, uint16_t sid) {
 }
 
 FObj * ObjFactory::newString(Env *env, const char *utf8) {
-    FObj * obj = (FObj *)sys_Str_fromUtf8(env, utf8);
+    FObj * obj = (FObj *)sys_Str_fromUtf8_(env, utf8);
     return obj;
 }
 

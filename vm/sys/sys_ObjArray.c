@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void sys_ObjArray_make_f(fr_Env env, fr_Obj self, fr_Int size) {
+void sys_ObjArray_make_f(fr_Env env, fr_Obj self, fr_Int size, fr_Obj type) {
     struct sys_ObjArray_ *array;
     //fr_lock(env);
     array = (struct sys_ObjArray_ *)fr_getPtr(env, self);
@@ -45,11 +45,11 @@ fr_Int sys_ObjArray_size_f(fr_Env env, fr_Obj self) {
     //fr_unlock(env);
     return result;
 }
-fr_Bool sys_ObjArray_realloc_f(fr_Env env, fr_Obj self, fr_Int newSize) {
+fr_Obj sys_ObjArray_realloc_f(fr_Env env, fr_Obj self, fr_Int newSize) {
     struct sys_ObjArray_ *array;
     FObj **p;
     
-    bool result;
+    //bool result;
     //fr_lock(env);
     array = (struct sys_ObjArray_ *)fr_getPtr(env, self);
     
@@ -60,11 +60,11 @@ fr_Bool sys_ObjArray_realloc_f(fr_Env env, fr_Obj self, fr_Int newSize) {
         }
         array->data = p;
         array->size = newSize;
-        result = true;
+        //result = true;
     }
-    result = false;
+    //result = false;
     //fr_unlock(env);
-    return result;
+    return self;
 }
 fr_Obj sys_ObjArray_copyFrom_f(fr_Env env, fr_Obj self, fr_Obj that, fr_Int thatOffset, fr_Int thisOffset, fr_Int length) {
     struct sys_ObjArray_ *array;
@@ -78,6 +78,15 @@ fr_Obj sys_ObjArray_copyFrom_f(fr_Env env, fr_Obj self, fr_Obj that, fr_Int that
     
     //fr_unlock(env);
     return self;
+}
+fr_Obj sys_ObjArray_fill_f(fr_Env env, fr_Obj self, fr_Obj obj, fr_Int times) {
+    return NULL;
+}
+fr_Obj sys_ObjArray_fromJava_f(fr_Env env, fr_Obj of, fr_Obj array) {
+    return NULL;
+}
+fr_Obj sys_ObjArray_toJava_f(fr_Env env, fr_Obj self, fr_Obj clz) {
+    return NULL;
 }
 void sys_ObjArray_finalize_f(fr_Env env, fr_Obj self) {
     struct sys_ObjArray_ *array;

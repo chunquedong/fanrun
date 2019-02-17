@@ -411,7 +411,7 @@ void Env::call(FMethod *method, int paramCount/*without self*/) {
 }
 
 FMethod * Env::findMethod(const char *pod, const char *type, const char *name) {
-    return podManager->findMethod(this, pod, type, name);
+    return podManager->findMethod(this, pod, type, name, -1);
 }
 void Env::callNonVirtual(FMethod * method, int paramCount) {
     call(method, paramCount);
@@ -438,13 +438,13 @@ void Env::callVirtualByName(const char *name, int paramCount) {
     FMethod *method = nullptr;
     fr_TagValue *entry = peek(-paramCount-1);
     FType *type = this->podManager->getInstanceType(this, *entry);
-    method = this->podManager->findVirtualMethod(this, type, name);
+    method = this->podManager->findVirtualMethod(this, type, name, paramCount);
     
     call(method, paramCount);
 }
 void Env::newObjByName(const char * pod, const char * type, const char * name, int paramCount) {
     FMethod *method = nullptr;
-    method = podManager->findMethod(this, pod, type, name);
+    method = podManager->findMethod(this, pod, type, name, paramCount);
     FObj * obj = allocObj(method->c_parent, 1);
 
     fr_TagValue self;
@@ -560,7 +560,7 @@ void Env::printError(FObj * err) {
     printf("error: %s\n", name.c_str());
     //TODO call Err.trace
     
-    FMethod *method = podManager->findMethodInType(this, ftype, "trace");
+    FMethod *method = podManager->findMethodInType(this, ftype, "trace", 0);
     fr_TagValue val;
     val.any.o = err;
     val.type = fr_vtObj;

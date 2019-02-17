@@ -195,6 +195,10 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
             continue;
         }
         
+        if ((method->flags & FFlags::Overload) != 0) {
+            continue;
+        }
+        
         name = preName + pod->names[method->name];
         std::string escapeName = name;
         escape(escapeName);
@@ -351,7 +355,7 @@ void NativeGen::genNative(std::string path, std::string podName, PodManager *pod
     
     printer.println("");
     
-    printer.println("void register_%s(fr_Fvm vm) {", podName.c_str());
+    printer.println("void %s_register(fr_Fvm vm) {", podName.c_str());
     printer.indent();
     genNativePod(path, pod, &printer, PrintType::pRegisterCode);
     printer.unindent();

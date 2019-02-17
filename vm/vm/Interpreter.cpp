@@ -828,8 +828,9 @@ bool Interpreter::isTypeof(uint16_t tid, bool pop, std::string *msg) {
 
 void Interpreter::callNew(int16_t mid) {
     FMethod *method = nullptr;
-    int paramCount = 0;
-    method = context->podManager->getMethod(context, frame()->curPod, mid, &paramCount);
+    FMethodRef &methodRef = frame()->curPod->methodRefs[mid];
+    int paramCount = methodRef.paramCount;
+    method = context->podManager->getMethod(context, frame()->curPod, methodRef);
     FObj * obj = context->allocObj(method->c_parent, 1);
     
     fr_TagValue self;
@@ -844,17 +845,19 @@ void Interpreter::callNew(int16_t mid) {
 
 void Interpreter::callMethod(int16_t mid, bool isVirtual) {
     FMethod *method = nullptr;
-    int paramCount = 0;
+    FMethodRef &methodRef = frame()->curPod->methodRefs[mid];
+    int paramCount = methodRef.paramCount;
     if (isVirtual) {
         fr_TagValue entry;
-        method = context->podManager->getMethod(context, frame()->curPod, mid, &paramCount);
+        //method = context->podManager->getMethod(context, frame()->curPod, mid, &paramCount);
+        
         int pos = -paramCount-1;
         entry = *context->peek(pos);
         FType *type = context->podManager->getInstanceType(context, entry);
-        bool isSetter = method->flags & FFlags::Setter;
-        method = context->podManager->getVirtualMethod(context, type, frame()->curPod, mid, isSetter);
+        //bool isSetter = method->flags & FFlags::Setter;
+        method = context->podManager->getVirtualMethod(context, type, frame()->curPod, &methodRef);
     } else {
-        method = context->podManager->getMethod(context, frame()->curPod, mid, &paramCount);
+        method = context->podManager->getMethod(context, frame()->curPod, methodRef);
     }
     context->call(method, paramCount);
 }

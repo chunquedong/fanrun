@@ -167,6 +167,7 @@ fr_Obj fr_getTypeObj(fr_Env self, fr_Type type);
 ////////////////////////////
 
 fr_Method fr_findMethod(fr_Env self, fr_Type type, const char *name);
+fr_Method fr_findMethodN(fr_Env self, fr_Type type, const char *name, int paramCount);
 
 void fr_callMethod(fr_Env self, fr_Method method, fr_Value *arg, int argCount, fr_Value *ret);
 

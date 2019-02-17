@@ -239,10 +239,12 @@ fr_Obj fr_getTypeObj(fr_Env self, fr_Type type) {
 ////////////////////////////
 // call
 ////////////////////////////
-
 fr_Method fr_findMethod(fr_Env self, fr_Type type, const char *name) {
+    return fr_findMethodN(self, type, name, -1);
+}
+fr_Method fr_findMethodN(fr_Env self, fr_Type type, const char *name, int paramCount) {
     Env *e = (Env*)self;
-    FMethod *m = e->podManager->findMethodInType(e, (FType*)type, name);
+    FMethod *m = e->podManager->findMethodInType(e, (FType*)type, name, paramCount);
     return (fr_Method)m;
 }
 
@@ -338,7 +340,7 @@ void fr_callVirtualM(fr_Env self, fr_Method method
 void fr_newObj(fr_Env self, const char *pod, const char *type, const char *name
                      , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
-    fr_Method method = (fr_Method)e->podManager->findMethod(e, pod, type, name);
+    fr_Method method = (fr_Method)e->podManager->findMethod(e, pod, type, name, argCount);
     
     argCount = pushArg(self, method, argCount, arg);
     e->newObj(((FMethod*)method)->c_parent, (FMethod*)method, argCount);
@@ -357,7 +359,7 @@ void fr_callVirtualOnObj(fr_Env self, const char *name
     entry.type = fr_vtObj;
     entry.any.o = obj;
     FType *type = e->podManager->getInstanceType(e, entry);
-    method = e->podManager->findVirtualMethod(e, type, name);
+    method = e->podManager->findVirtualMethod(e, type, name, paramCount);
     
     pushArg(self, method, argCount, arg);
     
@@ -369,7 +371,7 @@ void fr_callVirtual(fr_Env self, const char *pod, const char *type, const char *
                           , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
     FType *ftype = e->findType(pod, type);
-    FMethod *method = e->podManager->findVirtualMethod(e, ftype, name);
+    FMethod *method = e->podManager->findVirtualMethod(e, ftype, name, -1);
     
     fr_callVirtualM(self, method, argCount, arg, ret);
 }
@@ -377,7 +379,7 @@ void fr_callVirtual(fr_Env self, const char *pod, const char *type, const char *
 void fr_callNonVirtual(fr_Env self, const char *pod, const char *type, const char *name
                         , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
-    fr_Method m = (fr_Method)e->podManager->findMethod(e, pod, type, name);
+    fr_Method m = (fr_Method)e->podManager->findMethod(e, pod, type, name, -1);
     fr_callNonVirtualM(self, m, argCount, arg, ret);
 }
 

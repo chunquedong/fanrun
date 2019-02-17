@@ -48,8 +48,9 @@ class Gc {
     bool running;
 public:
     GcSupport *gcSupport;
-    int lastAllocSize;
-    int allocSize;
+    long collectSize;
+    long lastAllocSize;
+    long allocSize;
     bool trace;
     
     GcObj *maxAddress;

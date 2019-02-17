@@ -26,14 +26,14 @@ fr_Int sys_ByteArray_get_f(fr_Env env, fr_Obj self, fr_Int pos) {
     //fr_unlock(env);
     return result;
 }
-fr_Int sys_ByteArray_set_f(fr_Env env, fr_Obj self, fr_Int pos, fr_Int val) {
+void sys_ByteArray_set_f(fr_Env env, fr_Obj self, fr_Int pos, fr_Int val) {
     struct sys_ByteArray_ *array = NULL;
-    fr_Int result;
+   // fr_Int result;
     //fr_lock(env);
     array = (struct sys_ByteArray_ *)fr_getPtr(env, self);
-    result = array->data[pos] = val;
+    array->data[pos] = val;
     //fr_unlock(env);
-    return result;
+    //return result;
 }
 fr_Int sys_ByteArray_size_f(fr_Env env, fr_Obj self) {
     struct sys_ByteArray_ *array = NULL;
@@ -44,9 +44,8 @@ fr_Int sys_ByteArray_size_f(fr_Env env, fr_Obj self) {
     //fr_unlock(env);
     return result;
 }
-fr_Bool sys_ByteArray_realloc_f(fr_Env env, fr_Obj self, fr_Int newSize) {
+fr_Obj sys_ByteArray_realloc_f(fr_Env env, fr_Obj self, fr_Int newSize) {
     struct sys_ByteArray_ *array = NULL;
-    bool result;
     char *p;
     
     //fr_lock(env);
@@ -56,11 +55,11 @@ fr_Bool sys_ByteArray_realloc_f(fr_Env env, fr_Obj self, fr_Int newSize) {
     if (p) {
         array->data = p;
         array->size = newSize;
-        result = true;
+        //result = true;
     }
-    result = false;
+    //result = false;
     //fr_unlock(env);
-    return result;
+    return self;
 }
 fr_Obj sys_ByteArray_copyFrom_f(fr_Env env, fr_Obj self, fr_Obj that, fr_Int thatOffset, fr_Int thisOffset, fr_Int length) {
     struct sys_ByteArray_ *array;
@@ -86,4 +85,7 @@ void sys_ByteArray_finalize_f(fr_Env env, fr_Obj self) {
 }
 void sys_ByteArray_static__init(fr_Env env) {
     return;
+}
+fr_Obj sys_ByteArray_fill_f(fr_Env env, fr_Obj self, fr_Int byte, fr_Int times) {
+    return self;
 }

@@ -15,6 +15,7 @@
 Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr)
     , maxAddress(NULL), minAddress(NULL){
     lastAllocSize = 29;
+    collectSize = 10000;
 }
 
 Gc::~Gc() {
@@ -50,7 +51,7 @@ void Gc::mergeNewAlloc() {
 
 GcObj* Gc::alloc(void *type, int asize) {
     int size = asize + sizeof(GcObj);
-    if (allocSize + size > lastAllocSize * 1.5) {
+    if (allocSize > collectSize && allocSize + size > lastAllocSize * 1.5) {
         collect();
     } else {
         lastAllocSize -= 8;

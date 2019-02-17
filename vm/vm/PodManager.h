@@ -35,35 +35,35 @@ public:
     Fvm *vm;
     
 public:
-    bool load(std::string path, std::string name);
+    bool load(const std::string &path, const std::string &name);
     
     PodManager();
     ~PodManager();
     
 public:
-    void registerMethod(std::string name, fr_NativeFunc func);
+    void registerMethod(const std::string &name, fr_NativeFunc func);
     
-    FMethod *getMethod(Env *env, FPod *curPod, uint16_t mid, int *paramCount);
-    FMethod *getVirtualMethod(Env *env, FType *instanceType, FPod *curPod, uint16_t mid, bool isSetter);
+    FMethod *getMethod(Env *env, FPod *curPod, FMethodRef &methodRef);
+    FMethod *getVirtualMethod(Env *env, FType *instanceType, FPod *curPod, FMethodRef *methodRef);
 
-    FMethod *findMethod(Env *env, std::string pod, std::string type, std::string name);
-    FMethod *findMethodInType(Env *env, FType *type, std::string name);
+    FMethod *findMethod(Env *env, const std::string &pod, const std::string &type, const std::string &name, int paramCount);
+    FMethod *findMethodInType(Env *env, FType *type, const std::string &name, int paramCount);
     FMethod *toVirtualMethod(Env *env, FType *type, FMethod *method);
-    FMethod *findVirtualMethod(Env *env, FType *type, std::string name);
+    FMethod *findVirtualMethod(Env *env, FType *type, const std::string &name, int paramCount);
     
 public:
     FField *getField(Env *env, FPod *curPod, uint16_t fid);
-    FField *findFieldByName(Env *env, std::string podName, std::string typeName, std::string fieldName);
-    FField *findFieldInType(Env *env, FType *type, std::string fieldName);
-    FField *findFieldByType(FType *type, std::string fieldName);
+    FField *findFieldByName(Env *env, const std::string &podName, const std::string &typeName, const std::string &fieldName);
+    FField *findFieldInType(Env *env, FType *type, const std::string &fieldName);
+    //FField *findFieldByType(FType *type, std::string &fieldName);
     
     fr_Value *getInstanceFieldValue(FObj * obj, FField *field);
     fr_Value *getStaticFieldValue(FField *field);
     
 public:
-    FPod *findPod(std::string podName) { return podLoader.findPod(podName); }
+    FPod *findPod(const std::string &podName) { return podLoader.findPod(podName); }
     FType *getType(Env *env, FPod *curPod, uint16_t tid);
-    FType *findType(Env *env, std::string pod, std::string type, bool initType = true);
+    FType *findType(Env *env, const std::string &pod, const std::string &type, bool initType = true);
     bool fitType(Env *env, FType *type, FPod *curPod, uint16_t tid);
     bool fitTypeByType(Env *env, FType *typeA, FType *typeB);
     FObj * getWrappedType(Env *env, FType *type);

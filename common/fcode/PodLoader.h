@@ -17,9 +17,9 @@ class PodLoader {
     std::unordered_map<std::string, FPod*> podMap;
     
 public:
-    bool load(std::string path, std::string name);
+    bool load(const std::string &path, const std::string &name);
   
-    FPod *findPod(std::string podName) { return podMap[podName]; }
+    FPod *findPod(const std::string &podName) { return podMap[podName]; }
     
     
     PodLoader();

@@ -13,14 +13,14 @@ fr_Float sys_Float_makeBits_f(fr_Env env, fr_Int bits) {
 fr_Float sys_Float_makeBits32_f(fr_Env env, fr_Int bits) {
     return 0;
 }
-fr_Obj sys_Float_fromStr_f(fr_Env env, fr_Obj s, fr_Bool checked) {
+fr_Float sys_Float_fromStr_f(fr_Env env, fr_Obj s, fr_Bool checked) {
     return 0;
 }
 fr_Float sys_Float_random_f(fr_Env env) {
     return 0;
 }
-fr_Obj sys_Float_privateMake_f(fr_Env env) {
-    return 0;
+void sys_Float_privateMake_f(fr_Env env, fr_Float self) {
+    //return 0;
 }
 fr_Bool sys_Float_equals_f(fr_Env env, fr_Float self, fr_Obj obj) {
     fr_Type type;
@@ -66,6 +66,13 @@ fr_Int sys_Float_compare_f(fr_Env env, fr_Float self, fr_Obj obj) {
 }
 fr_Bool sys_Float_isNaN_f(fr_Env env, fr_Float self) {
     return isnan(self);
+}
+//TODO
+fr_Bool sys_Float_isNegZero_f(fr_Env env, fr_Float self) {
+    return self == -0.0;
+}
+fr_Float sys_Float_normNegZero_f(fr_Env env, fr_Float self) {
+    return 0.0;
 }
 fr_Int sys_Float_hash_f(fr_Env env, fr_Float self) {
     return *((fr_Int*)(&self));
@@ -203,6 +210,10 @@ fr_Obj sys_Float_toStr_f(fr_Env env, fr_Float self) {
     return str;
 }
 fr_Obj sys_Float_toCode_f(fr_Env env, fr_Float self) {
+    return sys_Float_toStr_f(env, self);
+}
+//TODO
+fr_Obj sys_Float_toLocale_f(fr_Env env, fr_Float self, fr_Obj pattern) {
     return sys_Float_toStr_f(env, self);
 }
 void sys_Float_make_f(fr_Env env, fr_Float self) {

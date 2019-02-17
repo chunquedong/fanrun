@@ -73,6 +73,10 @@ fr_Obj sys_StrBuf_add_f(fr_Env env, fr_Obj self, fr_Obj x) {
     
     return self;
 }
+//TODO
+fr_Obj sys_StrBuf_addStr_f(fr_Env env, fr_Obj self, fr_Obj str, fr_Int off, fr_Int len) {
+    return NULL;
+}
 fr_Obj sys_StrBuf_addChar_f(fr_Env env, fr_Obj self, fr_Int ch) {
     return 0;
 }

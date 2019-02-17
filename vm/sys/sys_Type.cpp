@@ -215,6 +215,9 @@ fr_Obj sys_Type_toStr_f(fr_Env env, fr_Obj self) {
 fr_Obj sys_Type_toLocale_f(fr_Env env, fr_Obj self) {
     return 0;
 }
+fr_Bool sys_Type_isJava_f(fr_Env env, fr_Obj self) {
+    return false;
+}
 
 CF_BEGIN
 void sys_Type_static__init(fr_Env env) {

@@ -73,6 +73,12 @@ void sys_Obj_echo_f(fr_Env env, fr_Obj x) {
     puts(utf8);
     return;
 }
+
+void sys_Obj_assert_f(fr_Env env, fr_Bool condition, fr_Obj msg) {
+    if (!condition) {
+        fr_throwNew(env, "sys", "AssertErr", fr_getStrUtf8(env, msg, NULL));
+    }
+}
 CF_BEGIN
 void sys_Obj_static__init(fr_Env env) {
     return;

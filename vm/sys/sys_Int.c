@@ -5,15 +5,15 @@
 #include <wctype.h>
 #include <stdlib.h>
 
-fr_Obj sys_Int_fromStr_f(fr_Env env, fr_Obj s, fr_Int radix, fr_Bool checked) {
+fr_Int sys_Int_fromStr_f(fr_Env env, fr_Obj s, fr_Int radix, fr_Bool checked) {
     return 0;
 }
 fr_Int sys_Int_random_f(fr_Env env, fr_Obj r) {
     //TODO
     return rand();
 }
-fr_Obj sys_Int_privateMake_f(fr_Env env) {
-    return 0;
+void sys_Int_privateMake_f(fr_Env env, fr_Int self) {
+    //return 0;
 }
 fr_Bool sys_Int_equals_f(fr_Env env, fr_Int self, fr_Obj obj) {
     fr_Type type;
@@ -114,6 +114,10 @@ fr_Int sys_Int_shiftl_f(fr_Env env, fr_Int self, fr_Int b) {
 fr_Int sys_Int_shiftr_f(fr_Env env, fr_Int self, fr_Int b) {
     return self >> b;
 }
+//TODO
+fr_Int sys_Int_shifta_f(fr_Env env, fr_Int self, fr_Int b) {
+    return self >> b;
+}
 fr_Int sys_Int_abs_f(fr_Env env, fr_Int self) {
     if (self < 0) {
         return -self;
@@ -204,16 +208,19 @@ fr_Obj sys_Int_toStr_f(fr_Env env, fr_Int self) {
     str = fr_newStrUtf8(env, buf);
     return str;
 }
-fr_Obj sys_Int_toHex_f(fr_Env env, fr_Int self, fr_Obj width) {
+fr_Obj sys_Int_toHex_f(fr_Env env, fr_Int self, fr_Int width) {
     return 0;
 }
-fr_Obj sys_Int_toRadix_f(fr_Env env, fr_Int self, fr_Int radix, fr_Obj width) {
+fr_Obj sys_Int_toRadix_f(fr_Env env, fr_Int self, fr_Int radix, fr_Int width) {
     return 0;
 }
 fr_Obj sys_Int_toChar_f(fr_Env env, fr_Int self) {
     return 0;
 }
 fr_Obj sys_Int_toCode_f(fr_Env env, fr_Int self, fr_Int base) {
+    return 0;
+}
+fr_Obj sys_Int_toLocale_f(fr_Env env, fr_Int self, fr_Obj pattern) {
     return 0;
 }
 void sys_Int_times_f(fr_Env env, fr_Int self, fr_Obj c) {

@@ -34,7 +34,7 @@ static void string_split(std::string& s, std::string delim,std::vector< std::str
     }
 }
 
-bool PodLoader::load(std::string path, std::string name) {
+bool PodLoader::load(const std::string &path, const std::string &name) {
     
     if (podMap.find(name) != podMap.end()) {
         return true;

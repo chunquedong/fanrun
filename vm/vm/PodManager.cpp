@@ -16,7 +16,7 @@
 ////////////////////////////////////////////////////////////////
 // methods
 
-void PodManager::registerMethod(std::string name, fr_NativeFunc func) {
+void PodManager::registerMethod(const std::string &name, fr_NativeFunc func) {
     nativeFuncMap[name] = func;
 }
 
@@ -37,28 +37,27 @@ void PodManager::loadNativeMethod(FMethod *method) {
     }
 }
 
-FMethod *PodManager::getMethod(Env *env, FPod *curPod, uint16_t mid, int *paramCount) {
-    FMethodRef &methodRef = curPod->methodRefs[mid];
+FMethod *PodManager::getMethod(Env *env, FPod *curPod, FMethodRef &methodRef) {
+    //FMethodRef &methodRef = curPod->methodRefs[mid];
     if (!methodRef.c_method) {
         std::string methodName = curPod->names[methodRef.name];
         FType *type = getType(env, curPod, methodRef.parent);
         FMethod *method = type->c_methodMap[methodName];
-        
-        //getter or setter
-        if (method == NULL || ((method->flags & FFlags::Getter) != 0
-                               && method->paramCount != methodRef.paramCount)) {
-            method = type->c_methodMap[methodName + "$"];
-        }
         
         if (method == NULL) {
             printf("ERROR: method not found %s", methodName.c_str());
             return NULL;
         }
         
+        //getter or setter/overload
+        if (method->paramCount != methodRef.paramCount) {
+            method = type->c_methodMap[methodName +"$"+ std::to_string(methodRef.paramCount)];
+        }
+        
         loadNativeMethod(method);
         methodRef.c_method = method;
     }
-    *paramCount = methodRef.paramCount;
+    //*paramCount = methodRef.paramCount;
     return methodRef.c_method;
 }
 
@@ -69,26 +68,26 @@ FMethod *PodManager::toVirtualMethod(Env *env, FType *instanceType, FMethod *met
     auto fr = instanceType->c_virtualMethodMapByMethod.find(method);
     if (fr == instanceType->c_virtualMethodMapByMethod.end()) {
         std::string &methodName = method->c_parent->c_pod->names[method->name];
-        FMethod *nmethod = findVirtualMethod(env, instanceType, methodName);
+        FMethod *nmethod = findVirtualMethod(env, instanceType, methodName, method->paramCount);
         instanceType->c_virtualMethodMapByMethod[method] = nmethod;
         return nmethod;
     }
     return fr->second;
 }
 
-FMethod *PodManager::getVirtualMethod(Env *env, FType *instanceType, FPod *curPod, uint16_t mid, bool isSetter) {
-    FMethodRef *methodRef = &curPod->methodRefs[mid];
+FMethod *PodManager::getVirtualMethod(Env *env, FType *instanceType, FPod *curPod, FMethodRef *methodRef) {
+    //FMethodRef *methodRef = &curPod->methodRefs[mid];
     auto fr = instanceType->c_virtualMethodMap.find(methodRef);
     if (fr == instanceType->c_virtualMethodMap.end()) {
         FMethod *method = nullptr;
         
         //FMethodRef &methodRef = curPod->methodRefs[mid];
         std::string methodName = curPod->names[methodRef->name];
-        if (isSetter) {
-            methodName += "$";
-        }
         
-        method = findVirtualMethod(env, instanceType, methodName);
+        method = findVirtualMethod(env, instanceType, methodName, -1);
+        if (method->paramCount != methodRef->paramCount) {
+            method = findVirtualMethod(env, instanceType, methodName, methodRef->paramCount);
+        }
         assert(method);
         
         instanceType->c_virtualMethodMap[methodRef] = method;
@@ -97,56 +96,85 @@ FMethod *PodManager::getVirtualMethod(Env *env, FType *instanceType, FPod *curPo
     return fr->second;
 }
 
-FMethod *PodManager::findMethodInType(Env *env, FType *type, std::string name) {
+FMethod *PodManager::findMethodInType(Env *env, FType *type, const std::string &name, int paramCount) {
     initTypeAllocSize(env, type);
     
-    FMethod *method = type->c_methodMap[name];
+    FMethod *method;
+    if (paramCount != -1) {
+        method = type->c_methodMap[name +"$"+ std::to_string(paramCount)];
+    }
+    else {
+        method = type->c_methodMap[name];
+    }
+    
+    assert(method);
     
     loadNativeMethod(method);
     return method;
 }
 
-FMethod *PodManager::findMethod(Env *env, std::string podName, std::string typeName, std::string methodName) {
+FMethod *PodManager::findMethod(Env *env, const std::string &podName, const std::string &typeName, const std::string &methodName, int paramCount) {
     
     FPod *pod = findPod(podName);
     if (!pod) return nullptr;
     FType *type = pod->c_typeMap[typeName];
     if (!type) return nullptr;
     
-    initTypeAllocSize(env, type);
-    
-    FMethod *method = type->c_methodMap[methodName];
-    
-    loadNativeMethod(method);
-    return method;
+    return findMethodInType(env, type, methodName, paramCount);
 }
 
-FMethod *PodManager::findVirtualMethod(Env *env, FType *instanceType, std::string name) {
-    auto fr = instanceType->c_virtualMethodMapByName.find(name);
+FMethod *PodManager::findVirtualMethod(Env *env, FType *instanceType, const std::string &name, int paramCount) {
+    std::unordered_map<std::string, FMethod*>::iterator fr;
+    if (paramCount != -1) {
+        fr = instanceType->c_virtualMethodMapByName.find(name+"$"+std::to_string(paramCount));
+    }
+    else {
+        fr = instanceType->c_virtualMethodMapByName.find(name);
+    }
+    
     if (fr == instanceType->c_virtualMethodMapByName.end()) {
         FMethod *method = nullptr;
         FPod *pod = instanceType->c_pod;
-        method = instanceType->c_methodMap[name];
+        
+        //getter or setter/overload
+        if (paramCount != -1) {
+            method = instanceType->c_methodMap[name +"$"+ std::to_string(paramCount)];
+        }
+        else {
+            method = instanceType->c_methodMap[name];
+        }
+        
         if (!method) {
             if (isRootType(env, instanceType)) {
                 return nullptr;
             }
 
             FType *base = getType(env, pod, instanceType->meta.base);
-            method = findVirtualMethod(env, base, name);
+            method = findVirtualMethod(env, base, name, paramCount);
             if (!method) {
                 for (int i=0; i<instanceType->meta.mixinCount; ++i) {
                     uint16_t mixin = instanceType->meta.mixin[i];
                     FType *base = getType(env, pod, mixin);
-                    method = findVirtualMethod(env, base, name);
+                    method = findVirtualMethod(env, base, name, paramCount);
                     if (method) {
                         break;
                     }
                 }
             }
         }
+        
+        if (method == NULL) {
+            printf("ERROR: method not found %s %d", name.c_str(), paramCount);
+            return NULL;
+        }
+        
         loadNativeMethod(method);
-        instanceType->c_virtualMethodMapByName[name] = method;
+        if (paramCount != method->paramCount) {
+            instanceType->c_virtualMethodMapByName[name +"$"+ std::to_string(paramCount)] = method;
+        }
+        else {
+            instanceType->c_virtualMethodMapByName[name] = method;
+        }
         return method;
     }
     return fr->second;
@@ -166,30 +194,26 @@ FField *PodManager::getField(Env *env, FPod *curPod, uint16_t fid) {
     return fieldRef.c_field;
 }
 
-FField *PodManager::findFieldInType(Env *env, FType *type, std::string fieldName) {
+FField *PodManager::findFieldInType(Env *env, FType *type, const std::string &fieldName) {
     initTypeAllocSize(env, type);
     
     FField *field = type->c_fieldMap[fieldName];
     return field;
 }
 
-FField *PodManager::findFieldByName(Env *env, std::string podName, std::string typeName, std::string fieldName) {
+FField *PodManager::findFieldByName(Env *env, const std::string &podName, const std::string &typeName, const std::string &fieldName) {
     FPod *pod = findPod(podName);
     if (!pod) return NULL;
     FType  *type = pod->c_typeMap[typeName];
     if (!type) return NULL;
-    
-    initTypeAllocSize(env, type);
-    
+    return findFieldInType(env, type, fieldName);
+}
+/*
+FField *PodManager::findFieldByType(FType *type, std::string &fieldName) {
     FField *field = type->c_fieldMap[fieldName];
     return field;
 }
-
-FField *PodManager::findFieldByType(FType *type, std::string fieldName) {
-    FField *field = type->c_fieldMap[fieldName];
-    return field;
-}
-
+*/
 fr_Value *PodManager::getInstanceFieldValue(FObj * obj, FField *field) {
     if ((field->flags & FFlags::Static)==0) {
         fr_Value *sfield = (fr_Value*)(((char*)obj)+field->c_offset);
@@ -491,7 +515,7 @@ FType *PodManager::getType(Env *env, FPod *curPod, uint16_t tid) {
     return typeRef.c_type;
 }
 
-FType *PodManager::findType(Env *env, std::string podName, std::string typeName, bool initType) {
+FType *PodManager::findType(Env *env, const std::string &podName, const std::string &typeName, bool initType) {
     FPod *pod = findPod(podName);
     if (pod == nullptr) {
         return nullptr;
@@ -570,7 +594,7 @@ PodManager::PodManager()
 PodManager::~PodManager() {
 }
 
-bool PodManager::load(std::string path, std::string name) {
+bool PodManager::load(const std::string &path, const std::string &name) {
     return podLoader.load(path, name);
 }
 

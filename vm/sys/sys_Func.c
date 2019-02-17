@@ -32,11 +32,14 @@ fr_Obj sys_Func_bind_f(fr_Env env, fr_Obj self, fr_Obj args) {
 fr_Obj sys_Func_retype_f(fr_Env env, fr_Obj self, fr_Obj t) {
     return 0;
 }
-void sys_Func_enterCtor_f(fr_Env env, fr_Obj self) {
+void sys_Func_enterCtor_f(fr_Env env, fr_Obj self, fr_Obj obj) {
     return;
 }
 void sys_Func_exitCtor_f(fr_Env env, fr_Obj self) {
     return;
+}
+void sys_Func_checkInCtor_f(fr_Env env, fr_Obj self, fr_Obj obj) {
+    
 }
 void sys_Func_static__init(fr_Env env) {
     return;

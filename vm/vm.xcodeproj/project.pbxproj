@@ -76,6 +76,7 @@
 		327A0E49221950F2001A6EF0 /* trees.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0E32221950F2001A6EF0 /* trees.c */; };
 		327A0E4A221950F2001A6EF0 /* inffast.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0E34221950F2001A6EF0 /* inffast.c */; };
 		327A0E4B221950F2001A6EF0 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0E35221950F2001A6EF0 /* adler32.c */; };
+		327A0E4E22195A82001A6EF0 /* sys_Enum.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0E4D22195A82001A6EF0 /* sys_Enum.c */; };
 		32FF47081D85ACF000724EB6 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 32FF47071D85ACF000724EB6 /* libz.tbd */; };
 		32FF470A1D85AFB000724EB6 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 32FF47091D85AFB000724EB6 /* libncurses.tbd */; };
 /* End PBXBuildFile section */
@@ -222,6 +223,7 @@
 		327A0E34221950F2001A6EF0 /* inffast.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inffast.c; sourceTree = "<group>"; };
 		327A0E35221950F2001A6EF0 /* adler32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = adler32.c; sourceTree = "<group>"; };
 		327A0E36221950F2001A6EF0 /* zconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zconf.h; sourceTree = "<group>"; };
+		327A0E4D22195A82001A6EF0 /* sys_Enum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Enum.c; sourceTree = "<group>"; };
 		32FF46161D85938800724EB6 /* libLLVMAArch64AsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64AsmParser.a; path = "../../../source/llvm-3.9.0.src/build/Debug/lib/libLLVMAArch64AsmParser.a"; sourceTree = "<group>"; };
 		32FF46171D85938800724EB6 /* libLLVMAArch64AsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64AsmPrinter.a; path = "../../../source/llvm-3.9.0.src/build/Debug/lib/libLLVMAArch64AsmPrinter.a"; sourceTree = "<group>"; };
 		32FF46181D85938800724EB6 /* libLLVMAArch64CodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64CodeGen.a; path = "../../../source/llvm-3.9.0.src/build/Debug/lib/libLLVMAArch64CodeGen.a"; sourceTree = "<group>"; };
@@ -431,6 +433,7 @@
 				327A0DA1221950D4001A6EF0 /* sys_Slot.c */,
 				327A0DA2221950D4001A6EF0 /* sys_IntArray.c */,
 				327A0DA3221950D4001A6EF0 /* sys_Func.c */,
+				327A0E4D22195A82001A6EF0 /* sys_Enum.c */,
 			);
 			path = sys;
 			sourceTree = "<group>";
@@ -763,6 +766,7 @@
 				327A0DBD221950D4001A6EF0 /* sys_Str.c in Sources */,
 				327A0DB0221950D4001A6EF0 /* pod_sys_register.c in Sources */,
 				3237F7741BB76D3600A58B54 /* Fvm.cpp in Sources */,
+				327A0E4E22195A82001A6EF0 /* sys_Enum.c in Sources */,
 				327A0E43221950F2001A6EF0 /* deflate.c in Sources */,
 				327A0DBA221950D4001A6EF0 /* sys_Bool.c in Sources */,
 				327A0DBE221950D4001A6EF0 /* sys_ByteArray.c in Sources */,
