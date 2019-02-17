@@ -1,45 +1,80 @@
-//
-//  sys_Obj.c
-//  run
-//
-//  Created by yangjiandong on 2017/12/17.
-//  Copyright © 2017年 yangjiandong. All rights reserved.
-//
+#include "vm.h"
+#include "pod_sys_struct.h"
+#include "pod_sys_native.h"
 
-#include "sys.h"
-#include <stdio.h>
+#include "FType.h"
 
-void sys_Obj_make0(fr_Env __env, sys_Obj_ref __self){ return; }
-sys_Bool sys_Obj_equals1(fr_Env __env, sys_Obj_ref __self, sys_Obj_null that){ return 0; }
-sys_Int sys_Obj_compare1(fr_Env __env, sys_Obj_ref __self, sys_Obj that){ return 0; }
-sys_Int sys_Obj_hash0(fr_Env __env, sys_Obj_ref __self){ return 0; }
-sys_Str sys_Obj_toStr0(fr_Env __env, sys_Obj_ref __self){ return 0; }
-//sys_Obj_null sys_Obj_trap1(fr_Env __env, sys_Obj_ref __self, sys_Str name){ return 0; }
-sys_Obj_null sys_Obj_trap2(fr_Env __env, sys_Obj_ref __self, sys_Str name, sys_List_null args){ return 0; }
-sys_Obj sys_Obj_with1(fr_Env __env, sys_Obj_ref __self, sys_Func f){ return 0; }
-sys_Bool sys_Obj_isImmutable0(fr_Env __env, sys_Obj_ref __self){ return 0; }
-sys_Obj sys_Obj_toImmutable0(fr_Env __env, sys_Obj_ref __self){ return 0; }
-sys_Type sys_Obj_typeof_0(fr_Env __env, sys_Obj_ref __self){ return 0; }
-void sys_Obj_finalize0(fr_Env __env, sys_Obj_ref __self){ return; }
-//void sys_Obj_echo0(fr_Env __env){
-//    printf("\n");
-//}
-void sys_Obj_echo1(fr_Env __env, sys_Obj_null x){
-    if (x == NULL) {
-        printf("null\n");
-        return;
+void sys_Obj_make_f(fr_Env env, fr_Obj self) {
+    return;
+}
+fr_Bool sys_Obj_equals_f(fr_Env env, fr_Obj self, fr_Obj that) {
+    return self == that;
+}
+fr_Int sys_Obj_compare_f(fr_Env env, fr_Obj self, fr_Obj that) {
+    return (char*)self - (char*)that;
+}
+fr_Int sys_Obj_hash_f(fr_Env env, fr_Obj self) {
+    return (fr_Int)self;
+}
+fr_Obj sys_Obj_toStr_f(fr_Env env, fr_Obj self) {
+    
+    char buf[128];
+    buf[0] = 0;
+    
+    fr_Type ftype = fr_getObjType(env, self);
+    std::string &name = ((FType*)ftype)->c_name;
+    
+    snprintf(buf, 128, "%p@%s", (void*)self, name.c_str());
+    return fr_newStrUtf8(env, buf);
+}
+fr_Obj sys_Obj_trap_f(fr_Env env, fr_Obj self, fr_Obj name, fr_Obj args) {
+    fr_Value val;
+    val.h = (self);
+    //val.type = fr_vtHandle;
+    
+    if (args) {
+        //TODO
     }
-    fr_Obj str = FR_VCALL(sys_Obj, toStr0, x);
-    if (str == NULL) {
-        printf("ERROR:null\n");
-        return;
-    }
-    const char *utf8 = fr_getStrUtf8(__env, str, NULL);
-    printf("%s\n", utf8);
+    
+    const char *sname = fr_getStrUtf8(env, name, nullptr);
+    fr_Value ret;
+    fr_callVirtualOnObj(env, sname, 1+0, &val, &ret);
+    //TODO
+    return 0;
+}
+fr_Obj sys_Obj_with_f(fr_Env env, fr_Obj self, fr_Obj f) {
+    return 0;
+}
+fr_Bool sys_Obj_isImmutable_f(fr_Env env, fr_Obj self) {
+    return 0;
+}
+fr_Obj sys_Obj_toImmutable_f(fr_Env env, fr_Obj self) {
+    return 0;
+}
+fr_Obj sys_Obj_typeof_f(fr_Env env, fr_Obj self) {
+    fr_Type ftype = fr_getObjType(env, self);
+    fr_Obj obj = fr_getTypeObj(env, ftype);
+    return obj;
+}
+void sys_Obj_finalize_f(fr_Env env, fr_Obj self) {
+    return;
 }
 
-void sys_Obj_assert2(fr_Env __env, sys_Bool condition, sys_Str msg) {
-    if (!condition) {
-        //TODO throw AsertErr
-    }
+void sys_Obj_echo_f(fr_Env env, fr_Obj x) {
+    fr_Obj str;
+    const char *utf8;
+    fr_Value val;
+    val.h = x;
+    
+    str = fr_objToStr(env, val, fr_vtHandle);
+    
+    utf8 = fr_getStrUtf8(env, str, nullptr);
+    
+    puts(utf8);
+    return;
 }
+CF_BEGIN
+void sys_Obj_static__init(fr_Env env) {
+    return;
+}
+CF_END

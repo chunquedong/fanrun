@@ -65,7 +65,7 @@ const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
 }
 
 ////////////////////////////////////////////////////////////////
-#ifdef GEN
+
 fr_Obj fr_toSysType(fr_Env __env, fr_Class clz) {
     if (!clz->sysType) {
         sys_Type type = FR_ALLOC(sys_Type);
@@ -76,19 +76,8 @@ fr_Obj fr_toSysType(fr_Env __env, fr_Class clz) {
 }
 
 fr_Class fr_fromSysType(fr_Env __env, fr_Obj clz) {
-    //return clz->sysType;
-    return NULL;
+    return ((sys_Type)clz)->rawClass;
 }
-#else
-fr_Obj fr_toSysType(fr_Env __env, fr_Class clz) {
-    //;
-    return NULL;
-}
-
-fr_Class fr_fromSysType(fr_Env __env, fr_Obj clz) {
-    return NULL;
-}
-#endif
 
 ////////////////////////////////////////////////////////////////
 void fr_throwNPE(fr_Env __env) {

@@ -465,6 +465,10 @@ void TypeGen::genField(Printer *printer) {
 }
 
 void TypeGen::genStaticField(Printer *printer, bool isExtern) {
+    if ((type->meta.flags & FFlags::Native) != 0) {
+        isExtern = true;
+    }
+    
     for (int i=0; i<type->fields.size(); ++i) {
         FField *field = &type->fields[i];
         if ((field->flags & FFlags::Static) == 0) {

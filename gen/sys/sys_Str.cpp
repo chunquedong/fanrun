@@ -95,7 +95,7 @@ size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
 }//extern "C" {
 /////////////////////////////////////////////////////////////
 
-sys_Str sys_Str_defVal = (sys_Str)fr_newStr(NULL, L"", 0);
+sys_Str sys_Str_defVal = NULL;
 
 void sys_Str_privateMake0(fr_Env __env, sys_Str_ref __self){
     __self->data = NULL;

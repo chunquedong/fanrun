@@ -12,7 +12,7 @@ int main(int argc, const char * argv[]) {
     
     std::string libPath = "/Users/yangjiandong/workspace/code/fanCore/devEnv";
     std::string pod = "baseTest";
-    std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/vm/temp/";
+    std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/gen/temp/";
   
     PodLoader podMgr;
     libPath += "/lib/fan/";
