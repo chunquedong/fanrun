@@ -23,7 +23,7 @@ class Gc;
 
 class GcSupport {
 public:
-    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::vector<GcObj*> *list) = 0;
+    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::list<GcObj*> *list) = 0;
     virtual void walkRoot(Gc *gc) = 0;
     virtual void onStartGc() = 0;
     
@@ -36,11 +36,12 @@ public:
 
 class Gc {
     std::list<GcObj*> pinObjs;
-    std::vector<GcObj*> newAllocRef;
-    std::set<GcObj*> allRef;
+    
+    GcObj *allRefHead;
+    //GcObj *allRefTail;
+    //GcObj *newRefHead;
     
     std::vector<GcObj*> tempGcRoot;
-    std::vector<GcObj*> tempArrived;
     
     std::recursive_mutex lock;
     bool isStopWorld;
@@ -79,12 +80,12 @@ private:
         isStopWorld = false;
     }
     
-    void mergeNewAlloc();
-    bool mark(std::vector<GcObj*> &root, std::vector<GcObj*> *arrived);
+    //void mergeNewAlloc();
+    bool mark();
     void getRoot();
     void sweep();
 //    bool remark();
-    void remove(GcObj* obj, std::set<GcObj*>::iterator &it);
+    void remove(GcObj* obj);
     
     bool markNode(GcObj* obj);
 };

@@ -49,7 +49,7 @@ public:
     void releaseEnv(Env *env);
     void addStaticRef(fr_Obj *obj);
     
-    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::vector<GcObj*> *list) override;
+    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::list<GcObj*> *list) override;
     virtual void walkRoot(Gc *gc) override;
     virtual void onStartGc() override;
     virtual void finalizeObj(GcObj *obj) override;

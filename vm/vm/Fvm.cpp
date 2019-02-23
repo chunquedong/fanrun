@@ -72,10 +72,10 @@ void Fvm::printObj(GcObj *obj) {
 }
 
 int Fvm::allocSize(void *type) {
-    return 1;
+    return ((FType *)(type))->c_allocSize;
 }
 
-void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::vector<GcObj*> *list) {
+void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::list<GcObj*> *list) {
     Env *env = nullptr;
     
     FType *ftype = fr_getFType(env, obj);

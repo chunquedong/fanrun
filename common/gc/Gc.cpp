@@ -16,6 +16,10 @@ Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullp
     , maxAddress(NULL), minAddress(NULL){
     lastAllocSize = 29;
     collectSize = 10000;
+    allRefHead = NULL;
+    //allRefTail = NULL;
+    //newRefHead = NULL;
+    //newRefTail = NULL;
 }
 
 Gc::~Gc() {
@@ -30,25 +34,18 @@ void Gc::unpinObj(GcObj* obj) {
     pinObjs.remove(obj);
 }
 void Gc::onRoot(GcObj* obj) {
-    if (obj == nullptr) {
-        return;
-    }
-    if (allRef.find(obj) == allRef.end()) {
-        //printf("ERROR:");
-        //gcSupport->printObj(obj);
-        //printf("\n");
+    if (obj == NULL) {
         return;
     }
     tempGcRoot.push_back(obj);
 }
-
+/*
 void Gc::mergeNewAlloc() {
-    for (auto it = newAllocRef.begin(); it != newAllocRef.end(); ++it) {
-        allRef.insert(*it);
-    }
-    newAllocRef.clear();
+    allRefTail->next = newRefHead;
+    newRefHead = NULL;
+    //newRefTail = NULL;
 }
-
+*/
 GcObj* Gc::alloc(void *type, int asize) {
     int size = asize + sizeof(GcObj);
     if (allocSize > collectSize && allocSize + size > lastAllocSize * 1.5) {
@@ -64,9 +61,9 @@ GcObj* Gc::alloc(void *type, int asize) {
     }
     
     assert(obj);
-    obj->header = type;
+    obj->type = type;
     gc_setMark(obj, marker);
-    gc_setDirty(obj, 0);
+    gc_setDirty(obj, 1);
     
     lock.lock();
     if (maxAddress == NULL || obj > maxAddress) {
@@ -75,7 +72,9 @@ GcObj* Gc::alloc(void *type, int asize) {
     if (minAddress == NULL || obj < minAddress) {
         minAddress = obj;
     }
-    newAllocRef.push_back(obj);
+    obj->next = allRefHead;
+    allRefHead = obj;
+    //newAllocRef.push_back(obj);
     lock.unlock();
     
     if (trace) {
@@ -87,6 +86,7 @@ GcObj* Gc::alloc(void *type, int asize) {
 }
 
 void Gc::collect() {
+    //ready for gc
     gcSupport->onStartGc();
     {
         std::lock_guard<std::recursive_mutex> lock_guard(lock);
@@ -94,7 +94,7 @@ void Gc::collect() {
             return;
         }
         running = true;
-        mergeNewAlloc();
+        //mergeNewAlloc();
         marker = !marker;
     }
     
@@ -102,18 +102,16 @@ void Gc::collect() {
     puaseWorld(true);
     getRoot();
     
-    //concurrent mark
     resumeWorld();
-    mark(tempGcRoot, &tempArrived);
-    
-    //remark changed
-    puaseWorld(false);
-    mark(tempArrived, NULL);
+    //concurrent mark
+    mark();
     
     //remark root
     puaseWorld(true);
     getRoot();
-    mark(tempArrived, NULL);
+    
+    //remark changed
+    mark();
     
     //concurrent sweep
     resumeWorld();
@@ -146,39 +144,45 @@ void Gc::getRoot() {
     }
 }
 
-bool Gc::mark(std::vector<GcObj*> &root, std::vector<GcObj*> *arrived) {
-    bool has = false;
-    std::vector<GcObj*> &list = root;
-    if (arrived) arrived->clear();
-    while (list.size() > 0) {
-        GcObj *obj = list.back();
-        list.pop_back();
-        if (markNode(obj)) {
-            has = true;
-            gcSupport->getNodeChildren(this, obj, &list);
-        }
-        if (arrived) arrived->push_back(obj);
+bool Gc::mark() {
+    std::list<GcObj*> visitQueue;
+    for (int i=0; i<tempGcRoot.size(); ++i) {
+        visitQueue.push_back(tempGcRoot[i]);
     }
-    return has;
+    
+    while (visitQueue.size() > 0) {
+        GcObj *obj = visitQueue.front();
+        visitQueue.pop_front();
+        if (markNode(obj)) {
+            gcSupport->getNodeChildren(this, obj, &visitQueue);
+        }
+    }
+    return true;
 }
 
 void Gc::sweep() {
-    for (auto it = allRef.begin(); it != allRef.end();) {
-        GcObj* obj = *it;
+    GcObj *obj = allRefHead;
+    GcObj **ref = &allRefHead;
+    while (obj) {
+        GcObj *next = (GcObj*)(obj->next);
         if (gc_getMark(obj) != marker) {
-            remove(obj, it);
-        } else {
-            ++it;
+            remove(obj);
+            *ref = next;
+            obj = next;
+        }
+        else {
+            ref = (GcObj **)(&(obj->next));
+            obj = next;
         }
     }
 }
 
-void Gc::remove(GcObj* obj, std::set<GcObj*>::iterator &it) {
+void Gc::remove(GcObj* obj) {
     
     int size = gcSupport->allocSize(gc_getType(obj));
     allocSize -= size;
     
-    it = allRef.erase(it);
+    //it = allRef.erase(it);
     gcSupport->finalizeObj(obj);
     
     if (trace) {
@@ -187,18 +191,21 @@ void Gc::remove(GcObj* obj, std::set<GcObj*>::iterator &it) {
         printf("\n");
     }
     
-    obj->header = nullptr;
+    obj->type = NULL;
+    obj->next = NULL;
     free(obj);
 }
 
 bool Gc::markNode(GcObj* obj) {
-    if (obj == nullptr) {
+    if (obj == NULL) {
         return false;
     }
+    /*
     if (allRef.find(obj) == allRef.end()) {
         //printf("ERROR: unknow obj %p", obj);
         return false;
     }
+     */
     if (!gc_isDirty(obj) && gc_getMark(obj) == marker) {
         return false;
     }

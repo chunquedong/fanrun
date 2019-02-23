@@ -47,7 +47,7 @@ void Vm::releaseEnv(Env *env) {
     delete env;
 }
 
-void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::vector<GcObj*> *list) {
+void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::list<GcObj*> *list) {
     fr_Obj obj = fr_fromGcObj(gcobj);
     fr_Class type = (fr_Class)gc_getType(gcobj);
     for (int i=0; i<type->fieldCount; ++i) {
