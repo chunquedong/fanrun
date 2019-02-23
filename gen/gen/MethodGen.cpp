@@ -90,9 +90,23 @@ void MethodGen::genImples(Printer *printer) {
     if ((method->flags & FFlags::Native) != 0 || (method->flags & FFlags::Abstract) != 0) {
         return;
     }
-    if ((parent->type->meta.flags & FFlags::Native) != 0
-        && ((method->flags & FFlags::Overload) == 0 || parent->name == "sys_Func")) {
-        return;
+    
+    //skip Func
+    if ((parent->type->meta.flags & FFlags::Native) != 0) {
+        if ((parent->name == "sys_Func") || parent->name == "sys_ByteArray"
+            || parent->name == "sys_ObjArray") {
+            return;
+        }
+    }
+    
+    if ((parent->type->meta.flags & FFlags::Native) != 0) {
+        std::string &methodName = parent->podGen->pod->names[method->name];
+        if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
+            //has code
+        }
+        else {
+            return;
+        }
     }
     
     //if (method->code.isEmpty()) return;

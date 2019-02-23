@@ -42,9 +42,7 @@ fr_Obj sys_Obj_trap_f(fr_Env env, fr_Obj self, fr_Obj name, fr_Obj args) {
     //TODO
     return 0;
 }
-fr_Obj sys_Obj_with_f(fr_Env env, fr_Obj self, fr_Obj f) {
-    return 0;
-}
+
 fr_Bool sys_Obj_isImmutable_f(fr_Env env, fr_Obj self) {
     return 0;
 }
@@ -74,13 +72,7 @@ void sys_Obj_echo_f(fr_Env env, fr_Obj x) {
     return;
 }
 
-void sys_Obj_assert_f(fr_Env env, fr_Bool condition, fr_Obj msg) {
-    if (!condition) {
-        fr_throwNew(env, "sys", "AssertErr", fr_getStrUtf8(env, msg, NULL));
-    }
-}
-CF_BEGIN
-void sys_Obj_static__init(fr_Env env) {
+void sys_Obj_static__init_f(fr_Env env) {
     return;
 }
-CF_END
+

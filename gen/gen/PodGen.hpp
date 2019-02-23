@@ -33,8 +33,8 @@ private:
     void genHeader(Printer *printer);
     void genImple(Printer *printer);
     void horizontalLine(Printer *printer, const char *name);
-    void genRegister(Printer *printer);
-    void genStub(Printer *printer);
+    //void genRegister(Printer *printer);
+    //void genStub(Printer *printer);
     void genStaticInit(Printer *printer);
 public:
     std::string getTypeRefName(uint16_t tid);

@@ -168,20 +168,20 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
         
         if (printType == PrintType::pRegisterDef) {
             printer->println("int %s_allocSize__();", typeName.c_str());
-            printer->println("void %sstatic__init(fr_Env self, void *param, void *ret);", typeName.c_str());
+            //printer->println("void %sstatic__init(fr_Env self, void *param, void *ret);", typeName.c_str());
         }
         else if (printType == PrintType::pRegisterCode) {
             printer->println("fr_registerMethod(vm, \"%s_allocSize__\", (fr_NativeFunc)%s_allocSize__);"
                              , preName.c_str(), typeName.c_str());
-            printer->println("fr_registerMethod(vm, \"%sstatic$init\", (fr_NativeFunc)%sstatic__init);"
-                             , preName.c_str(), typeName.c_str());
+            //printer->println("fr_registerMethod(vm, \"%sstatic$init\", (fr_NativeFunc)%sstatic__init);"
+            //                 , preName.c_str(), typeName.c_str());
         }
         else if (printType == PrintType::pNatiAll) {
             printer->println("int %s_allocSize__() {"
                              "return sizeof(struct %s);}"
                              , typeName.c_str(), typeName.c_str());
-            printer->println("void %sstatic__init(fr_Env self, void *param, void *ret);"
-                             , typeName.c_str(), typeName.c_str());
+            //printer->println("void %sstatic__init(fr_Env self, void *param, void *ret);"
+            //                 , typeName.c_str(), typeName.c_str());
             printer->newLine();
         }
     }
@@ -199,7 +199,14 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
             continue;
         }
         
-        name = preName + pod->names[method->name];
+        std::string &methodName = pod->names[method->name];
+        if ((type->meta.flags & FFlags::Native) != 0) {
+            if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
+                continue;
+            }
+        }
+        
+        name = preName + methodName;
         std::string escapeName = name;
         escape(escapeName);
         escapeKeyword(escapeName);
@@ -299,17 +306,16 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
 }
 
 static bool hasNative(FType *type) {
+    if ((type->meta.flags & FFlags::Native) != 0) return true;
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
-        
-        if ((type->meta.flags & FFlags::Native)==0
-            && (method->flags & FFlags::Native)==0) {
-            continue;
+        if ((method->flags & FFlags::Native) != 0) {
+            return true;
         }
-        return true;
     }
     return false;
 }
+
 void NativeGen::genNativePod(std::string &path, FPod *pod, Printer *printer, PrintType printType) {
     
     for (int i=0; i<pod->types.size(); ++i) {

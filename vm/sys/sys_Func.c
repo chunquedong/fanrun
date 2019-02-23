@@ -41,6 +41,6 @@ void sys_Func_exitCtor_f(fr_Env env, fr_Obj self) {
 void sys_Func_checkInCtor_f(fr_Env env, fr_Obj self, fr_Obj obj) {
     
 }
-void sys_Func_static__init(fr_Env env) {
+void sys_Func_static__init_f(fr_Env env) {
     return;
 }

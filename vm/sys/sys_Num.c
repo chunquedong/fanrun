@@ -32,6 +32,6 @@ fr_Obj sys_Num_localeNegInf_f(fr_Env env) {
 fr_Obj sys_Num_localeNaN_f(fr_Env env) {
     return 0;
 }
-void sys_Num_static__init(fr_Env env) {
+void sys_Num_static__init_f(fr_Env env) {
     return;
 }

@@ -36,9 +36,9 @@ public:
     void genImple(Printer *printer);
     void genStaticField(Printer *printer, bool isExtern);
     
-    void genMethodStub(Printer *printer);
-    void genMethodWrap(Printer *printer);
-    void genMethodRegister(Printer *printer);
+    //void genMethodStub(Printer *printer);
+    //void genMethodWrap(Printer *printer);
+    //void genMethodRegister(Printer *printer);
 private:
     void genField(Printer *printer);
     void genTypeMetadata(Printer *printer);

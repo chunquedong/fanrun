@@ -14,11 +14,7 @@ void sys_StrBuf_make_f(fr_Env env, fr_Obj self, fr_Int capacity) {
     str->capacity= capacity;
     return;
 }
-fr_Bool sys_StrBuf_isEmpty_f(fr_Env env, fr_Obj self) {
-    struct sys_StrBuf_ *str;
-    str = (struct sys_StrBuf_ *)fr_getPtr(env, self);
-    return str->size == 0;
-}
+
 fr_Int sys_StrBuf_size_f(fr_Env env, fr_Obj self) {
     struct sys_StrBuf_ *str;
     str = (struct sys_StrBuf_ *)fr_getPtr(env, self);
@@ -44,16 +40,15 @@ fr_Obj sys_StrBuf_set_f(fr_Env env, fr_Obj self, fr_Int index, fr_Int ch) {
     return 0;
 }
 
-fr_Obj sys_StrBuf_add_f(fr_Env env, fr_Obj self, fr_Obj x) {
+//TODO
+fr_Obj sys_StrBuf_addStr_f(fr_Env env, fr_Obj self, fr_Obj astr, fr_Int off, fr_Int len) {
     struct sys_StrBuf_ *strbuf;
     struct sys_Str_ *str;
     fr_Obj strObj;
     fr_Value val;
-    
     strbuf = (struct sys_StrBuf_ *)fr_getPtr(env, self);
     
-    val.h = x;
-    strObj = fr_objToStr(env, val, fr_vtHandle);
+    val.h = astr;
     str = (struct sys_Str_ *)fr_getPtr(env, strObj);
     
     size_t newSize = strbuf->size + str->size;
@@ -73,14 +68,7 @@ fr_Obj sys_StrBuf_add_f(fr_Env env, fr_Obj self, fr_Obj x) {
     
     return self;
 }
-//TODO
-fr_Obj sys_StrBuf_addStr_f(fr_Env env, fr_Obj self, fr_Obj str, fr_Int off, fr_Int len) {
-    return NULL;
-}
 fr_Obj sys_StrBuf_addChar_f(fr_Env env, fr_Obj self, fr_Int ch) {
-    return 0;
-}
-fr_Obj sys_StrBuf_join_f(fr_Env env, fr_Obj self, fr_Obj x, fr_Obj sep) {
     return 0;
 }
 fr_Obj sys_StrBuf_insert_f(fr_Env env, fr_Obj self, fr_Int index, fr_Obj x) {
@@ -111,7 +99,7 @@ fr_Obj sys_StrBuf_toStr_f(fr_Env env, fr_Obj self) {
     return fr_toHandle(env,str);
 }
 
-void sys_StrBuf_static__init(fr_Env env) {
+void sys_StrBuf_static__init_f(fr_Env env) {
     return;
 }
 void sys_StrBuf_finalize_f(fr_Env env, fr_Obj self) {

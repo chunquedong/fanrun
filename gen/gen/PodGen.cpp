@@ -40,6 +40,7 @@ void PodGen::gen(std::string &path) {
     Printer implePrinter(impleFile.c_str());
     genImple(&implePrinter);
     
+    /*
     std::string regisFile = path + podName + "_register.c";
     Printer regisPrinter(regisFile.c_str());
     genRegister(&regisPrinter);
@@ -47,6 +48,7 @@ void PodGen::gen(std::string &path) {
     std::string stubFile = path + podName + "_stub.c";
     Printer stubPrinter(stubFile.c_str());
     genStub(&stubPrinter);
+     */
 }
 
 void PodGen::horizontalLine(Printer *printer, const char *name) {
@@ -177,7 +179,7 @@ void PodGen::genStaticInit(Printer *printer) {
     printer->unindent();
     printer->println("}");
 }
-
+/*
 void PodGen::genRegister(Printer *printer) {
     printer->println("#include \"%s.h\"", podName.c_str());
     printer->newLine();
@@ -206,7 +208,7 @@ void PodGen::genStub(Printer *printer) {
         gtype->genMethodStub(printer);
     }
 }
-
+*/
 std::string PodGen::getTypeRefName(uint16_t tid) {
     return FCodeUtil::getTypeRefName(pod, tid, true);
 }

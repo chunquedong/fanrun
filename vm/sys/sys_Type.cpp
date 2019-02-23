@@ -121,6 +121,7 @@ fr_Bool sys_Type_isPublic_f(fr_Env env, fr_Obj self) {
 fr_Bool sys_Type_isSynthetic_f(fr_Env env, fr_Obj self) {
     return 0;
 }
+/*
 fr_Obj sys_Type_fields_f(fr_Env env, fr_Obj self) {
     return 0;
 }
@@ -206,6 +207,7 @@ fr_Obj sys_Type_facet_f(fr_Env env, fr_Obj self, fr_Obj type, fr_Bool checked) {
 fr_Bool sys_Type_hasFacet_f(fr_Env env, fr_Obj self, fr_Obj type) {
     return 0;
 }
+ */
 fr_Obj sys_Type_doc_f(fr_Env env, fr_Obj self) {
     return 0;
 }
@@ -220,7 +222,7 @@ fr_Bool sys_Type_isJava_f(fr_Env env, fr_Obj self) {
 }
 
 CF_BEGIN
-void sys_Type_static__init(fr_Env env) {
+void sys_Type_static__init_f(fr_Env env) {
     return;
 }
 CF_END

@@ -61,9 +61,7 @@ sys_Int sys_Int_compare1_val(fr_Env __env, sys_Int_val __self, sys_Obj obj){
         return __self - other;
     }
 }
-sys_Int sys_Int_hash0_val(fr_Env __env, sys_Int_val __self){
-    return __self;
-}
+
 sys_Int sys_Int_negate0_val(fr_Env __env, sys_Int_val __self){
     return -__self;
 }
@@ -129,15 +127,6 @@ sys_Int sys_Int_shiftr1_val(fr_Env __env, sys_Int_val __self, sys_Int b){
 sys_Int sys_Int_shifta1_val(fr_Env __env, sys_Int_val __self, sys_Int b) {
     return __self >> b;
 }
-sys_Int sys_Int_abs0_val(fr_Env __env, sys_Int_val __self){
-    return llabs(__self);
-}
-sys_Int sys_Int_min1_val(fr_Env __env, sys_Int_val __self, sys_Int that){
-    return __self > that ? that : __self;
-}
-sys_Int sys_Int_max1_val(fr_Env __env, sys_Int_val __self, sys_Int that){
-    return __self > that ? __self : that;
-}
 sys_Int sys_Int_pow1_val(fr_Env __env, sys_Int_val __self, sys_Int pow){
     if (pow < 0) {
         sys_ArgErr e = FR_ALLOC(sys_ArgErr);
@@ -145,101 +134,7 @@ sys_Int sys_Int_pow1_val(fr_Env __env, sys_Int_val __self, sys_Int pow){
     }
     return powf(__self, pow);
 }
-sys_Bool sys_Int_isEven0_val(fr_Env __env, sys_Int_val __self){
-    return (__self & 1) == 0;
-}
-sys_Bool sys_Int_isOdd0_val(fr_Env __env, sys_Int_val __self){
-    return (__self & 1) == 1;
-}
-sys_Bool sys_Int_isSpace0_val(fr_Env __env, sys_Int_val __self){
-    return iswspace((wchar_t)__self);
-}
-sys_Bool sys_Int_isAlpha0_val(fr_Env __env, sys_Int_val __self){
-    return iswalpha((wchar_t)__self);
-}
-sys_Bool sys_Int_isAlphaNum0_val(fr_Env __env, sys_Int_val __self){
-    return iswalnum((wchar_t)__self);
-}
-sys_Bool sys_Int_isUpper0_val(fr_Env __env, sys_Int_val __self){
-    return iswupper((wchar_t)__self);
-}
-sys_Bool sys_Int_isLower0_val(fr_Env __env, sys_Int_val __self){
-    return iswlower((wchar_t)__self);
-}
-sys_Int sys_Int_upper0_val(fr_Env __env, sys_Int_val __self){
-    return towupper((wchar_t)__self);
-}
-sys_Int sys_Int_lower0_val(fr_Env __env, sys_Int_val __self){
-    return towlower((wchar_t)__self);
-}
-//sys_Bool sys_Int_isDigit0_val(fr_Env __env, sys_Int_val __self){
-//    return iswdigit((wchar_t)__self);
-//}
-sys_Bool sys_Int_isDigit1_val(fr_Env __env, sys_Int_val __self, sys_Int radix){
-    if (radix <= 10) {
-        return iswdigit((wchar_t)__self);
-    }
-    else if (radix <= 16) {
-        return iswxdigit((wchar_t)__self);
-    }
-    else {
-        FR_ALLOC_THROW(sys_UnsupportedErr);
-        return false;
-    }
-}
-//sys_Int_null sys_Int_toDigit0_val(fr_Env __env, sys_Int_val __self){
-//    return sys_Int_toDigit1_val(__env, __self, 10);
-//}
-sys_Int_null sys_Int_toDigit1_val(fr_Env __env, sys_Int_val __self, sys_Int radix){
-    const wchar_t *str= L"0123456789abcdef";
-    if (__self < 16 && __self < radix) {
-        sys_Int res = str[__self];
-        return (sys_Int_null)fr_box_int(__env, res);
-    }
-    return NULL;
-}
-//sys_Int_null sys_Int_fromDigit0_val(fr_Env __env, sys_Int_val __self){
-//    return sys_Int_fromDigit1_val(__env, __self, 10);
-//}
-sys_Int_null sys_Int_fromDigit1_val(fr_Env __env, sys_Int_val __self, sys_Int radix){
-    wchar_t c = (wchar_t)__self;
-    sys_Int res = 0;
-    if (radix == 10) {
-        if (c >= L'0' && c <= L'9') {
-            res = c - L'0';
-            return (sys_Int_null)fr_box_int(__env, res);
-        }
-    }
-    else if (radix == 16) {
-        if (c >= L'0' && c <= L'9') {
-            res = c - L'0';
-            return (sys_Int_null)fr_box_int(__env, res);
-        }
-        c = towlower(c);
-        if (c >= L'a' && c <= L'f') {
-            res = (c - L'a')+10;
-            return (sys_Int_null)fr_box_int(__env, res);
-        }
-    }
-    return NULL;
-}
-sys_Bool sys_Int_equalsIgnoreCase1_val(fr_Env __env, sys_Int_val __self, sys_Int ch){
-    wchar_t a = towlower((wchar_t)__self);
-    wchar_t b = towlower((wchar_t)ch);
-    return a == b;
-}
-sys_Bool sys_Int_localeIsUpper0_val(fr_Env __env, sys_Int_val __self){
-    return iswupper((wchar_t)__self);
-}
-sys_Bool sys_Int_localeIsLower0_val(fr_Env __env, sys_Int_val __self){
-    return iswlower((wchar_t)__self);
-}
-sys_Int sys_Int_localeUpper0_val(fr_Env __env, sys_Int_val __self){
-    return towupper((wchar_t)__self);
-}
-sys_Int sys_Int_localeLower0_val(fr_Env __env, sys_Int_val __self){
-    return towlower((wchar_t)__self);
-}
+
 sys_Str sys_Int_toStr0_val(fr_Env __env, sys_Int_val __self){
     wchar_t buf[256];
     swprintf(buf, 256, L"%lld", __self);
@@ -307,12 +202,7 @@ sys_Str sys_Int_toCode1_val(fr_Env __env, sys_Int_val __self, sys_Int base){
     FR_ALLOC_THROW(sys_UnsupportedErr);
     return NULL;
 }
-void sys_Int_times1_val(fr_Env __env, sys_Int_val __self, sys_Func c){
-    for (int i=0; i<__self; ++i) {
-        fr_Obj a = fr_box_int(__env, i);
-        FR_VCALL(sys_Func, call1, c, (sys_Obj)a);
-    }
-}
+
 void sys_Int_make0_val(fr_Env __env, sys_Int_val __self){
     __self = 0;
 }
@@ -324,7 +214,6 @@ sys_Str sys_Int_toHex1_val(fr_Env __env, sys_Int_val __self, sys_Int width) {
 sys_Str sys_Int_toRadix2_val(fr_Env __env, sys_Int_val __self, sys_Int radix, sys_Int width) {
     return NULL;
 }
-//TODO
-sys_Str sys_Int_toLocale1_val(fr_Env __env, sys_Int_val __self, sys_Str_null pattern) {
-    return NULL;
+
+void sys_Int_static__init0(fr_Env __env) {
 }

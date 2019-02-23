@@ -2,7 +2,6 @@
 #include "pod_sys_struct.h"
 
 int sys_Obj__allocSize__() {return sizeof(struct sys_Obj_);}
-void sys_Obj_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Obj_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -100,24 +99,6 @@ void sys_Obj_trap(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Obj_with(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Obj_with_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Obj_isImmutable(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -179,24 +160,7 @@ void sys_Obj_echo(fr_Env env, void *param, void *ret) {
     sys_Obj_echo_f(env, arg_0);
 }
 
-void sys_Obj_assert(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Bool arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.b;
-
-
-    sys_Obj_assert_f(env, arg_0, arg_1);
-}
-
 int sys_Num__allocSize__() {return sizeof(struct sys_Num_);}
-void sys_Num_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Num_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -236,7 +200,6 @@ void sys_Num_toFloat(fr_Env env, void *param, void *ret) {
 }
 
 int sys_Int__allocSize__() {return sizeof(struct sys_Int_);}
-void sys_Int_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Int_fromStr(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -318,19 +281,6 @@ void sys_Int_compare(fr_Env env, void *param, void *ret) {
 
 
     retValue.i = sys_Int_compare_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_hash(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.i = sys_Int_hash_f(env, arg_0);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -674,55 +624,6 @@ void sys_Int_shifta(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Int_abs(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.i = sys_Int_abs_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_min(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.i = sys_Int_min_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_max(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.i = sys_Int_max_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Int_pow(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Int arg_0; 
@@ -738,213 +639,6 @@ void sys_Int_pow(fr_Env env, void *param, void *ret) {
 
 
     retValue.i = sys_Int_pow_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isEven(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isEven_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isOdd(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isOdd_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isSpace(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isSpace_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isAlpha(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isAlpha_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isAlphaNum(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isAlphaNum_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isUpper(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isUpper_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isLower(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isLower_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_upper(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.i = sys_Int_upper_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_lower(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.i = sys_Int_lower_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_isDigit(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_isDigit_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_toDigit(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.h = sys_Int_toDigit_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_fromDigit(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.h = sys_Int_fromDigit_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_equalsIgnoreCase(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.b = sys_Int_equalsIgnoreCase_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Int_toLocale(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.h = sys_Int_toLocale_f(env, arg_0, arg_1);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -1033,24 +727,13 @@ void sys_Int_toCode(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Int_times(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
+void sys_Int_static__init(fr_Env env, void *param, void *ret) {
 
 
-    sys_Int_times_f(env, arg_0, arg_1);
+    sys_Int_static__init_f(env);
 }
 
 int sys_Void__allocSize__() {return sizeof(struct sys_Void_);}
-void sys_Void_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Void_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -1064,7 +747,6 @@ void sys_Void_make(fr_Env env, void *param, void *ret) {
 }
 
 int sys_StrBuf__allocSize__() {return sizeof(struct sys_StrBuf_);}
-void sys_StrBuf_static__init(fr_Env self, void *param, void *ret);
 
 void sys_StrBuf_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -1080,19 +762,6 @@ void sys_StrBuf_make(fr_Env env, void *param, void *ret) {
 
 
     sys_StrBuf_make_f(env, arg_0, arg_1);
-}
-
-void sys_StrBuf_isEmpty(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_StrBuf_isEmpty_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
 }
 
 void sys_StrBuf_size(fr_Env env, void *param, void *ret) {
@@ -1196,24 +865,6 @@ void sys_StrBuf_set(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_StrBuf_add(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_StrBuf_add_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_StrBuf_addChar(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -1257,29 +908,6 @@ void sys_StrBuf_addStr(fr_Env env, void *param, void *ret) {
 
 
     retValue.h = sys_StrBuf_addStr_f(env, arg_0, arg_1, arg_2, arg_3);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_StrBuf_join(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Obj arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.h;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_StrBuf_join_f(env, arg_0, arg_1, arg_2);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -1403,7 +1031,6 @@ void sys_StrBuf_finalize(fr_Env env, void *param, void *ret) {
 }
 
 int sys_Func__allocSize__() {return sizeof(struct sys_Func_);}
-void sys_Func_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Func_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -1585,7 +1212,6 @@ void sys_Func_checkInCtor(fr_Env env, void *param, void *ret) {
 }
 
 int sys_Err__allocSize__() {return sizeof(struct sys_Err_);}
-void sys_Err_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Err_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -1674,7 +1300,6 @@ void sys_Err_toStr(fr_Env env, void *param, void *ret) {
 }
 
 int sys_Str__allocSize__() {return sizeof(struct sys_Str_);}
-void sys_Str_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Str_privateMake(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -1710,78 +1335,6 @@ void sys_Str_fromChars(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Str_equals(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_equals_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_equalsIgnoreCase(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_equalsIgnoreCase_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_compare(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.i = sys_Str_compare_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_compareIgnoreCase(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.i = sys_Str_compareIgnoreCase_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Str_hash(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -1792,32 +1345,6 @@ void sys_Str_hash(fr_Env env, void *param, void *ret) {
 
 
     retValue.i = sys_Str_hash_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toStr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_toStr_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isEmpty(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isEmpty_f(env, arg_0);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -1847,42 +1374,6 @@ void sys_Str_intern(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Str_startsWith(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_startsWith_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_endsWith(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_endsWith_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Str_find(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -1903,29 +1394,6 @@ void sys_Str_find(fr_Env env, void *param, void *ret) {
 
 
     retValue.i = sys_Str_find_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_index(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_index_f(env, arg_0, arg_1, arg_2);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -1952,111 +1420,6 @@ void sys_Str_findr(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Str_indexr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_indexr_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_indexIgnoreCase(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_indexIgnoreCase_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_indexrIgnoreCase(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_indexrIgnoreCase_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_contains(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_contains_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_containsChar(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_containsChar_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Str_get(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -2072,29 +1435,6 @@ void sys_Str_get(fr_Env env, void *param, void *ret) {
 
 
     retValue.i = sys_Str_get_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_getSafe(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.i = sys_Str_getSafe_f(env, arg_0, arg_1, arg_2);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -2147,348 +1487,6 @@ void sys_Str_chars(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Str_each(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    sys_Str_each_f(env, arg_0, arg_1);
-}
-
-void sys_Str_eachr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    sys_Str_eachr_f(env, arg_0, arg_1);
-}
-
-void sys_Str_any(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_any_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_all(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_all_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_spaces(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Int arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.i;
-
-
-    retValue.h = sys_Str_spaces_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_lower(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_lower_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_upper(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_upper_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_capitalize(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_capitalize_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_decapitalize(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_decapitalize_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toDisplayName(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_toDisplayName_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_fromDisplayName(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_fromDisplayName_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_justl(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_justl_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_justr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_justr_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_padl(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_padl_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_padr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_padr_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_reverse(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_reverse_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_trim(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_trim_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_trimToNull(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_trimToNull_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_trimStart(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_trimStart_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_trimEnd(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_trimEnd_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_split(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Bool arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.b;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_split_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_splitLines(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_splitLines_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Str_replace(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -2509,192 +1507,6 @@ void sys_Str_replace(fr_Env env, void *param, void *ret) {
 
 
     retValue.h = sys_Str_replace_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_numNewlines(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.i = sys_Str_numNewlines_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isAscii(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isAscii_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isSpace(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isSpace_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isUpper(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isUpper_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isLower(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isLower_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isAlpha(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isAlpha_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_isAlphaNum(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_isAlphaNum_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toBool(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Bool arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.b;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Str_toBool_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toInt(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value value_2;
-    fr_Bool arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.b;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.i = sys_Str_toInt_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toFloat(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Bool arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.b;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.f = sys_Str_toFloat_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toCode(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value value_2;
-    fr_Bool arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.b;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_toCode_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Str_toXml(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_toXml_f(env, arg_0);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -2770,25 +1582,6 @@ void sys_Str_static__init(fr_Env env, void *param, void *ret) {
 }
 
 int sys_Bool__allocSize__() {return sizeof(struct sys_Bool_);}
-void sys_Bool_static__init(fr_Env self, void *param, void *ret);
-
-void sys_Bool_fromStr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Bool arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.b;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.b = sys_Bool_fromStr_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
 
 void sys_Bool_privateMake(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -2816,32 +1609,6 @@ void sys_Bool_equals(fr_Env env, void *param, void *ret) {
 
 
     retValue.b = sys_Bool_equals_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Bool_hash(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Bool arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.b;
-
-
-    retValue.i = sys_Bool_hash_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Bool_toStr(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Bool arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.b;
-
-
-    retValue.h = sys_Bool_toStr_f(env, arg_0);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -2912,21 +1679,13 @@ void sys_Bool_xor(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Bool_toCode(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Bool arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.b;
+void sys_Bool_static__init(fr_Env env, void *param, void *ret) {
 
 
-    retValue.h = sys_Bool_toCode_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
+    sys_Bool_static__init_f(env);
 }
 
 int sys_ObjArray__allocSize__() {return sizeof(struct sys_ObjArray_);}
-void sys_ObjArray_static__init(fr_Env self, void *param, void *ret);
 
 void sys_ObjArray_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -3019,62 +1778,6 @@ void sys_ObjArray_realloc(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_ObjArray_fill(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_ObjArray_fill_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_ObjArray_copyFrom(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value value_3;
-    fr_Int arg_3; 
-    fr_Value value_4;
-    fr_Int arg_4; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_4, 4);
-    arg_4 = value_4.i;
-
-    fr_getParam(env, param, &value_3, 3);
-    arg_3 = value_3.i;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_ObjArray_copyFrom_f(env, arg_0, arg_1, arg_2, arg_3, arg_4);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_ObjArray_finalize(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -3086,44 +1789,7 @@ void sys_ObjArray_finalize(fr_Env env, void *param, void *ret) {
     sys_ObjArray_finalize_f(env, arg_0);
 }
 
-void sys_ObjArray_fromJava(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_ObjArray_fromJava_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_ObjArray_toJava(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_ObjArray_toJava_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 int sys_ByteArray__allocSize__() {return sizeof(struct sys_ByteArray_);}
-void sys_ByteArray_static__init(fr_Env self, void *param, void *ret);
 
 void sys_ByteArray_make(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -3211,62 +1877,6 @@ void sys_ByteArray_realloc(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_ByteArray_fill(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Int arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.i;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_ByteArray_fill_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_ByteArray_copyFrom(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Int arg_2; 
-    fr_Value value_3;
-    fr_Int arg_3; 
-    fr_Value value_4;
-    fr_Int arg_4; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_4, 4);
-    arg_4 = value_4.i;
-
-    fr_getParam(env, param, &value_3, 3);
-    arg_3 = value_3.i;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.i;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_ByteArray_copyFrom_f(env, arg_0, arg_1, arg_2, arg_3, arg_4);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_ByteArray_finalize(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -3279,7 +1889,6 @@ void sys_ByteArray_finalize(fr_Env env, void *param, void *ret) {
 }
 
 int sys_Float__allocSize__() {return sizeof(struct sys_Float_);}
-void sys_Float_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Float_makeBits(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
@@ -3362,47 +1971,6 @@ void sys_Float_equals(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Float_approx(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value value_1;
-    fr_Float arg_1; 
-    fr_Value value_2;
-    fr_Obj arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.h;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.f;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.b = sys_Float_approx_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Float_compare(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.i = sys_Float_compare_f(env, arg_0, arg_1);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Float_isNaN(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Float arg_0; 
@@ -3416,45 +1984,6 @@ void sys_Float_isNaN(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Float_isNegZero(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.b = sys_Float_isNegZero_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Float_normNegZero(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.f = sys_Float_normNegZero_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Float_hash(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.i = sys_Float_hash_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Float_negate(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Float arg_0; 
@@ -3465,32 +1994,6 @@ void sys_Float_negate(fr_Env env, void *param, void *ret) {
 
 
     retValue.f = sys_Float_negate_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Float_increment(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.f = sys_Float_increment_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
-void sys_Float_decrement(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.f = sys_Float_decrement_f(env, arg_0);
     *((fr_Value*)ret) = retValue;
 }
 
@@ -3713,19 +2216,6 @@ void sys_Float_toStr(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Float_toCode(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Float arg_0; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.f;
-
-
-    retValue.h = sys_Float_toCode_f(env, arg_0);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Float_toLocale(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Float arg_0; 
@@ -3744,8 +2234,13 @@ void sys_Float_toLocale(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
+void sys_Float_static__init(fr_Env env, void *param, void *ret) {
+
+
+    sys_Float_static__init_f(env);
+}
+
 int sys_Type__allocSize__() {return sizeof(struct sys_Type_);}
-void sys_Type_static__init(fr_Env self, void *param, void *ret);
 
 void sys_Type_privateMake(fr_Env env, void *param, void *ret) {
     fr_Value value_0;

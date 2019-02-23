@@ -19,9 +19,7 @@ void sys_StrBuf_make1(fr_Env __env, sys_StrBuf_ref __self, sys_Int capacity){
     __self->data = (wchar_t*)malloc((capacity+1) * sizeof(wchar_t));
     __self->size = 0;
 }
-sys_Bool sys_StrBuf_isEmpty0(fr_Env __env, sys_StrBuf_ref __self){
-    return __self->size == 0;
-}
+
 sys_Int sys_StrBuf_size0(fr_Env __env, sys_StrBuf_ref __self){
     return __self->size;
 }
@@ -90,6 +88,7 @@ sys_StrBuf sys_StrBuf_set2(fr_Env __env, sys_StrBuf_ref __self, sys_Int index, s
     __self->data[index] = (wchar_t)ch;
     return __self;
 }
+/*
 sys_StrBuf sys_StrBuf_add1(fr_Env __env, sys_StrBuf_ref __self, sys_Obj_null x){
     sys_Str str = FR_VCALL(sys_Obj, toStr0, x);
     if (str->size + __self->size > __self->capacity) {
@@ -100,7 +99,7 @@ sys_StrBuf sys_StrBuf_add1(fr_Env __env, sys_StrBuf_ref __self, sys_Obj_null x){
     __self->size += str->size;
     return __self;
 }
-
+*/
 sys_StrBuf sys_StrBuf_addStr3(fr_Env __env, sys_StrBuf_ref __self, sys_Str str, sys_Int off, sys_Int len) {
     if (len > str->size) {
         len = str->size;
@@ -130,6 +129,7 @@ sys_StrBuf sys_StrBuf_addChar1(fr_Env __env, sys_StrBuf_ref __self, sys_Int ch){
 //sys_This sys_StrBuf_join1(fr_Env __env, sys_StrBuf_ref __self, sys_Obj_null x){
 //    return sys_StrBuf_join2(__env, __self, x, fr_newStrNT(__env, L" "));
 //}
+/*
 sys_StrBuf sys_StrBuf_join2(fr_Env __env, sys_StrBuf_ref __self, sys_Obj_null x, sys_Str sep){
     if (__self->size > 0) {
         sys_StrBuf_add1(__env, __self, (sys_Obj)sep);
@@ -137,6 +137,7 @@ sys_StrBuf sys_StrBuf_join2(fr_Env __env, sys_StrBuf_ref __self, sys_Obj_null x,
     sys_StrBuf_add1(__env, __self, x);
     return __self;
 }
+ */
 sys_StrBuf sys_StrBuf_insert2(fr_Env __env, sys_StrBuf_ref __self, sys_Int index, sys_Obj_null x){
     if (index < 0) {
         index += __self->size;

@@ -165,100 +165,12 @@ void sys_Str_privateMake_f(fr_Env env, fr_Obj self) {
 fr_Obj sys_Str_fromChars_f(fr_Env env, fr_Obj chars, fr_Int offset, fr_Int len) {
     return 0;
 }
-fr_Bool sys_Str_equals_f(fr_Env env, fr_Obj self, fr_Obj obj) {
-    fr_Type type;
-    struct sys_Str_ *str;
-    struct sys_Str_ *other;
-    size_t i = 0;
-    
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    
-    if (obj == NULL) {
-        //fr_unlock(env);
-        return false;
-    }
-    type = fr_findType(env, "sys", "Str");
-    
-    if (!fr_isInstanceOf(env, obj, type)) {
-        //fr_unlock(env);
-        return false;
-    }
-    
-    other = (struct sys_Str_ *)fr_getPtr(env, obj);
-    if (str->size != other->size) {
-        //fr_unlock(env);
-        return false;
-    }
-    if (str->hashCode != other->hashCode) {
-        //fr_unlock(env);
-        return false;
-    }
-    
-    for (i=0; i<str->size; ++i) {
-        if (str->data[i] != other->data[i]) {
-            //fr_unlock(env);
-            return false;
-        }
-    }
-    
-    //fr_unlock(env);
-    return true;
-}
-
-fr_Bool sys_Str_equalsIgnoreCase_f(fr_Env env, fr_Obj self, fr_Obj s) {
-    return 0;
-}
-fr_Int sys_Str_compare_f(fr_Env env, fr_Obj self, fr_Obj obj) {
-    fr_Type type;
-    struct sys_Str_ *str;
-    struct sys_Str_ *other;
-    fr_Int result;
-    
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    
-    if (obj == NULL) {
-        //fr_unlock(env);
-        return 0;
-    }
-    type = fr_findType(env, "sys", "Str");
-    
-    if (!fr_isInstanceOf(env, obj, type)) {
-        fr_throwNew(env, "sys", "CastErr", "can not compare with Str");
-        //fr_unlock(env);
-        return 0;
-    }
-    
-    other = (struct sys_Str_ *)fr_getPtr(env, obj);
-    result = wcscmp(str->data, other->data);
-    //fr_unlock(env);
-    return result;
-}
-fr_Int sys_Str_compareIgnoreCase_f(fr_Env env, fr_Obj self, fr_Obj s) {
-    return 0;
-}
 fr_Int sys_Str_hash_f(fr_Env env, fr_Obj self) {
     struct sys_Str_ *str;
     fr_Int result;
     //fr_lock(env);
     str = (struct sys_Str_ *)fr_getPtr(env, self);
     result = str->hashCode;
-    //fr_unlock(env);
-    return result;
-}
-fr_Obj sys_Str_toStr_f(fr_Env env, fr_Obj self) {
-    return self;
-}
-fr_Obj sys_Str_toLocale_f(fr_Env env, fr_Obj self) {
-    return self;
-}
-fr_Bool sys_Str_isEmpty_f(fr_Env env, fr_Obj self) {
-    struct sys_Str_ *str;
-    fr_Bool result;
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    result = str->size == 0;
     //fr_unlock(env);
     return result;
 }
@@ -274,30 +186,6 @@ fr_Int sys_Str_size_f(fr_Env env, fr_Obj self) {
 fr_Obj sys_Str_intern_f(fr_Env env, fr_Obj self) {
     //TODO
     return self;
-}
-fr_Bool sys_Str_startsWith_f(fr_Env env, fr_Obj self, fr_Obj s) {
-    struct sys_Str_ *str;
-    struct sys_Str_ *src;
-    
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    src = (struct sys_Str_ *)fr_getPtr(env, s);
-    
-    wchar_t *pos = wcsstr(str->data, src->data);
-    if (pos == NULL) {
-        //fr_unlock(env);
-        return NULL;
-    }
-    
-    if (pos == str->data) {
-        //fr_unlock(env);
-        return true;
-    }
-    //fr_unlock(env);
-    return false;
-}
-fr_Bool sys_Str_endsWith_f(fr_Env env, fr_Obj self, fr_Obj s) {
-    return 0;
 }
 fr_Int sys_Str_find_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
     struct sys_Str_ *str;
@@ -320,45 +208,12 @@ fr_Int sys_Str_find_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
     
     return pos - str->data;
 }
-fr_Obj sys_Str_index_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
-    fr_Int i = sys_Str_find_f(env, self, s, offset);
-    if (i < 0) return NULL;
-    fr_Value val;
-    val.i = i;
-    //val.type = fr_vtInt;
-    
-    //fr_unlock(env);
-    return fr_box(env, &val, fr_vtInt);
-}
+
 //TODO
 fr_Int sys_Str_findr_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
     return -1;
 }
-fr_Obj sys_Str_indexr_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
-    return 0;
-}
-fr_Obj sys_Str_indexIgnoreCase_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
-    return 0;
-}
-fr_Obj sys_Str_indexrIgnoreCase_f(fr_Env env, fr_Obj self, fr_Obj s, fr_Int offset) {
-    return 0;
-}
-fr_Bool sys_Str_contains_f(fr_Env env, fr_Obj self, fr_Obj s) {
-    struct sys_Str_ *str;
-    struct sys_Str_ *src;
-    
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    src = (struct sys_Str_ *)fr_getPtr(env, s);
-    
-    wchar_t *pos = wcsstr(str->data, src->data);
-    
-    //fr_unlock(env);
-    return pos != NULL;
-}
-fr_Bool sys_Str_containsChar_f(fr_Env env, fr_Obj self, fr_Int ch) {
-    return 0;
-}
+
 fr_Int sys_Str_get_f(fr_Env env, fr_Obj self, fr_Int index) {
     struct sys_Str_ *str;
     fr_Int result;
@@ -368,9 +223,7 @@ fr_Int sys_Str_get_f(fr_Env env, fr_Obj self, fr_Int index) {
     //fr_unlock(env);
     return result;
 }
-fr_Int sys_Str_getSafe_f(fr_Env env, fr_Obj self, fr_Int index, fr_Int def) {
-    return 0;
-}
+
 fr_Obj sys_Str_getRange_f(fr_Env env, fr_Obj self, fr_Obj range) {
     return 0;
 }
@@ -380,170 +233,11 @@ fr_Obj sys_Str_plus_f(fr_Env env, fr_Obj self, fr_Obj obj) {
 fr_Obj sys_Str_chars_f(fr_Env env, fr_Obj self) {
     return 0;
 }
-void sys_Str_each_f(fr_Env env, fr_Obj self, fr_Obj c) {
-    return;
-}
-void sys_Str_eachr_f(fr_Env env, fr_Obj self, fr_Obj c) {
-    return;
-}
-fr_Bool sys_Str_any_f(fr_Env env, fr_Obj self, fr_Obj c) {
-    return 0;
-}
-fr_Bool sys_Str_all_f(fr_Env env, fr_Obj self, fr_Obj c) {
-    return 0;
-}
-fr_Obj sys_Str_spaces_f(fr_Env env, fr_Int n) {
-    return 0;
-}
-fr_Obj sys_Str_lower_f(fr_Env env, fr_Obj self) {
-    struct sys_Str_ *str;
-    struct sys_Str_ *nstr;
-    fr_Obj onstr;
-    int i;
-    
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    
-    fr_Type type = fr_findType(env, "sys", "Str");
-    onstr = fr_allocObj(env, type, sizeof(struct sys_Str_));
-    nstr = (struct sys_Str_*)fr_getPtr(env, onstr);
-    
-    nstr->data = (wchar_t*)malloc(sizeof(wchar_t)*(str->size+1));
-    nstr->size = str->size;
-    nstr->hashCode = hash(nstr);
-    nstr->utf8 = NULL;
-    
-    for (i=0; i<str->size; ++i) {
-        nstr->data[i] = towlower(str->data[i]);
-    }
-    
-    //fr_unlock(env);
-    return onstr;
-}
-fr_Obj sys_Str_upper_f(fr_Env env, fr_Obj self) {
-    struct sys_Str_ *str;
-    struct sys_Str_ *nstr;
-    fr_Obj onstr;
-    int i;
-    
-    //fr_lock(env);
-    str = (struct sys_Str_ *)fr_getPtr(env, self);
-    
-    fr_Type type = fr_findType(env, "sys", "Str");
-    onstr = fr_allocObj(env, type, sizeof(struct sys_Str_));
-    nstr = (struct sys_Str_*)fr_getPtr(env, onstr);
-    
-    nstr->data = (wchar_t*)malloc(sizeof(wchar_t)*(str->size+1));
-    nstr->size = str->size;
-    nstr->hashCode = hash(nstr);
-    nstr->utf8 = NULL;
-    
-    for (i=0; i<str->size; ++i) {
-        nstr->data[i] = towupper(str->data[i]);
-    }
-    
-    //fr_unlock(env);
-    return onstr;
-}
-fr_Obj sys_Str_capitalize_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_decapitalize_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_toDisplayName_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_fromDisplayName_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_justl_f(fr_Env env, fr_Obj self, fr_Int width) {
-    return 0;
-}
-fr_Obj sys_Str_justr_f(fr_Env env, fr_Obj self, fr_Int width) {
-    return 0;
-}
-fr_Obj sys_Str_padl_f(fr_Env env, fr_Obj self, fr_Int width, fr_Int char_) {
-    return 0;
-}
-fr_Obj sys_Str_padr_f(fr_Env env, fr_Obj self, fr_Int width, fr_Int char_) {
-    return 0;
-}
-fr_Obj sys_Str_reverse_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_trim_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_trimToNull_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_trimStart_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_trimEnd_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_split_f(fr_Env env, fr_Obj self, fr_Obj separator, fr_Bool trim) {
-    return 0;
-}
-fr_Obj sys_Str_splitLines_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
+
 fr_Obj sys_Str_replace_f(fr_Env env, fr_Obj self, fr_Obj from, fr_Obj to) {
     return 0;
 }
-fr_Int sys_Str_numNewlines_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_isAscii_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_isSpace_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_isUpper_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_isLower_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_isAlpha_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_isAlphaNum_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Int sys_Str_localeCompare_f(fr_Env env, fr_Obj self, fr_Obj s) {
-    return 0;
-}
-fr_Obj sys_Str_localeLower_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_localeUpper_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_localeCapitalize_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Obj sys_Str_localeDecapitalize_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
-fr_Bool sys_Str_toBool_f(fr_Env env, fr_Obj self, fr_Bool checked) {
-    return 0;
-}
-fr_Int sys_Str_toInt_f(fr_Env env, fr_Obj self, fr_Int radix, fr_Bool checked) {
-    return 0;
-}
-fr_Float sys_Str_toFloat_f(fr_Env env, fr_Obj self, fr_Bool checked) {
-    return 0;
-}
-fr_Obj sys_Str_toCode_f(fr_Env env, fr_Obj self, fr_Int quote, fr_Bool escapeUnicode) {
-    return 0;
-}
-fr_Obj sys_Str_toXml_f(fr_Env env, fr_Obj self) {
-    return 0;
-}
+
 //TODO
 fr_Obj sys_Str_format_f(fr_Env env, fr_Obj format, fr_Obj args) {
     return NULL;

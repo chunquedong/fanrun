@@ -26,21 +26,7 @@ fr_Bool sys_Bool_equals_f(fr_Env env, fr_Bool self, fr_Obj obj) {
     //fr_unlock(env);
     return eq;
 }
-fr_Int sys_Bool_hash_f(fr_Env env, fr_Bool self) {
-    return self;
-}
-fr_Obj sys_Bool_toStr_f(fr_Env env, fr_Bool self) {
-    fr_Obj str;
-    if (self) {
-        str = fr_newStrUtf8(env, "true");
-    } else {
-        str = fr_newStrUtf8(env, "false");
-    }
-    return str;
-}
-fr_Obj sys_Bool_toLocale_f(fr_Env env, fr_Bool self) {
-    return sys_Bool_toStr_f(env, self);
-}
+
 fr_Bool sys_Bool_not_f(fr_Env env, fr_Bool self) {
     return !self;
 }
@@ -53,10 +39,7 @@ fr_Bool sys_Bool_or_f(fr_Env env, fr_Bool self, fr_Bool b) {
 fr_Bool sys_Bool_xor_f(fr_Env env, fr_Bool self, fr_Bool b) {
     return self != b;
 }
-fr_Obj sys_Bool_toCode_f(fr_Env env, fr_Bool self) {
-    return sys_Bool_toStr_f(env, self);
-}
-void sys_Bool_static__init(fr_Env env) {
+void sys_Bool_static__init_f(fr_Env env) {
     fr_Value val;
     //val.type = fr_vtBool;
     val.b = false;

@@ -68,6 +68,6 @@ fr_Obj sys_Err_traceToStr_f(fr_Env env, fr_Obj self) {
 fr_Obj sys_Err_toStr_f(fr_Env env, fr_Obj self) {
     return sys_Err_msg_f(env, self);
 }
-void sys_Err_static__init(fr_Env env) {
+void sys_Err_static__init_f(fr_Env env) {
     return;
 }

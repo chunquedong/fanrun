@@ -50,10 +50,6 @@ struct sys_StrBuf_{
     size_t capacity;
 };
 
-struct sys_This_{
-    struct sys_Obj_ super;
-};
-
 struct sys_Void_{
     struct sys_Obj_ super;
 };
@@ -63,13 +59,13 @@ struct sys_ByteArray_{
     char *data;
     size_t size;
 };
-
+/*
 struct sys_IntArray_{
     struct sys_Obj_ super;
     fr_Int *data;
     size_t size;
 };
-
+*/
 struct sys_ObjArray_{
     struct sys_Obj_ super;
     FObj **data;
@@ -79,7 +75,7 @@ struct sys_ObjArray_{
 struct sys_Func_{
     struct sys_Obj_ super;
 };
-
+/*
 struct sys_Type_;
 struct sys_Slot_{
     struct sys_Obj_ super;
@@ -125,7 +121,7 @@ struct sys_Pod_{
     fr_Obj doc;
     fr_Obj log;
 };
-
+*/
 struct sys_Type_{
     struct sys_Obj_ super;
     struct FType* ftype;

@@ -97,6 +97,6 @@ void sys_ObjArray_finalize_f(fr_Env env, fr_Obj self) {
     array->size = 0;
     //fr_unlock(env);
 }
-void sys_ObjArray_static__init(fr_Env env) {
+void sys_ObjArray_static__init_f(fr_Env env) {
     return;
 }

@@ -83,7 +83,7 @@ void sys_ByteArray_finalize_f(fr_Env env, fr_Obj self) {
     
     //fr_unlock(env);
 }
-void sys_ByteArray_static__init(fr_Env env) {
+void sys_ByteArray_static__init_f(fr_Env env) {
     return;
 }
 fr_Obj sys_ByteArray_fill_f(fr_Env env, fr_Obj self, fr_Int byte, fr_Int times) {

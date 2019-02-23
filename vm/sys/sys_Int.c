@@ -54,9 +54,6 @@ fr_Int sys_Int_compare_f(fr_Env env, fr_Int self, fr_Obj obj) {
     //fr_unlock(env);
     return result;
 }
-fr_Int sys_Int_hash_f(fr_Env env, fr_Int self) {
-    return self;
-}
 fr_Int sys_Int_negate_f(fr_Env env, fr_Int self) {
     return -self;
 }
@@ -118,6 +115,7 @@ fr_Int sys_Int_shiftr_f(fr_Env env, fr_Int self, fr_Int b) {
 fr_Int sys_Int_shifta_f(fr_Env env, fr_Int self, fr_Int b) {
     return self >> b;
 }
+/*
 fr_Int sys_Int_abs_f(fr_Env env, fr_Int self) {
     if (self < 0) {
         return -self;
@@ -136,9 +134,11 @@ fr_Int sys_Int_max_f(fr_Env env, fr_Int self, fr_Int that) {
     }
     return that;
 }
+*/
 fr_Int sys_Int_pow_f(fr_Env env, fr_Int self, fr_Int apow) {
     return powl(self, apow);
 }
+/*
 fr_Bool sys_Int_isEven_f(fr_Env env, fr_Int self) {
     return (1 & self) == 0;
 }
@@ -178,6 +178,7 @@ fr_Bool sys_Int_isDigit_f(fr_Env env, fr_Int self, fr_Int radix) {
         return false;
     }
 }
+
 fr_Obj sys_Int_toDigit_f(fr_Env env, fr_Int self, fr_Int radix) {
     return 0;
 }
@@ -198,7 +199,7 @@ fr_Int sys_Int_localeUpper_f(fr_Env env, fr_Int self) {
 }
 fr_Int sys_Int_localeLower_f(fr_Env env, fr_Int self) {
     return 0;
-}
+}*/
 fr_Obj sys_Int_toStr_f(fr_Env env, fr_Int self) {
     char buf[128];
     buf[0] = 0;
@@ -220,33 +221,11 @@ fr_Obj sys_Int_toChar_f(fr_Env env, fr_Int self) {
 fr_Obj sys_Int_toCode_f(fr_Env env, fr_Int self, fr_Int base) {
     return 0;
 }
-fr_Obj sys_Int_toLocale_f(fr_Env env, fr_Int self, fr_Obj pattern) {
-    return 0;
-}
-void sys_Int_times_f(fr_Env env, fr_Int self, fr_Obj c) {
-    fr_Int i;
-    fr_Value val[2];
-    //fr_Value arg;
-    fr_Value ret;
-    
-    //val[0].type = fr_vtHandle;
-    val[0].h = c;
-    //val[1].type = fr_vtInt;
-    
-    for (i=0; i<self; ++i) {
-        val[1].i = i;
-        
-        //fr_push(env, &val);
-        //fr_push(env, &arg);
-        fr_callVirtual(env, "sys", "Int", "call", 1+1, val, &ret);
-        //fr_pop(env, &ret);
-    }
-    return;
-}
+
 void sys_Int_make_f(fr_Env env, fr_Int self) {
     return;
 }
-void sys_Int_static__init(fr_Env env) {
+void sys_Int_static__init_f(fr_Env env) {
     fr_Value val;
     //val.type = fr_vtInt;
     val.i = 0;

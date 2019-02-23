@@ -41,6 +41,7 @@ fr_Bool sys_Float_equals_f(fr_Env env, fr_Float self, fr_Obj obj) {
     //fr_unlock(env);
     return eq;
 }
+/*
 fr_Bool sys_Float_approx_f(fr_Env env, fr_Float self, fr_Float r, fr_Obj tolerance) {
     return 0;
 }
@@ -64,10 +65,11 @@ fr_Int sys_Float_compare_f(fr_Env env, fr_Float self, fr_Obj obj) {
     //fr_unlock(env);
     return result;
 }
+ */
 fr_Bool sys_Float_isNaN_f(fr_Env env, fr_Float self) {
     return isnan(self);
 }
-//TODO
+/*
 fr_Bool sys_Float_isNegZero_f(fr_Env env, fr_Float self) {
     return self == -0.0;
 }
@@ -77,15 +79,18 @@ fr_Float sys_Float_normNegZero_f(fr_Env env, fr_Float self) {
 fr_Int sys_Float_hash_f(fr_Env env, fr_Float self) {
     return *((fr_Int*)(&self));
 }
+*/
 fr_Float sys_Float_negate_f(fr_Env env, fr_Float self) {
     return -self;
 }
+/*
 fr_Float sys_Float_increment_f(fr_Env env, fr_Float self) {
     return ++self;
 }
 fr_Float sys_Float_decrement_f(fr_Env env, fr_Float self) {
     return --self;
 }
+ */
 fr_Float sys_Float_mult_f(fr_Env env, fr_Float self, fr_Float b) {
     return self * b;
 }
@@ -117,6 +122,7 @@ fr_Float sys_Float_minus_f(fr_Env env, fr_Float self, fr_Float b) {
 fr_Float sys_Float_minusInt_f(fr_Env env, fr_Float self, fr_Int b) {
     return self - b;
 }
+/*
 fr_Float sys_Float_abs_f(fr_Env env, fr_Float self) {
     return fabs(self);
 }
@@ -193,6 +199,7 @@ fr_Float sys_Float_toDegrees_f(fr_Env env, fr_Float self) {
 fr_Float sys_Float_toRadians_f(fr_Env env, fr_Float self) {
     return ((self)/180.0*cf_Math_pi);
 }
+*/
 fr_Int sys_Float_bits_f(fr_Env env, fr_Float self) {
     return 0;
 }
@@ -209,17 +216,15 @@ fr_Obj sys_Float_toStr_f(fr_Env env, fr_Float self) {
     
     return str;
 }
+/*
 fr_Obj sys_Float_toCode_f(fr_Env env, fr_Float self) {
     return sys_Float_toStr_f(env, self);
 }
-//TODO
-fr_Obj sys_Float_toLocale_f(fr_Env env, fr_Float self, fr_Obj pattern) {
-    return sys_Float_toStr_f(env, self);
-}
+*/
 void sys_Float_make_f(fr_Env env, fr_Float self) {
     return;
 }
-void sys_Float_static__init(fr_Env env) {
+void sys_Float_static__init_f(fr_Env env) {
     fr_Value val;
     //val.type = fr_vtFloat;
     val.i = 0;
@@ -236,3 +241,4 @@ void sys_Float_static__init(fr_Env env) {
     fr_setStaticField(env, "sys", "Float", "pi", &val);
     return;
 }
+fr_Obj sys_Float_toLocale_f(fr_Env env, fr_Float selfj, fr_Obj pattern){ return 0; }

@@ -12,6 +12,7 @@
 
 extern  "C"  {
 #if 0
+    void sys_register(fr_Fvm vm) {}
     FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) { return 0; }
     char *sys_Str_getUtf8(fr_Env env__, FObj * self__) { return 0; }
     FObj * sys_Type_fromFType(fr_Env env__, FType * ftype) { return 0; }
