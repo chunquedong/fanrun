@@ -70,7 +70,11 @@ enum class FOp {
     FinallyStart    =  54, // ()        starting instruction of a finally block
     FinallyEnd      =  55, // ()        ending instruction of a finally block
     CallSuper       =  56, // (method) call super method
+    LoadFieldLiteral = 57, //  (FOpArg.FieldRef),   //  57
+    LoadMethodLiteral = 58, // (FOpArg.MethodRef)   //  58
 };
+
+extern const char* OpNames[];
 
 enum class FOpArg
 {

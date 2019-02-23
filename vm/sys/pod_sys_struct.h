@@ -74,6 +74,7 @@ struct sys_ObjArray_{
 
 struct sys_Func_{
     struct sys_Obj_ super;
+    fr_Int arity;
 };
 /*
 struct sys_Type_;

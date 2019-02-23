@@ -186,6 +186,12 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
         }
     }
     
+    bool optimize = false;
+    if ((preName == "sys_Func_") || preName == "sys_ByteArray_"
+        || preName == "sys_ObjArray_") {
+        optimize = true;
+    }
+    
     std::string name;
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
@@ -195,25 +201,22 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
             continue;
         }
         
-        if ((method->flags & FFlags::Overload) != 0) {
-            continue;
-        }
-        
         std::string &methodName = pod->names[method->name];
-        if ((type->meta.flags & FFlags::Native) != 0) {
+        if (!optimize && (type->meta.flags & FFlags::Native) != 0 && ((method->flags & FFlags::Native)==0)) {
             if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
                 continue;
             }
         }
         
         name = preName + methodName;
+        if ((method->flags & FFlags::Setter) || (method->flags & FFlags::Overload)) {
+            name += "$";
+            name += std::to_string(method->paramCount);
+        }
+        
         std::string escapeName = name;
         escape(escapeName);
         escapeKeyword(escapeName);
-        
-        if (method->flags & FFlags::Setter) {
-            escapeName += "_";
-        }
         
         //--------------------------------
         //get return type

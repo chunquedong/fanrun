@@ -59,9 +59,9 @@ namespace FFlags {
 struct FConstantas {
     std::vector<int64_t> ints;
     std::vector<double> reals;
-    std::vector<std::string> strings;
+    std::vector<const std::string> strings;
     std::vector<int64_t> durations;
-    std::vector<std::string> uris;
+    std::vector<const std::string> uris;
     
     std::vector<void*> c_strings;
 };
@@ -122,7 +122,7 @@ public:
 private:
     void read(ZipFile &zip);
     
-    void readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &type);
+    void readType(ZipFile &zip, const std::string &name, FTypeMeta &meta, FType &type);
     
 };
 

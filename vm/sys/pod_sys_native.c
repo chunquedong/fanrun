@@ -790,7 +790,7 @@ void sys_StrBuf_capacity(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_StrBuf_capacity_(fr_Env env, void *param, void *ret) {
+void sys_StrBuf_capacity__1(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
     fr_Value value_1;
@@ -803,7 +803,7 @@ void sys_StrBuf_capacity_(fr_Env env, void *param, void *ret) {
     arg_0 = value_0.h;
 
 
-    sys_StrBuf_capacity__f(env, arg_0, arg_1);
+    sys_StrBuf_capacity__1_f(env, arg_0, arg_1);
 }
 
 void sys_StrBuf_get(fr_Env env, void *param, void *ret) {
@@ -1209,6 +1209,250 @@ void sys_Func_checkInCtor(fr_Env env, void *param, void *ret) {
 
 
     sys_Func_checkInCtor_f(env, arg_0, arg_1);
+}
+
+void sys_Func_call__0(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__0_f(env, arg_0);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__1(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__1_f(env, arg_0, arg_1);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__2(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Obj arg_2; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.h;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__2_f(env, arg_0, arg_1, arg_2);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__3(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Obj arg_2; 
+    fr_Value value_3;
+    fr_Obj arg_3; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.h;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.h;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__3_f(env, arg_0, arg_1, arg_2, arg_3);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__4(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Obj arg_2; 
+    fr_Value value_3;
+    fr_Obj arg_3; 
+    fr_Value value_4;
+    fr_Obj arg_4; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_4, 4);
+    arg_4 = value_4.h;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.h;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.h;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__4_f(env, arg_0, arg_1, arg_2, arg_3, arg_4);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__5(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Obj arg_2; 
+    fr_Value value_3;
+    fr_Obj arg_3; 
+    fr_Value value_4;
+    fr_Obj arg_4; 
+    fr_Value value_5;
+    fr_Obj arg_5; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_5, 5);
+    arg_5 = value_5.h;
+
+    fr_getParam(env, param, &value_4, 4);
+    arg_4 = value_4.h;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.h;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.h;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__5_f(env, arg_0, arg_1, arg_2, arg_3, arg_4, arg_5);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__6(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Obj arg_2; 
+    fr_Value value_3;
+    fr_Obj arg_3; 
+    fr_Value value_4;
+    fr_Obj arg_4; 
+    fr_Value value_5;
+    fr_Obj arg_5; 
+    fr_Value value_6;
+    fr_Obj arg_6; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_6, 6);
+    arg_6 = value_6.h;
+
+    fr_getParam(env, param, &value_5, 5);
+    arg_5 = value_5.h;
+
+    fr_getParam(env, param, &value_4, 4);
+    arg_4 = value_4.h;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.h;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.h;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__6_f(env, arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_Func_call__7(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Obj arg_2; 
+    fr_Value value_3;
+    fr_Obj arg_3; 
+    fr_Value value_4;
+    fr_Obj arg_4; 
+    fr_Value value_5;
+    fr_Obj arg_5; 
+    fr_Value value_6;
+    fr_Obj arg_6; 
+    fr_Value value_7;
+    fr_Obj arg_7; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_7, 7);
+    arg_7 = value_7.h;
+
+    fr_getParam(env, param, &value_6, 6);
+    arg_6 = value_6.h;
+
+    fr_getParam(env, param, &value_5, 5);
+    arg_5 = value_5.h;
+
+    fr_getParam(env, param, &value_4, 4);
+    arg_4 = value_4.h;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.h;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.h;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Func_call__7_f(env, arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7);
+    *((fr_Value*)ret) = retValue;
 }
 
 int sys_Err__allocSize__() {return sizeof(struct sys_Err_);}
@@ -1778,6 +2022,62 @@ void sys_ObjArray_realloc(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
+void sys_ObjArray_fill(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Int arg_2; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.i;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_ObjArray_fill_f(env, arg_0, arg_1, arg_2);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_ObjArray_copyFrom(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Int arg_2; 
+    fr_Value value_3;
+    fr_Int arg_3; 
+    fr_Value value_4;
+    fr_Int arg_4; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_4, 4);
+    arg_4 = value_4.i;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.i;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.i;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_ObjArray_copyFrom_f(env, arg_0, arg_1, arg_2, arg_3, arg_4);
+    *((fr_Value*)ret) = retValue;
+}
+
 void sys_ObjArray_finalize(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 
@@ -1787,6 +2087,42 @@ void sys_ObjArray_finalize(fr_Env env, void *param, void *ret) {
 
 
     sys_ObjArray_finalize_f(env, arg_0);
+}
+
+void sys_ObjArray_fromJava(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_ObjArray_fromJava_f(env, arg_0, arg_1);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_ObjArray_toJava(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_ObjArray_toJava_f(env, arg_0, arg_1);
+    *((fr_Value*)ret) = retValue;
 }
 
 int sys_ByteArray__allocSize__() {return sizeof(struct sys_ByteArray_);}
@@ -1874,6 +2210,62 @@ void sys_ByteArray_realloc(fr_Env env, void *param, void *ret) {
 
 
     retValue.h = sys_ByteArray_realloc_f(env, arg_0, arg_1);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_ByteArray_fill(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Int arg_1; 
+    fr_Value value_2;
+    fr_Int arg_2; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.i;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.i;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_ByteArray_fill_f(env, arg_0, arg_1, arg_2);
+    *((fr_Value*)ret) = retValue;
+}
+
+void sys_ByteArray_copyFrom(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value value_1;
+    fr_Obj arg_1; 
+    fr_Value value_2;
+    fr_Int arg_2; 
+    fr_Value value_3;
+    fr_Int arg_3; 
+    fr_Value value_4;
+    fr_Int arg_4; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_4, 4);
+    arg_4 = value_4.i;
+
+    fr_getParam(env, param, &value_3, 3);
+    arg_3 = value_3.i;
+
+    fr_getParam(env, param, &value_2, 2);
+    arg_2 = value_2.i;
+
+    fr_getParam(env, param, &value_1, 1);
+    arg_1 = value_1.h;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_ByteArray_copyFrom_f(env, arg_0, arg_1, arg_2, arg_3, arg_4);
     *((fr_Value*)ret) = retValue;
 }
 

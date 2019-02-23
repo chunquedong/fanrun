@@ -120,7 +120,7 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadUri: {
-            std::string &i = curPod->constantas.uris[opObj.i1];
+            const std::string &i = curPod->constantas.uris[opObj.i1];
             printer.printf("\"%s\"", i.c_str());
             break;
         }

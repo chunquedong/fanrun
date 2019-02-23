@@ -25,7 +25,7 @@ fr_Int sys_StrBuf_capacity_f(fr_Env env, fr_Obj self) {
     str = (struct sys_StrBuf_ *)fr_getPtr(env, self);
     return str->capacity;
 }
-void sys_StrBuf_capacity__f(fr_Env env, fr_Obj self, fr_Int it) {
+void sys_StrBuf_capacity__1_f(fr_Env env, fr_Obj self, fr_Int it) {
     return;
 }
 fr_Int sys_StrBuf_get_f(fr_Env env, fr_Obj self, fr_Int index) {

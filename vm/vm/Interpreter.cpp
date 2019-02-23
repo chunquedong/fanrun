@@ -12,65 +12,6 @@
 
 #define F_STR_BUF_SIZE 256
 
-const char* OpNames[] =
-{
-    "Nop",                //   0
-    "LoadNull",           //   1
-    "LoadFalse",          //   2
-    "LoadTrue",           //   3
-    "LoadInt",            //   4
-    "LoadFloat",          //   5
-    "LoadDecimal",        //   6
-    "LoadStr",            //   7
-    "LoadDuration",       //   8
-    "LoadType",           //   9
-    "LoadUri",            //  10
-    "LoadVar",            //  11
-    "StoreVar",           //  12
-    "LoadInstance",       //  13
-    "StoreInstance",      //  14
-    "LoadStatic",         //  15
-    "StoreStatic",        //  16
-    "LoadMixinStatic",    //  17
-    "StoreMixinStatic",   //  18
-    "CallNew",            //  19
-    "CallCtor",           //  20
-    "CallStatic",         //  21
-    "CallVirtual",        //  22
-    "CallNonVirtual",     //  23
-    "CallMixinStatic",    //  24
-    "CallMixinVirtual",   //  25
-    "CallMixinNonVirtual",  //  26
-    "Jump",               //  27
-    "JumpTrue",           //  28
-    "JumpFalse",          //  29
-    "CompareEQ",          //  30
-    "CompareNE",          //  31
-    "Compare",            //  32
-    "CompareLE",          //  33
-    "CompareLT",          //  34
-    "CompareGT",          //  35
-    "CompareGE",          //  36
-    "CompareSame",        //  37
-    "CompareNotSame",     //  38
-    "CompareNull",        //  39
-    "CompareNotNull",     //  40
-    "Return",             //  41
-    "Pop",                //  42
-    "Dup",                //  43
-    "Is",                 //  44
-    "As",                 //  45
-    "Coerce",             //  46
-    "Switch",             //  47
-    "Throw",              //  48
-    "Leave",              //  49
-    "JumpFinally",        //  50
-    "CatchAllStart",      //  51
-    "CatchErrStart",      //  52
-    "CatchEnd",           //  53
-    "FinallyStart",       //  54
-    "FinallyEnd",         //  55
-};
 
 struct InterStackFrame : public StackFrame {
     friend Interpreter;
@@ -650,7 +591,12 @@ bool Interpreter::exeStep() {
             
         case FOp::FinallyEnd:
             break;
-            
+        case FOp::LoadFieldLiteral:
+            //TODO
+            break;
+        case FOp::LoadMethodLiteral:
+            //TODO
+            break;
         default:
             break;
     }

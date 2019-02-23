@@ -31,7 +31,12 @@ void PodManager::loadNativeMethod(FMethod *method) {
         && ((method->flags & FFlags::Native) || (method->c_parent->meta.flags & FFlags::Native))) {
         std::string fullName = pod->name + "_" + type->c_name + "_"+methodName;
         method->c_native = (FNativeFunc)nativeFuncMap[fullName];
-        if (method->c_native == nullptr) {
+        if (method->c_native == NULL) {
+            fullName += std::to_string(method->paramCount);
+            method->c_native = (FNativeFunc)nativeFuncMap[fullName];
+        }
+        
+        if (method->c_native == NULL && method->code.isEmpty()) {
             printf("ERROR: not found native func %s\n", fullName.c_str());
         }
     }
@@ -268,6 +273,10 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
         FPod *pod = type->c_pod;
         std::string name = pod->name +"_"+ type->c_name + "__allocSize__";
         int (*func)() = (int (*)())nativeFuncMap[name];
+        if (func == NULL) {
+            printf("ERROR:not found native method: %s\n", name.c_str());
+            abort();
+        }
         size = func();
         if (size > type->c_allocSize) {
             type->c_allocSize = size;

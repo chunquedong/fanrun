@@ -888,7 +888,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 block->stmts.push_back(stmt);
             }
                 break;
-                
+            case FOp::LoadFieldLiteral: {
+                //TODO
+            }
+                break;
+            case FOp::LoadMethodLiteral: {
+                //TODO
+            }
+                break;
             default:
                 printf("ERROR: unkonw opcode\n");
                 break;

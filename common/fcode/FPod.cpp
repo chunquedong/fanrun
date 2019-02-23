@@ -269,7 +269,7 @@ void FPod::read(ZipFile &zip) {
     }
 }
 
-void FPod::readType(ZipFile &zip, std::string &name, FTypeMeta &meta, FType &type) {
+void FPod::readType(ZipFile &zip, const std::string &name, FTypeMeta &meta, FType &type) {
     ssize_t bufSize;
     std::string path = ("fcode/");
     //if (isSpecial) {
