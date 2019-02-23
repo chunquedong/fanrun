@@ -38,7 +38,7 @@ fr_Obj sys_Obj_trap_f(fr_Env env, fr_Obj self, fr_Obj name, fr_Obj args) {
     
     const char *sname = fr_getStrUtf8(env, name, nullptr);
     fr_Value ret;
-    fr_callVirtualOnObj(env, sname, 1+0, &val, &ret);
+    fr_callOnObj(env, sname, 1+0, &val, &ret);
     //TODO
     return 0;
 }
@@ -51,7 +51,7 @@ fr_Obj sys_Obj_toImmutable_f(fr_Env env, fr_Obj self) {
 }
 fr_Obj sys_Obj_typeof_f(fr_Env env, fr_Obj self) {
     fr_Type ftype = fr_getObjType(env, self);
-    fr_Obj obj = fr_getTypeObj(env, ftype);
+    fr_Obj obj = fr_toTypeObj(env, ftype);
     return obj;
 }
 void sys_Obj_finalize_f(fr_Env env, fr_Obj self) {

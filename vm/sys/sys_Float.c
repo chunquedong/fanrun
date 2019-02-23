@@ -29,7 +29,7 @@ fr_Bool sys_Float_equals_f(fr_Env env, fr_Float self, fr_Obj obj) {
     if (obj == NULL) {
         return false;
     }
-    type = fr_getSysType(env, fr_vtFloat);
+    type = fr_toType(env, fr_vtFloat);
     
     if (!fr_isInstanceOf(env, obj, type)) {
         return false;
@@ -52,7 +52,7 @@ fr_Int sys_Float_compare_f(fr_Env env, fr_Float self, fr_Obj obj) {
     if (obj == NULL) {
         return 0;
     }
-    type = fr_getSysType(env, fr_vtFloat);
+    type = fr_toType(env, fr_vtFloat);
     
     if (!fr_isInstanceOf(env, obj, type)) {
         fr_throwNew(env, "sys", "CastErr", "can not compare with float");
@@ -228,17 +228,17 @@ void sys_Float_static__init_f(fr_Env env) {
     fr_Value val;
     //val.type = fr_vtFloat;
     val.i = 0;
-    fr_setStaticField(env, "sys", "Float", "defVal", &val);
+    fr_setStaticFieldS(env, "sys", "Float", "defVal", &val);
     val.i = INFINITY;
-    fr_setStaticField(env, "sys", "Float", "posInf", &val);
+    fr_setStaticFieldS(env, "sys", "Float", "posInf", &val);
     val.i = -INFINITY;
-    fr_setStaticField(env, "sys", "Float", "negInf", &val);
+    fr_setStaticFieldS(env, "sys", "Float", "negInf", &val);
     val.i = NAN;
-    fr_setStaticField(env, "sys", "Float", "nan", &val);
+    fr_setStaticFieldS(env, "sys", "Float", "nan", &val);
     val.i = 2.71828182845904523536;
-    fr_setStaticField(env, "sys", "Float", "e", &val);
+    fr_setStaticFieldS(env, "sys", "Float", "e", &val);
     val.i = cf_Math_pi;
-    fr_setStaticField(env, "sys", "Float", "pi", &val);
+    fr_setStaticFieldS(env, "sys", "Float", "pi", &val);
     return;
 }
 fr_Obj sys_Float_toLocale_f(fr_Env env, fr_Float selfj, fr_Obj pattern){ return 0; }

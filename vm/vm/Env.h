@@ -97,7 +97,7 @@ public:
     ////////////////////////////
     
     FType * findType(std::string pod, std::string type);
-    FType * getSysType(fr_ValueType vt);
+    FType * toType(fr_ValueType vt);
     FType * getInstanceType(fr_TagValue *obj);
     bool fitType(FType * a, FType * b);
     

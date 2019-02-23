@@ -118,7 +118,7 @@ void fr_yieldGc(fr_Env self);
  * allow gc to run in backgroud.
  * must only insert at before of IO blocking.
  */
-void fr_currentGc(fr_Env self);
+void fr_allowGc(fr_Env self);
 
 /**
  * fatch pointer from handle
@@ -153,14 +153,14 @@ fr_Obj fr_allocObj(fr_Env self, fr_Type type, int size);
 ////////////////////////////
 
 fr_Type fr_findType(fr_Env self, const char *pod, const char *type);
-fr_Type fr_getSysType(fr_Env self, fr_ValueType vt);
+fr_Type fr_toType(fr_Env self, fr_ValueType vt);
 
 bool fr_fitType(fr_Env self, fr_Type a, fr_Type b);
 fr_Type fr_getInstanceType(fr_Env self, fr_Value *obj, fr_ValueType vtype);
 fr_Type fr_getObjType(fr_Env self, fr_Obj obj);
 bool fr_isInstanceOf(fr_Env self, fr_Obj obj, fr_Type type);
 
-fr_Obj fr_getTypeObj(fr_Env self, fr_Type type);
+fr_Obj fr_toTypeObj(fr_Env self, fr_Type type);
 
 ////////////////////////////
 // Method
@@ -169,26 +169,21 @@ fr_Obj fr_getTypeObj(fr_Env self, fr_Type type);
 fr_Method fr_findMethod(fr_Env self, fr_Type type, const char *name);
 fr_Method fr_findMethodN(fr_Env self, fr_Type type, const char *name, int paramCount);
 
-void fr_callMethod(fr_Env self, fr_Method method, fr_Value *arg, int argCount, fr_Value *ret);
+void fr_callMethod(fr_Env self, fr_Method method, int argCount, fr_Value *arg, fr_Value *ret);
 
-void fr_callNonVirtualM(fr_Env self, fr_Method method
+void fr_callNonVirtual(fr_Env self, fr_Method method
                        , int argCount, fr_Value *arg, fr_Value *ret);
-void fr_newObjM(fr_Env self, fr_Type type, fr_Method method
-               , int argCount, fr_Value *arg, fr_Value *ret);
-void fr_callVirtualM(fr_Env self, fr_Method method
-                    , int argCount, fr_Value *arg, fr_Value *ret);
-
-void fr_newObj(fr_Env self, const char *pod, const char *type, const char *name
+void fr_newObj(fr_Env self, fr_Type type, fr_Method method
                , int argCount, fr_Value *arg, fr_Value *ret);
 
-void fr_callVirtual(fr_Env self, const char *pod, const char *type, const char *name
+void fr_newObjS(fr_Env self, const char *pod, const char *type, const char *name
+               , int argCount, fr_Value *arg, fr_Value *ret);
+
+void fr_callMethodS(fr_Env self, const char *pod, const char *type, const char *name
                           , int argCount, fr_Value *arg, fr_Value *ret);
 
-void fr_callVirtualOnObj(fr_Env self, const char *name
+void fr_callOnObj(fr_Env self, const char *name
                     , int argCount, fr_Value *arg, fr_Value *ret);
-
-void fr_callNonVirtual(fr_Env self, const char *pod, const char *type, const char *name
-             , int argCount, fr_Value *arg, fr_Value *ret);
 
 ////////////////////////////
 // Field
@@ -196,26 +191,25 @@ void fr_callNonVirtual(fr_Env self, const char *pod, const char *type, const cha
 
 fr_Field fr_findField(fr_Env self, fr_Type type, const char *name);
 
-void fr_setStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *val);
-bool fr_getStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *val);
-void fr_setInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val);
-bool fr_getInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val);
+void fr_setStaticField(fr_Env self, fr_Type type, fr_Field field, fr_Value *val);
+bool fr_getStaticField(fr_Env self, fr_Type type, fr_Field field, fr_Value *val);
+void fr_setInstanceField(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val);
+bool fr_getInstanceField(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val);
 
-void fr_setStaticField(fr_Env self, const char *pod, const char *type, const char *name, fr_Value *val);
-bool fr_getStaticField(fr_Env self, const char *pod, const char *type, const char *name, fr_Value *val);
-
-void fr_setField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val);
-bool fr_getField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val);
+void fr_setStaticFieldS(fr_Env self, const char *pod, const char *type, const char *name, fr_Value *val);
+bool fr_getStaticFieldS(fr_Env self, const char *pod, const char *type, const char *name, fr_Value *val);
+void fr_setFieldS(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val);
+bool fr_getFieldS(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val);
 
 /////////////////////////////////////////////////////////////////////////////////
 // exception
 ////////////////////////////////////////////////////////////////////
 
-fr_Obj fr_getError(fr_Env self);
+fr_Obj fr_getErr(fr_Env self);
 
-bool fr_errorOccurred(fr_Env self);
+bool fr_errOccurred(fr_Env self);
 
-void fr_printError(fr_Env self, fr_Obj err);
+void fr_printErr(fr_Env self, fr_Obj err);
 
 void fr_throw(fr_Env self, fr_Obj err);
 
@@ -225,7 +219,7 @@ void fr_throwUnsupported(fr_Env self);
 
 void fr_throwNew(fr_Env self, const char *pod, const char *type, const char *msg);
 
-void fr_clearError(fr_Env self);
+void fr_clearErr(fr_Env self);
 
 ////////////////////////////////////////////////////////////////////
 // box

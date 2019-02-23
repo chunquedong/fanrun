@@ -14,7 +14,7 @@ fr_Bool sys_Bool_equals_f(fr_Env env, fr_Bool self, fr_Obj obj) {
     if (obj == NULL) {
         return false;
     }
-    type = fr_getSysType(env, fr_vtBool);
+    type = fr_toType(env, fr_vtBool);
     
     if (!fr_isInstanceOf(env, obj, type)) {
         return false;
@@ -43,6 +43,6 @@ void sys_Bool_static__init_f(fr_Env env) {
     fr_Value val;
     //val.type = fr_vtBool;
     val.b = false;
-    fr_setStaticField(env, "sys", "Bool", "defVal", &val);
+    fr_setStaticFieldS(env, "sys", "Bool", "defVal", &val);
     return;
 }

@@ -50,7 +50,7 @@ static int funcArity(fr_Env env, fr_Obj self) {
         fr_Method m = fr_findMethod(env, t, "arity");
         fr_Value args[2];
         args[0].h = self;
-        fr_callVirtualM(env, m, 0, &args[0], &args[1]);
+        fr_callMethod(env, m, 0, &args[0], &args[1]);
         p->arity = args[1].i;
     }
     return (int)p->arity;

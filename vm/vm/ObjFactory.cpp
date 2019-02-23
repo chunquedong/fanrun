@@ -74,7 +74,7 @@ CF_END
 #ifdef FR_DUMMY_BOX
 FObj * sys_Int_box__(fr_Env self, fr_Int i, int addRef) {
     Env *e = (Env*)self;
-    FType *type = e->getSysType(fr_vtInt);
+    FType *type = e->toType(fr_vtInt);
     int size = sizeof(fr_ObjHeader) + sizeof(fr_Int);
     
     FObj * obj = e->allocObj(type, addRef, size);
@@ -92,7 +92,7 @@ fr_Int sys_Int_unbox__(fr_Env self, FObj * i) {
 
 FObj * sys_Float_box__(fr_Env self, fr_Float i, int addRef) {
     Env *e = (Env*)self;
-    FType *type = e->getSysType(fr_vtFloat);
+    FType *type = e->toType(fr_vtFloat);
     int size = sizeof(fr_ObjHeader) + sizeof(fr_Float);
     
     FObj * obj = e->allocObj(type, addRef, size);
@@ -110,7 +110,7 @@ fr_Float sys_Float_unbox__(fr_Env self, FObj * i) {
 
 FObj * sys_Bool_box__(fr_Env self, fr_Bool i, int addRef) {
     Env *e = (Env*)self;
-    FType *type = e->getSysType(fr_vtBool);
+    FType *type = e->toType(fr_vtBool);
     int size = sizeof( fr_ObjHeader) + sizeof(fr_Bool);
     
     FObj * obj = e->allocObj(type, addRef, size);

@@ -95,9 +95,9 @@ void fr_yieldGc(fr_Env self) {
     Env *e = (Env*)self;
     e->checkSafePoint();
 }
-void fr_currentGc(fr_Env self) {
+void fr_allowGc(fr_Env self) {
 //    Env *e = (Env*)self;
-    //TODO current GC
+    //TODO fr_allowGc GC
 }
 
 fr_Obj fr_newLocalRef(fr_Env self, fr_Obj obj) {
@@ -174,10 +174,10 @@ fr_Type fr_findType(fr_Env self, const char *pod, const char *type) {
     //return fr_getTypeObj(self, t);
     return t;
 }
-fr_Type fr_getSysType(fr_Env self, fr_ValueType vt) {
+fr_Type fr_toType(fr_Env self, fr_ValueType vt) {
     Env *e = (Env*)self;
     //e->lock();
-    FType *t = e->getSysType(vt);
+    FType *t = e->toType(vt);
     //e->unlock();
     //return fr_getTypeObj(self, t);
     return t;
@@ -227,7 +227,7 @@ bool fr_isInstanceOf(fr_Env self, fr_Obj obj, fr_Type type) {
     return rc;
 }
 
-fr_Obj fr_getTypeObj(fr_Env self, fr_Type type) {
+fr_Obj fr_toTypeObj(fr_Env self, fr_Type type) {
     Env *e = (Env*)self;
     //e->lock();
     FObj *obj = e->podManager->getWrappedType(e, (FType *)type);
@@ -303,16 +303,22 @@ static void popRet(Env *context, FMethod *method, fr_Value *ret) {
     //context->unlock();
 }
 
-void fr_callMethod(fr_Env self, fr_Method method, fr_Value *arg, int argCount, fr_Value *ret) {
+void fr_callMethod(fr_Env self, fr_Method method, int argCount, fr_Value *arg, fr_Value *ret) {
     //TODO
     Env *e = (Env*)self;
-    argCount = pushArg(self, method, argCount, arg);
-    e->callNonVirtual((FMethod*)method, argCount);
+    int paramCount = pushArg(self, method, argCount, arg);
     
+    FMethod *f = (FMethod*)method;
+    if (f->flags & FFlags::Virtual || f->flags & FFlags::Abstract) {
+        e->callVirtual(f, paramCount);
+    }
+    else {
+        e->callNonVirtual(f, paramCount);
+    }
     popRet(e, (FMethod*)method, ret);
 }
 
-void fr_callNonVirtualM(fr_Env self, fr_Method method
+void fr_callNonVirtual(fr_Env self, fr_Method method
                        , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
     argCount = pushArg(self, method, argCount, arg);
@@ -320,7 +326,7 @@ void fr_callNonVirtualM(fr_Env self, fr_Method method
     
     popRet(e, (FMethod*)method, ret);
 }
-void fr_newObjM(fr_Env self, fr_Type type, fr_Method method
+void fr_newObj(fr_Env self, fr_Type type, fr_Method method
                , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
     argCount = pushArg(self, method, argCount, arg);
@@ -328,16 +334,8 @@ void fr_newObjM(fr_Env self, fr_Type type, fr_Method method
     
     popRet(e, (FMethod*)method, ret);
 }
-void fr_callVirtualM(fr_Env self, fr_Method method
-                    , int argCount, fr_Value *arg, fr_Value *ret) {
-    Env *e = (Env*)self;
-    argCount = pushArg(self, method, argCount, arg);
-    e->callVirtual((FMethod*)method, argCount);
-    
-    popRet(e, (FMethod*)method, ret);
-}
 
-void fr_newObj(fr_Env self, const char *pod, const char *type, const char *name
+void fr_newObjS(fr_Env self, const char *pod, const char *type, const char *name
                      , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
     fr_Method method = (fr_Method)e->podManager->findMethod(e, pod, type, name, argCount);
@@ -348,7 +346,7 @@ void fr_newObj(fr_Env self, const char *pod, const char *type, const char *name
     popRet(e, (FMethod*)method, ret);
 }
 
-void fr_callVirtualOnObj(fr_Env self, const char *name
+void fr_callOnObj(fr_Env self, const char *name
                          , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
     FObj *obj = fr_getPtr(self, arg[0].h);
@@ -361,26 +359,14 @@ void fr_callVirtualOnObj(fr_Env self, const char *name
     FType *type = e->podManager->getInstanceType(e, entry);
     method = e->podManager->findVirtualMethod(e, type, name, paramCount);
     
-    pushArg(self, method, argCount, arg);
-    
-    e->callNonVirtual((FMethod*)method, paramCount);
-    popRet(e, (FMethod*)method, ret);
+    fr_callMethod(self, method, argCount, arg, ret);
 }
 
-void fr_callVirtual(fr_Env self, const char *pod, const char *type, const char *name
-                          , int argCount, fr_Value *arg, fr_Value *ret) {
-    Env *e = (Env*)self;
-    FType *ftype = e->findType(pod, type);
-    FMethod *method = e->podManager->findVirtualMethod(e, ftype, name, -1);
-    
-    fr_callVirtualM(self, method, argCount, arg, ret);
-}
-
-void fr_callNonVirtual(fr_Env self, const char *pod, const char *type, const char *name
+void fr_callMethodS(fr_Env self, const char *pod, const char *type, const char *name
                         , int argCount, fr_Value *arg, fr_Value *ret) {
     Env *e = (Env*)self;
     fr_Method m = (fr_Method)e->podManager->findMethod(e, pod, type, name, -1);
-    fr_callNonVirtualM(self, m, argCount, arg, ret);
+    fr_callMethod(self, m, argCount, arg, ret);
 }
 
 ////////////////////////////
@@ -392,7 +378,7 @@ fr_Field fr_findField(fr_Env self, fr_Type type, const char *name) {
     return (fr_Field)e->podManager->findFieldInType(e, (FType*)type, name);
 }
 
-void fr_setStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *arg) {
+void fr_setStaticField(fr_Env self, fr_Type type, fr_Field field, fr_Value *arg) {
     Env *e = (Env*)self;
     //e->lock();
     fr_Value val;
@@ -405,7 +391,7 @@ void fr_setStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *arg
     e->setStaticField((FField*)field, &val);
     //e->unlock();
 }
-bool fr_getStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *val) {
+bool fr_getStaticField(fr_Env self, fr_Type type, fr_Field field, fr_Value *val) {
     Env *e = (Env*)self;
     //e->lock();
     FField *ffield = (FField*)field;
@@ -417,7 +403,7 @@ bool fr_getStaticFieldF(fr_Env self, fr_Type type, fr_Field field, fr_Value *val
     //e->unlock();
     return rc;
 }
-void fr_setInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *arg) {
+void fr_setInstanceField(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *arg) {
     Env *e = (Env*)self;
     //e->lock();
     fr_Value val;
@@ -430,7 +416,7 @@ void fr_setInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Valu
     e->setInstanceField(*bottom, (FField *)field, &val);
     //e->unlock();
 }
-bool fr_getInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val) {
+bool fr_getInstanceField(fr_Env self, fr_Value *bottom, fr_Field field, fr_Value *val) {
     Env *e = (Env*)self;
     //e->lock();
     FField *ffield = (FField*)field;
@@ -444,30 +430,30 @@ bool fr_getInstanceFieldF(fr_Env self, fr_Value *bottom, fr_Field field, fr_Valu
 }
 
 
-void fr_setStaticField(fr_Env self, const char *pod, const char *typeName, const char *name, fr_Value *val) {
+void fr_setStaticFieldS(fr_Env self, const char *pod, const char *typeName, const char *name, fr_Value *val) {
     //Env *e = (Env*)self;
     fr_Type type = fr_findType(self, pod, typeName);
     fr_Field field = fr_findField(self, type, name);
-    fr_setStaticFieldF(self, type, field, val);
+    fr_setStaticField(self, type, field, val);
 }
-bool fr_getStaticField(fr_Env self, const char *pod, const char *typeName, const char *name, fr_Value *val) {
+bool fr_getStaticFieldS(fr_Env self, const char *pod, const char *typeName, const char *name, fr_Value *val) {
     //Env *e = (Env*)self;
     fr_Type type = fr_findType(self, pod, typeName);
     fr_Field field = fr_findField(self, type, name);
-    bool rc = fr_getStaticFieldF(self, type, field, val);
+    bool rc = fr_getStaticField(self, type, field, val);
     return rc;
 }
-void fr_setField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val) {
+void fr_setFieldS(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val) {
     //Env *e = (Env*)self;
     fr_Type type = fr_getObjType(self, bottom->h);;
     fr_Field field = fr_findField(self, type, name);
-    fr_setInstanceFieldF(self, bottom, field, val);
+    fr_setInstanceField(self, bottom, field, val);
 }
-bool fr_getField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val) {
+bool fr_getFieldS(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val) {
     //Env *e = (Env*)self;
     fr_Type type = fr_getObjType(self, bottom->h);
     fr_Field field = fr_findField(self, type, name);
-    int rc = fr_getInstanceFieldF(self, bottom, field, val);
+    int rc = fr_getInstanceField(self, bottom, field, val);
     return rc;
 }
 
@@ -475,7 +461,7 @@ bool fr_getField(fr_Env self, fr_Value *bottom, const char *name, fr_Value *val)
 // exception
 ////////////////////////////
 
-fr_Obj fr_getError(fr_Env self) {
+fr_Obj fr_getErr(fr_Env self) {
     Env *e = (Env*)self;
     //e->lock();
     FObj *obj = e->getError();
@@ -484,7 +470,7 @@ fr_Obj fr_getError(fr_Env self) {
     return objRef;
 }
 
-bool fr_errorOccurred(fr_Env self) {
+bool fr_errOccurred(fr_Env self) {
     Env *e = (Env*)self;
     bool oc;
     //e->lock();
@@ -493,7 +479,7 @@ bool fr_errorOccurred(fr_Env self) {
     return oc;
 }
 
-void fr_printError(fr_Env self, fr_Obj err) {
+void fr_printErr(fr_Env self, fr_Obj err) {
     Env *e = (Env*)self;
     e->printError(fr_getPtr(self, err));
 }
@@ -505,7 +491,7 @@ void fr_throw(fr_Env self, fr_Obj err) {
     //fr_unlock(self);
 }
 
-void fr_clearError(fr_Env self) {
+void fr_clearErr(fr_Env self) {
     Env *e = (Env*)self;
     //fr_lock(self);
     e->clearError();
@@ -601,7 +587,7 @@ fr_Obj fr_handleToStr(fr_Env env, fr_Obj x) {
     
     fr_Method method = fr_findMethod(env, type, "toStr");
     
-    fr_callVirtualM(env, method, 1, &val, &rVal);
+    fr_callMethod(env, method, 1, &val, &rVal);
     
     str = rVal.h;
     return str;

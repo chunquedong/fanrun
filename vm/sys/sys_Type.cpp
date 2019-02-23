@@ -158,7 +158,7 @@ fr_Obj sys_Type_methods_f(fr_Env env, fr_Obj self) {
 
             list[1] = met;
             
-            fr_callVirtualM(env, fmethod, 1+1, list, NULL);
+            fr_callMethod(env, fmethod, 1+1, list, NULL);
             
             if (fr_errorOccurred(env)) {
                 return NULL;

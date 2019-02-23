@@ -22,7 +22,7 @@ fr_Bool sys_Int_equals_f(fr_Env env, fr_Int self, fr_Obj obj) {
     if (obj == NULL) {
         return false;
     }
-    type = fr_getSysType(env, fr_vtInt);
+    type = fr_toType(env, fr_vtInt);
     
     if (!fr_isInstanceOf(env, obj, type)) {
         return false;
@@ -41,7 +41,7 @@ fr_Int sys_Int_compare_f(fr_Env env, fr_Int self, fr_Obj obj) {
     if (obj == NULL) {
         return 0;
     }
-    type = fr_getSysType(env, fr_vtInt);
+    type = fr_toType(env, fr_vtInt);
     
     if (!fr_isInstanceOf(env, obj, type)) {
         fr_throwNew(env, "sys", "CastErr", "can not compare with int");
@@ -229,10 +229,10 @@ void sys_Int_static__init_f(fr_Env env) {
     fr_Value val;
     //val.type = fr_vtInt;
     val.i = 0;
-    fr_setStaticField(env, "sys", "Int", "defVal", &val);
+    fr_setStaticFieldS(env, "sys", "Int", "defVal", &val);
     val.i = INT64_MAX;
-    fr_setStaticField(env, "sys", "Int", "maxVal", &val);
+    fr_setStaticFieldS(env, "sys", "Int", "maxVal", &val);
     val.i = INT64_MIN;
-    fr_setStaticField(env, "sys", "Int", "minVal", &val);
+    fr_setStaticFieldS(env, "sys", "Int", "minVal", &val);
     return;
 }

@@ -287,7 +287,7 @@ FType * Env::findType(std::string pod, std::string type) {
     return ftype;
 }
 
-FType * Env::getSysType(fr_ValueType vt) {
+FType * Env::toType(fr_ValueType vt) {
     FType *ftype = podManager->getSysType(this, vt);
     return ftype;
 }
@@ -434,6 +434,7 @@ void Env::callVirtual(FMethod * method, int paramCount) {
     method = podManager->toVirtualMethod(this, type, method);
     call(method, paramCount);
 }
+
 void Env::callVirtualByName(const char *name, int paramCount) {
     FMethod *method = nullptr;
     fr_TagValue *entry = peek(-paramCount-1);
@@ -442,6 +443,7 @@ void Env::callVirtualByName(const char *name, int paramCount) {
     
     call(method, paramCount);
 }
+
 void Env::newObjByName(const char * pod, const char * type, const char * name, int paramCount) {
     FMethod *method = nullptr;
     method = podManager->findMethod(this, pod, type, name, paramCount);
