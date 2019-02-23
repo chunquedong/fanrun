@@ -16,75 +16,6 @@ static fr_Int hash(struct sys_Str_ *str) {
     return hashValue;
 }
 
-size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal) {
-    if (n == 0)
-        return 0;
-    
-    char *s = (char *)str;
-    size_t i = 0;
-    wchar_t uc = 0;
-    int r_illegal_all = 0, r_illegal;
-    
-    while ((uc = getu8c(&s, &r_illegal)))
-    {
-        if (i < (n - 1))
-        {
-            des[i++] = uc;
-            r_illegal_all += r_illegal;
-        }
-        else
-        {
-            break;
-        }
-    }
-    
-    des[i] = 0;
-    if (illegal)
-    {
-        *illegal = r_illegal_all + r_illegal;
-    }
-    
-    return i;
-}
-
-size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
-{
-    if (n == 0)
-        return 0;
-    
-    char *s = des;
-    size_t left = n;
-    size_t len = 0;
-    int r_illegal = 0;
-    
-    *s = 0;
-    while (*us)
-    {
-        int ret = putu8c(*us, &s, &left);
-        if (ret > 0)
-        {
-            len += ret;
-        }
-        else if (ret == -1)
-        {
-            r_illegal += 1;
-        }
-        else
-        {
-            break;
-        }
-        
-        ++us;
-    }
-    
-    if (illegal)
-    {
-        *illegal = r_illegal;
-    }
-    
-    return len;
-}
-
 //////////////////////////////////////////////////////////
 
 FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) {
@@ -114,7 +45,7 @@ FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) {
     return (FObj*)(str);
 }
 
-FObj * sys_Str_fromUnicode(fr_Env env__, const wchar_t *data, size_t size) {
+FObj * sys_Str_fromUnicode(fr_Env env__, const wchar_t *data, size_t size, bool copy) {
     struct sys_Str_* str;
     FObj *obj;
 

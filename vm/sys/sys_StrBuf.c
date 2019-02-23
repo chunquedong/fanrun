@@ -90,12 +90,12 @@ fr_Obj sys_StrBuf_clear_f(fr_Env env, fr_Obj self) {
     return self;
 }
 
-FObj * sys_Str_fromUnicode(fr_Env env__, const wchar_t *data, size_t size);
+FObj * sys_Str_fromUnicode(fr_Env env__, const wchar_t *data, size_t size, bool copy);
 
 fr_Obj sys_StrBuf_toStr_f(fr_Env env, fr_Obj self) {
     struct sys_StrBuf_ *strbuf;
     strbuf = (struct sys_StrBuf_ *)fr_getPtr(env, self);
-    FObj * str = sys_Str_fromUnicode(env, strbuf->data, strbuf->size);
+    FObj * str = sys_Str_fromUnicode(env, strbuf->data, strbuf->size, true);
     return fr_toHandle(env,str);
 }
 

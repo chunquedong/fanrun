@@ -74,13 +74,13 @@ void fr_yieldGc(fr_Env self);
 ////////////////////////////
 // Util
 ////////////////////////////
-fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size);
+fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy);
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
 //NullTerminated
-fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data);
+fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy);
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj str, bool *isCopy);
     
-fr_Obj fr_toSysType(fr_Env env, fr_Class);
+fr_Obj fr_toTypeObj(fr_Env env, fr_Class);
 void fr_throwNPE(fr_Env __env);
 
 ////////////////////////////
@@ -98,7 +98,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 // Other
 ////////////////////////////
 
-#define FR_TYPE(type) (sys_Type)fr_toSysType(__env, type##_class__)
+#define FR_TYPE(type) (sys_Type)fr_toTypeObj(__env, type##_class__)
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
 #define FR_CAST(obj, type, toType) (FR_TYPE_IS(obj, type)?(toType)obj:(fr_throwNPE(__env),(toType)0) )

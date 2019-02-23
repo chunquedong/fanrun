@@ -29,7 +29,7 @@ void fr_VTable_init(fr_Env env, fr_Class type) {
     type->fieldCount = 0;
     type->methodCount = 0;
     type->allocSize = 0;
-    type->sysType = NULL;
+    type->typeObj = NULL;
     type->funcArity = 0;
 }
 

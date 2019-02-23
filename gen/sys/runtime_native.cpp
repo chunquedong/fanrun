@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////
 extern "C" {
 sys_Int strHash(sys_Str str);
-size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal);
+size_t utf8encode(const wchar_t *us, char *des, size_t n, int *illegal);
 size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal);
 }
 fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes) {
@@ -28,28 +28,33 @@ fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes) {
     
     sys_Str str = FR_ALLOC(sys_Str);
     
-    str->data = (wchar_t*)malloc(sizeof(wchar_t)*size);
+    wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*size);
     //mbstowcs();
     //str->size = mbstowcs(cstr, str->data, len);
-    str->size = utf8decode(bytes, str->data, size, NULL);
-    
+    str->size = utf8decode(bytes, data, size, NULL);
+    str->data = data;
     str->hashCode = strHash(str);
-    str->utf8 = NULL;
+    str->utf8 = bytes;
     return str;
 }
-fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size) {
+fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy) {
     sys_Str str = FR_ALLOC(sys_Str);
-    
-    str->data = (wchar_t*)malloc(sizeof(wchar_t)*(size+1));
-    wcsncpy(str->data, data, size);
+    if (copy) {
+        wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*(size+1));
+        wcsncpy(data, data, size);
+        str->data = data;
+    }
+    else {
+        str->data = data;
+    }
     str->size = size;
     str->hashCode = strHash(str);
     str->utf8 = NULL;
     return str;
 }
-fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data) {
+fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy) {
     size_t size = wcslen(data);
-    return fr_newStr(__env, data, size);
+    return fr_newStr(__env, data, size, copy);
 }
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
     size_t size;
@@ -66,13 +71,13 @@ const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
 
 ////////////////////////////////////////////////////////////////
 
-fr_Obj fr_toSysType(fr_Env __env, fr_Class clz) {
-    if (!clz->sysType) {
+fr_Obj fr_toTypeObj(fr_Env __env, fr_Class clz) {
+    if (!clz->typeObj) {
         sys_Type type = FR_ALLOC(sys_Type);
         type->rawClass = clz;
-        clz->sysType = type;
+        clz->typeObj = type;
     }
-    return clz->sysType;
+    return clz->typeObj;
 }
 
 fr_Class fr_fromSysType(fr_Env __env, fr_Obj clz) {

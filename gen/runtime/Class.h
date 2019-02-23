@@ -66,7 +66,7 @@ typedef struct fr_Class_ {
     uint32_t flags;
     
     int allocSize;
-    fr_Obj sysType;
+    fr_Obj typeObj;
   
     struct fr_Class_ *base;
     int mixinCount;

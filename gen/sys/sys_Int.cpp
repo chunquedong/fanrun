@@ -138,7 +138,7 @@ sys_Int sys_Int_pow1_val(fr_Env __env, sys_Int_val __self, sys_Int pow){
 sys_Str sys_Int_toStr0_val(fr_Env __env, sys_Int_val __self){
     wchar_t buf[256];
     swprintf(buf, 256, L"%lld", __self);
-    return (sys_Str)fr_newStrNT(__env, buf);
+    return (sys_Str)fr_newStrNT(__env, buf, true);
 }
 
 //sys_Str sys_Int_toHex0_val(fr_Env __env, sys_Int_val __self){
@@ -183,7 +183,7 @@ sys_Str sys_Int_toRadix2_val(fr_Env __env, sys_Int_val __self, sys_Int radix, sy
 sys_Str sys_Int_toChar0_val(fr_Env __env, sys_Int_val __self){
     wchar_t buf[256];
     swprintf(buf, 256, L"%c", (wchar_t)__self);
-    return (sys_Str)fr_newStrNT(__env, buf);
+    return (sys_Str)fr_newStrNT(__env, buf, true);
 }
 //sys_Str sys_Int_toCode0_val(fr_Env __env, sys_Int_val __self){
 //    return sys_Int_toCode1_val(__env, __self, 10);

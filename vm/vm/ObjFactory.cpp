@@ -198,7 +198,7 @@ FObj *ObjFactory::getString(Env *env, FPod *curPod, uint16_t sid) {
         return fr_getPtr(env, objRef);
     }
     
-    std::string utf8 = curPod->constantas.strings[sid];
+    const std::string &utf8 = curPod->constantas.strings[sid];
     FObj *obj = (FObj *)sys_Str_fromUtf8_(env, utf8.c_str());
     objRef = env->newGlobalRef(obj);
     curPod->constantas.c_strings[sid] = (void*)objRef;

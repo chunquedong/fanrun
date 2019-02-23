@@ -46,7 +46,7 @@ struct sys_Num_struct {
 
 struct sys_Str_struct {
     struct sys_Obj_struct super__;
-    wchar_t *data;
+    const wchar_t *data;
     size_t size;
     
     size_t hashCode;

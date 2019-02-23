@@ -51,30 +51,11 @@ sys_Int sys_StrBuf_get1(fr_Env __env, sys_StrBuf_ref __self, sys_Int index){
     return __self->data[index];
 }
 sys_Str sys_StrBuf_getRange1(fr_Env __env, sys_StrBuf_ref __self, sys_Range range){
-    sys_Int start = range->_start;
-    sys_Int end = range->_end;
-    if (start < 0) {
-        start += __self->size;
-    }
-    if (end < 0) {
-        end += __self->size;
-    }
-    if (!range->_exclusive) ++end;
-    
-    if (start < 0 || start > __self->size) {
-        sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        FR_THROW(e);
-    }
-    if (end < 0 || end > __self->size) {
-        sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        FR_THROW(e);
-    }
+    sys_Int start = sys_Range_startIndex1(__env, range, __self->size);
+    sys_Int end = sys_Range_endIndex1(__env, range, __self->size);
     sys_Int size = end - start;
-    if (size < 0) {
-        sys_IndexErr e = FR_ALLOC(sys_IndexErr);
-        FR_THROW(e);
-    }
-    sys_Str str = (sys_Str)fr_newStr(__env, __self->data+start, size);
+    
+    sys_Str str = (sys_Str)fr_newStr(__env, __self->data+start, size, true);
     return str;
 }
 sys_StrBuf sys_StrBuf_set2(fr_Env __env, sys_StrBuf_ref __self, sys_Int index, sys_Int ch){
@@ -238,7 +219,7 @@ sys_StrBuf sys_StrBuf_clear0(fr_Env __env, sys_StrBuf_ref __self){
     return __self;
 }
 sys_Str sys_StrBuf_toStr0(fr_Env __env, sys_StrBuf_ref __self){
-    sys_Str str = (sys_Str)fr_newStr(__env, __self->data, __self->size);
+    sys_Str str = (sys_Str)fr_newStr(__env, __self->data, __self->size, true);
     return str;
 }
 void sys_StrBuf_finalize0(fr_Env __env, sys_StrBuf_ref __self){

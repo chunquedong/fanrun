@@ -10,6 +10,10 @@
 #include "FCodeUtil.hpp"
 #include "escape.h"
 
+extern "C" {
+#include "utf8.h"
+}
+
 std::string TypeInfo::getName() const {
     std::string typeName = pod + "_" + name;
     if (isNullable) {
@@ -102,6 +106,7 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
         }
         case FOp::LoadStr: {
             std::string str = curPod->constantas.strings[opObj.i1];
+            size_t len = utf8len(str.c_str(), str.size());
             long pos = 0;
             while (pos < str.length()) {
                 if (str[pos] == '"') {
@@ -110,7 +115,7 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
                 }
                 ++pos;
             }
-            printer.printf("(sys_Str)fr_newStrUtf8(__env, \"%s\")", str.c_str());
+            printer.printf("(sys_Str)fr_newStr(__env, L\"%s\", %d, false)", str.c_str(), len);
             break;
         }
         case FOp::LoadDuration: {

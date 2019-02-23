@@ -23,75 +23,6 @@ sys_Int strHash(sys_Str str) {
     }
     return hashValue;
 }
-
-size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal) {
-    if (n == 0)
-        return 0;
-    
-    char *s = (char *)str;
-    size_t i = 0;
-    wchar_t uc = 0;
-    int r_illegal_all = 0, r_illegal;
-    
-    while ((uc = getu8c(&s, &r_illegal)))
-    {
-        if (i < (n - 1))
-        {
-            des[i++] = uc;
-            r_illegal_all += r_illegal;
-        }
-        else
-        {
-            break;
-        }
-    }
-    
-    des[i] = 0;
-    if (illegal)
-    {
-        *illegal = r_illegal_all + r_illegal;
-    }
-    
-    return i;
-}
-
-size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal)
-{
-    if (n == 0)
-        return 0;
-    
-    char *s = des;
-    size_t left = n;
-    size_t len = 0;
-    int r_illegal = 0;
-    
-    *s = 0;
-    while (*us)
-    {
-        int ret = putu8c(*us, &s, &left);
-        if (ret > 0)
-        {
-            len += ret;
-        }
-        else if (ret == -1)
-        {
-            r_illegal += 1;
-        }
-        else
-        {
-            break;
-        }
-        
-        ++us;
-    }
-    
-    if (illegal)
-    {
-        *illegal = r_illegal;
-    }
-    
-    return len;
-}
 }//extern "C" {
 /////////////////////////////////////////////////////////////
 
@@ -116,15 +47,29 @@ sys_Int sys_Str_find2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int offse
     if (offset >= __self->size) {
         return -1;
     }
-    wchar_t *str = __self->data + offset;
-    wchar_t *found = wcsstr(str, s->data);
+    const wchar_t *str = __self->data + offset;
+    const wchar_t *found = wcsstr(str, s->data);
     if (!found) return -1;
     sys_Int diff = (found - __self->data);
     return diff;
 }
-//TODO
+
 sys_Int sys_Str_findr2(fr_Env __env, sys_Str_ref __self, sys_Str s, sys_Int offset) {
-    return 0;
+    if (offset >= __self->size) {
+        return -1;
+    }
+    const wchar_t *str = __self->data + offset;
+    
+    const wchar_t *found = NULL;
+    while (true) {
+        wchar_t *p = wcsstr(str, s->data);
+        if (p == NULL) break;
+        found = p;
+        ++str;
+    }
+    if (!found) return -1;
+    sys_Int diff = (found - __self->data);
+    return diff;
 }
 sys_Int sys_Str_get1(fr_Env __env, sys_Str_ref __self, sys_Int index){
     if (index < 0) {
@@ -136,14 +81,41 @@ sys_Int sys_Str_get1(fr_Env __env, sys_Str_ref __self, sys_Int index){
     return __self->data[index];
 }
 
-sys_Str sys_Str_getRange1(fr_Env __env, sys_Str_ref __self, sys_Range range){ return 0; }
-sys_Str sys_Str_plus1(fr_Env __env, sys_Str_ref __self, sys_Obj_null obj){ return 0; }
+sys_Str sys_Str_getRange1(fr_Env __env, sys_Str_ref __self, sys_Range range){
+    size_t s = sys_Range_startIndex1(__env, range, __self->size);
+    size_t e = sys_Range_endIndex1(__env, range, __self->size);
+
+    if (s >= e) return sys_Str_defVal;
+    size_t len = e-s;
+    wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*(len+1));
+    return (sys_Str)fr_newStr(__env, data, len, false);
+}
+sys_Str sys_Str_plus1(fr_Env __env, sys_Str_ref __self, sys_Obj_null obj) {
+    const wchar_t *p = L"";
+    size_t plen = 0;
+    if (obj == NULL) {
+        p = L"null";
+        plen = 4;
+    }
+    else {
+        sys_Str_ref str = FR_VCALL(sys_Obj, toStr0, obj);
+        p = str->data;
+        plen = str->size;
+    }
+    wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*(plen+1));
+    
+    wmemcpy(data, __self->data, __self->size);
+    wmemcpy(data+__self->size, p, plen);
+    size_t nlen = __self->size+plen;
+    data[nlen] = 0;
+    return (sys_Str)fr_newStr(__env, data, nlen, false);
+}
 sys_List sys_Str_chars0(fr_Env __env, sys_Str_ref __self){ return 0; }
 
 sys_Str sys_Str_replace2(fr_Env __env, sys_Str_ref __self, sys_Str from, sys_Str to){ return 0; }
 
 void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){
-    free(__self->data);
+    free((void*)(__self->data));
     free((void*)__self->utf8);
     __self->data = NULL;
     __self->utf8 = NULL;
@@ -152,7 +124,7 @@ void sys_Str_finalize0(fr_Env __env, sys_Str_ref __self){
     return;
 }
 void sys_Str_static__init0(fr_Env __env){
-    sys_Str_defVal = (sys_Str)fr_newStrUtf8(__env, "");
+    sys_Str_defVal = (sys_Str)fr_newStr(__env, L"", 0, false);
 }
 //TODO
 sys_Str sys_Str_fromChars3(fr_Env __env, sys_List chars, sys_Int offset, sys_Int len) {
