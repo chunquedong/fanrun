@@ -64,8 +64,10 @@ void fr_addStaticRef(fr_Env self, fr_Obj *obj);
     
 fr_Obj fr_malloc(fr_Env self, fr_Class vtable);
 void fr_gc(fr_Env self);
-GcObj *fr_toGcObj(fr_Obj obj);
-fr_Obj fr_fromGcObj(GcObj *g);
+//GcObj *fr_toGcObj(fr_Obj obj);
+//fr_Obj fr_fromGcObj(GcObj *g);
+#define fr_toGcObj(obj) ((GcObj*)(obj))
+#define fr_fromGcObj(g) ((fr_Obj)(g))
 void fr_checkPoint(fr_Env self);
 void fr_yieldGc(fr_Env self);
 
@@ -87,16 +89,6 @@ void fr_throwNPE(fr_Env __env);
 typedef int64_t sys_Int_val;
 typedef double sys_Float_val;
 typedef bool sys_Bool_val;
-
-struct sys_Int_struct {
-    int64_t _val;
-};
-struct sys_Float_struct {
-    double _val;
-};
-struct sys_Bool_struct {
-    bool _val;
-};
 
 fr_Obj fr_box_int(fr_Env, sys_Int_val val);
 fr_Obj fr_box_float(fr_Env, sys_Float_val val);

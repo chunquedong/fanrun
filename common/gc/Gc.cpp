@@ -47,7 +47,8 @@ void Gc::mergeNewAlloc() {
 }
 */
 GcObj* Gc::alloc(void *type, int asize) {
-    int size = asize + sizeof(GcObj);
+    //int size = asize + sizeof(GcObj);
+    int size = asize;
     if (allocSize > collectSize && allocSize + size > lastAllocSize * 1.5) {
         collect();
     } else {

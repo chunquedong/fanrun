@@ -47,7 +47,7 @@ void TypeGen::genStruct(Printer *printer) {
     printer->println("struct %s_struct {", name.c_str());
     
     printer->indent();
-    if (name == "sys_Obj" || baseName == "sys_Obj") {
+    if (name == "sys_Obj") {
         //printer->println("fr_Obj super__;");
     } else {
         printer->println("struct %s_struct super__;", baseName.c_str());

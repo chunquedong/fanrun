@@ -36,18 +36,18 @@ int fr_getFuncArity(fr_Env, fr_Class clz) {
 
 //////////////////////////////////////////
 // GC
-
+/*
 GcObj *fr_toGcObj(fr_Obj obj) {
     GcObj *g = (GcObj*)obj;
     --g;
     return g;
+    
 }
-
 fr_Obj fr_fromGcObj(GcObj *g) {
     fr_Obj obj = (fr_Obj)(++g);
     return obj;
 }
-
+*/
 void fr_checkPoint(fr_Env self) {
     Env *env = (Env*)self;
     if (env->needStop) {
@@ -75,7 +75,7 @@ void fr_yieldGc(fr_Env self) {
 fr_Obj fr_malloc(fr_Env self, fr_Class vtable) {
     Env *env = (Env*)self;
     GcObj *gcobj = env->vm->getGc()->alloc(vtable, vtable->allocSize);
-    fr_Obj obj = (fr_Obj)(++gcobj);
+    fr_Obj obj = fr_fromGcObj(gcobj);
     return obj;
 }
 
