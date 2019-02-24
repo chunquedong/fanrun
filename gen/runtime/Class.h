@@ -82,6 +82,7 @@ typedef struct fr_Class_ {
     
     //only for Func
     int funcArity;
+    bool staticInited;
   
     fr_Function finalize;
     

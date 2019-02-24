@@ -138,6 +138,8 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
     
 #define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
 #define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);
+    
+#define FR_STATIC_INIT(type) {if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init0(__env);}}
 
 #ifdef  __cplusplus
 }

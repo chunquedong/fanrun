@@ -49,7 +49,8 @@ class Gc {
     bool running;
 public:
     GcSupport *gcSupport;
-    long collectSize;
+    
+    long collectLimit;
     long lastAllocSize;
     long allocSize;
     bool trace;

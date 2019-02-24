@@ -162,7 +162,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
         std::string typeName = podGen->getTypeRefName(field.type);
         printer->println("((fr_Class)vtable)->fieldList[%d].type = \"%s\";", i, typeName.c_str());
     
-        bool isValType = isValueType;
+        bool isValType = FCodeUtil::isBuildinVal(typeName);
         printer->println("((fr_Class)vtable)->fieldList[%d].isValType = %s;", i, isValType ? "true" : "false");
         
         if (field.flags & FFlags::Static) {

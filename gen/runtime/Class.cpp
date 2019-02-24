@@ -31,6 +31,7 @@ void fr_VTable_init(fr_Env env, fr_Class type) {
     type->allocSize = 0;
     type->typeObj = NULL;
     type->funcArity = 0;
+    type->staticInited = false;
 }
 
 fr_Class fr_getClass(fr_Env env, fr_Obj obj) {

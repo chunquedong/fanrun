@@ -159,7 +159,7 @@ void PodGen::genStaticInit(Printer *printer) {
     printer->println("void %s_init__(fr_Env __env) {", podName.c_str());
     printer->indent();
     printer->println("static bool inited = false;");
-    printer->println("if (inited) { printf(\"ERROR: pod already inited\"); return; }");
+    printer->println("if (inited) { return; }");
     printer->println("inited = true;");
     
     for (int i=0; i<pod->c_dependPods.size(); ++i) {
@@ -183,7 +183,7 @@ void PodGen::genStaticInit(Printer *printer) {
         std::string staticInit = "static$init";
         auto itr = gtype->type->c_methodMap.find(staticInit);
         if (itr != gtype->type->c_methodMap.end()) {
-            printer->println("%s_static__init0(__env);", gtype->name.c_str());
+            printer->println("FR_STATIC_INIT(%s);", gtype->name.c_str());
         }
     }
     printer->unindent();

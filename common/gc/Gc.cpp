@@ -15,7 +15,7 @@
 Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr)
     , maxAddress(NULL), minAddress(NULL){
     lastAllocSize = 29;
-    collectSize = 10000;
+    collectLimit = 1000;
     allRefHead = NULL;
     //allRefTail = NULL;
     //newRefHead = NULL;
@@ -49,7 +49,7 @@ void Gc::mergeNewAlloc() {
 GcObj* Gc::alloc(void *type, int asize) {
     //int size = asize + sizeof(GcObj);
     int size = asize;
-    if (allocSize > collectSize && allocSize + size > lastAllocSize * 1.5) {
+    if (allocSize > collectLimit && allocSize + size > lastAllocSize * 1.5) {
         collect();
     } else {
         lastAllocSize -= 8;
@@ -73,9 +73,10 @@ GcObj* Gc::alloc(void *type, int asize) {
     if (minAddress == NULL || obj < minAddress) {
         minAddress = obj;
     }
-    obj->next = allRefHead;
+    gc_setNext(obj, this->allRefHead);
     allRefHead = obj;
     //newAllocRef.push_back(obj);
+    allocSize += size;
     lock.unlock();
     
     if (trace) {
@@ -87,6 +88,10 @@ GcObj* Gc::alloc(void *type, int asize) {
 }
 
 void Gc::collect() {
+    if (trace) {
+        printf("******* start gc: %ld (%ld, %ld)\n", allocSize, collectLimit, lastAllocSize);
+    }
+    
     //ready for gc
     gcSupport->onStartGc();
     {
@@ -122,6 +127,10 @@ void Gc::collect() {
         std::lock_guard<std::recursive_mutex> lock_guard(lock);
         lastAllocSize = allocSize;
         running = false;
+    }
+    
+    if (trace) {
+        printf("******* end gc: %ld\n", allocSize);
     }
 }
 
@@ -163,16 +172,21 @@ bool Gc::mark() {
 
 void Gc::sweep() {
     GcObj *obj = allRefHead;
-    GcObj **ref = &allRefHead;
+    GcObj *pre = NULL;
     while (obj) {
-        GcObj *next = (GcObj*)(obj->next);
+        GcObj *next = (GcObj*)gc_getNext(obj);
         if (gc_getMark(obj) != marker) {
             remove(obj);
-            *ref = next;
+            if (pre == NULL) {
+                allRefHead = next;
+            }
+            else {
+                gc_setNext(pre, next);
+            }
             obj = next;
         }
         else {
-            ref = (GcObj **)(&(obj->next));
+            pre = obj;
             obj = next;
         }
     }

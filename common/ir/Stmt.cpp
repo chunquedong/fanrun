@@ -282,6 +282,17 @@ void FieldStmt::print(Printer& printer) {
     std::string name = FCodeUtil::getIdentifierName(curPod, fieldRef->name);
     bool isValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->parent);
     if (isLoad) {
+        //lazy init class
+        if (isStatic) {
+            FTypeRef &typeRef = curPod->typeRefs[fieldRef->parent];
+            const std::string &purName = curPod->names[typeRef.typeName];
+            FType *ftype = curPod->c_typeMap[purName];
+            auto itr = ftype->c_methodMap.find("static$init");
+            if (itr != ftype->c_methodMap.end()) {
+                printer.println("FR_STATIC_INIT(%s);", typeName.c_str());
+            }
+        }
+        
         printer.printf("%s = ", value.getName().c_str());
         if (isStatic) {
             printer.printf("%s_%s", typeName.c_str(), name.c_str());
