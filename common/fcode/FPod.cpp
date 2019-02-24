@@ -159,6 +159,17 @@ void FPod::read(ZipFile &zip) {
     }
     {
         ssize_t bufSize;
+        unsigned char *data = zip.getFileData("fcode/decimals.def", &bufSize);
+        if (data) {
+            Buffer buf(data, bufSize, true);
+            int size = buf.readUInt16();
+            for (int i=0; i<size; ++i) {
+                constantas.decimals.push_back(buf.readString());
+            }
+        }
+    }
+    {
+        ssize_t bufSize;
         unsigned char *data = zip.getFileData("fcode/durations.def", &bufSize);
         if (data) {
             Buffer buf(data, bufSize, true);

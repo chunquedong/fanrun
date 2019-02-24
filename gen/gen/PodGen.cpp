@@ -65,6 +65,7 @@ void PodGen::horizontalLine(Printer *printer, const char *name) {
     printer->newLine();
 }
 
+
 void PodGen::genHeader(Printer *printer) {
     printer->println("#ifndef _%s_h_", podName.c_str());
     printer->println("#define _%s_h_", podName.c_str());
@@ -136,6 +137,8 @@ void PodGen::genImple(Printer *printer) {
     printer->println("#include \"%s.h\"", podName.c_str());
     printer->newLine();
     
+    genConstPool(printer);
+    
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
         gtype->genImple(printer);
@@ -143,6 +146,13 @@ void PodGen::genImple(Printer *printer) {
     }
     
     genStaticInit(printer);
+}
+
+void PodGen::genConstPool(Printer *printer) {
+    printer->println("fr_Obj %s_ConstPoolStrs[%d] = {};", podName.c_str(), pod->constantas.strings.size());
+    printer->println("fr_Obj %s_ConstPoolUris[%d] = {};", podName.c_str(), pod->constantas.uris.size());
+    printer->println("fr_Obj %s_ConstPoolDurations[%d] = {};", podName.c_str(), pod->constantas.durations.size());
+    printer->println("fr_Obj %s_ConstPoolDecimals[%d] = {};", podName.c_str(), pod->constantas.decimals.size());
 }
 
 void PodGen::genStaticInit(Printer *printer) {

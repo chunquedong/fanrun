@@ -33,6 +33,7 @@ private:
     void genHeader(Printer *printer);
     void genImple(Printer *printer);
     void horizontalLine(Printer *printer, const char *name);
+    void genConstPool(Printer *printer);
     //void genRegister(Printer *printer);
     //void genStub(Printer *printer);
     void genStaticInit(Printer *printer);

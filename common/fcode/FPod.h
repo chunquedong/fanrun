@@ -62,6 +62,7 @@ struct FConstantas {
     std::vector<const std::string> strings;
     std::vector<int64_t> durations;
     std::vector<const std::string> uris;
+    std::vector<const std::string> decimals;
     
     std::vector<void*> c_strings;
 };

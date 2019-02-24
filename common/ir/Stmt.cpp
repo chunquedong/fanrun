@@ -75,7 +75,7 @@ Expr Var::asRef() {
     return expr;
 }
 
-void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
+void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpObj &opObj) {
     switch (opObj.opcode) {
         case FOp::LoadNull: {
             printer.printf("NULL");
@@ -115,7 +115,11 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
                 }
                 ++pos;
             }
-            printer.printf("(sys_Str)fr_newStr(__env, L\"%s\", %d, false)", str.c_str(), len);
+
+            printer.println("(sys_Str)(%s_ConstPoolStrs[%d]);", curPod->name.c_str(), opObj.i1);
+            printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStr(__env, L\"%s\", %d, false);"
+                           , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
+            printer.printf("%s = (sys_Str)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
             break;
         }
         case FOp::LoadDuration: {
@@ -125,8 +129,21 @@ void printValue(Printer& printer, FPod *curPod, FOpObj &opObj) {
             break;
         }
         case FOp::LoadUri: {
-            const std::string &i = curPod->constantas.uris[opObj.i1];
-            printer.printf("\"%s\"", i.c_str());
+            std::string str = curPod->constantas.strings[opObj.i1];
+            size_t len = utf8len(str.c_str(), str.size());
+            long pos = 0;
+            while (pos < str.length()) {
+                if (str[pos] == '"') {
+                    str.replace(pos, 2, "\\\"");
+                    ++pos;
+                }
+                ++pos;
+            }
+            
+            printer.println("(std_Uri)(%s_ConstPoolUris[%d]);", curPod->name.c_str(), opObj.i1);
+            printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d, false));"
+                           , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
+            printer.printf("%s = (std_Uri)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
             break;
         }
         case FOp::LoadType: {
@@ -162,7 +179,7 @@ bool Expr::isValueType() {
 
 void ConstStmt::print(Printer& printer) {
     printer.printf("%s = ", dst.getName().c_str());
-    printValue(printer, curPod, opObj);
+    printValue(dst.getName(), printer, curPod, opObj);
     printer.printf(";");
 }
 
