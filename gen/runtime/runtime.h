@@ -39,7 +39,7 @@ typedef void *fr_Fvm;
 fr_Env fr_getEnv(fr_Fvm vm);
 void fr_releaseEnv(fr_Fvm vm, fr_Env env);
     
-int fr_getFuncArity(fr_Env, fr_Class clz);
+int fr_getFuncArity(fr_Env, fr_Type clz);
 
 ////////////////////////////
 // Exception
@@ -62,7 +62,7 @@ fr_Obj fr_addGlobalRef(fr_Env self, fr_Obj obj);
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
 void fr_addStaticRef(fr_Env self, fr_Obj *obj);
     
-fr_Obj fr_malloc(fr_Env self, fr_Class vtable);
+fr_Obj fr_malloc(fr_Env self, fr_Type vtable);
 void fr_gc(fr_Env self);
 //GcObj *fr_toGcObj(fr_Obj obj);
 //fr_Obj fr_fromGcObj(GcObj *g);
@@ -80,7 +80,7 @@ fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
 fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy);
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj str, bool *isCopy);
     
-fr_Obj fr_toTypeObj(fr_Env env, fr_Class);
+fr_Obj fr_toTypeObj(fr_Env env, fr_Type);
 void fr_throwNPE(fr_Env __env);
 
 ////////////////////////////

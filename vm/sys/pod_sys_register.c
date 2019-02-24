@@ -105,7 +105,6 @@ void sys_Str_get(fr_Env env, void *param, void *ret);
 void sys_Str_getRange(fr_Env env, void *param, void *ret);
 void sys_Str_plus(fr_Env env, void *param, void *ret);
 void sys_Str_chars(fr_Env env, void *param, void *ret);
-void sys_Str_replace(fr_Env env, void *param, void *ret);
 void sys_Str_toUtf8(fr_Env env, void *param, void *ret);
 void sys_Str_fromUtf8(fr_Env env, void *param, void *ret);
 void sys_Str_finalize(fr_Env env, void *param, void *ret);
@@ -298,7 +297,6 @@ void sys_register(fr_Fvm vm) {
     fr_registerMethod(vm, "sys_Str_getRange", sys_Str_getRange);
     fr_registerMethod(vm, "sys_Str_plus", sys_Str_plus);
     fr_registerMethod(vm, "sys_Str_chars", sys_Str_chars);
-    fr_registerMethod(vm, "sys_Str_replace", sys_Str_replace);
     fr_registerMethod(vm, "sys_Str_toUtf8", sys_Str_toUtf8);
     fr_registerMethod(vm, "sys_Str_fromUtf8", sys_Str_fromUtf8);
     fr_registerMethod(vm, "sys_Str_finalize", sys_Str_finalize);

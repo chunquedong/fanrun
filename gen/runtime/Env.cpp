@@ -28,7 +28,7 @@ static bool isPointer(Vm *vm, Gc *gc, int64_t pointer) {
     //test is Obj ptr
     int64_t type = (int64_t)gc_getType(gcobj);
     if (type % 8 != 0) return false;
-    if (vm->classSet.find((fr_Class)type) == vm->classSet.end()) {
+    if (vm->classSet.find((fr_Type)type) == vm->classSet.end()) {
         return false;
     }
 //#endif

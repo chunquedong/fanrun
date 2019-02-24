@@ -81,6 +81,9 @@ void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::list<GcObj*> *list) {
     FType *ftype = fr_getFType(env, obj);
     for (int i=0; i<ftype->fields.size(); ++i) {
         FField &f = ftype->fields[i];
+        if ((f.flags & FFlags::Storage) == 0) {
+            continue;
+        }
         if (f.flags & FFlags::Static) {
             //pass;
         } else {

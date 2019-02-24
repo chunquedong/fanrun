@@ -30,7 +30,7 @@ void fr_releaseEnv(fr_Fvm vm, fr_Env env) {
     fvm->releaseEnv((Env*)env);
 }
 
-int fr_getFuncArity(fr_Env, fr_Class clz) {
+int fr_getFuncArity(fr_Env, fr_Type clz) {
     return clz->funcArity;
 }
 
@@ -72,7 +72,7 @@ void fr_yieldGc(fr_Env self) {
     System_barrier();
 }
 
-fr_Obj fr_malloc(fr_Env self, fr_Class vtable) {
+fr_Obj fr_malloc(fr_Env self, fr_Type vtable) {
     Env *env = (Env*)self;
     GcObj *gcobj = env->vm->getGc()->alloc(vtable, vtable->allocSize);
     fr_Obj obj = fr_fromGcObj(gcobj);

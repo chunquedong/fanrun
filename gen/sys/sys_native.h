@@ -92,7 +92,7 @@ struct sys_Func_struct {
 
 struct sys_Type_struct {
     struct sys_Obj_struct super__;
-    fr_Class rawClass;
+    fr_Type rawClass;
 };
 
 struct sys_Void_struct {

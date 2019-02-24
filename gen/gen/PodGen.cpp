@@ -170,7 +170,7 @@ void PodGen::genStaticInit(Printer *printer) {
     
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
-        printer->println("%s_class__ = (fr_Class)"
+        printer->println("%s_class__ = (fr_Type)"
                          "malloc(sizeof(struct %s_vtable));"
                          , gtype->name.c_str(), gtype->name.c_str());
         printer->println("%s_initVTable(__env, (struct %s_vtable*)%s_class__);"

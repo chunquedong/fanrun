@@ -1731,29 +1731,6 @@ void sys_Str_chars(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
-void sys_Str_replace(fr_Env env, void *param, void *ret) {
-    fr_Value value_0;
-    fr_Obj arg_0; 
-    fr_Value value_1;
-    fr_Obj arg_1; 
-    fr_Value value_2;
-    fr_Obj arg_2; 
-    fr_Value retValue;
-
-    fr_getParam(env, param, &value_2, 2);
-    arg_2 = value_2.h;
-
-    fr_getParam(env, param, &value_1, 1);
-    arg_1 = value_1.h;
-
-    fr_getParam(env, param, &value_0, 0);
-    arg_0 = value_0.h;
-
-
-    retValue.h = sys_Str_replace_f(env, arg_0, arg_1, arg_2);
-    *((fr_Value*)ret) = retValue;
-}
-
 void sys_Str_toUtf8(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 

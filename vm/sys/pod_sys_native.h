@@ -98,7 +98,6 @@ fr_Int sys_Str_get_f(fr_Env env, fr_Obj self, fr_Int index);
 fr_Obj sys_Str_getRange_f(fr_Env env, fr_Obj self, fr_Obj range);
 fr_Obj sys_Str_plus_f(fr_Env env, fr_Obj self, fr_Obj obj);
 fr_Obj sys_Str_chars_f(fr_Env env, fr_Obj self);
-fr_Obj sys_Str_replace_f(fr_Env env, fr_Obj self, fr_Obj from, fr_Obj to);
 fr_Obj sys_Str_toUtf8_f(fr_Env env, fr_Obj self);
 fr_Obj sys_Str_fromUtf8_f(fr_Env env, fr_Obj ba, fr_Int offset, fr_Int len);
 void sys_Str_finalize_f(fr_Env env, fr_Obj self);

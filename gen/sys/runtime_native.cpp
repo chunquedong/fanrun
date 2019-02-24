@@ -66,12 +66,14 @@ const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
     realSize = utf8encode(str->data, utf8, size, NULL);
     utf8[realSize] = 0;
     str->utf8 = utf8;
+    
+    if (isCopy) *isCopy = false;
     return str->utf8;
 }
 
 ////////////////////////////////////////////////////////////////
 
-fr_Obj fr_toTypeObj(fr_Env __env, fr_Class clz) {
+fr_Obj fr_toTypeObj(fr_Env __env, fr_Type clz) {
     if (!clz->typeObj) {
         sys_Type type = FR_ALLOC(sys_Type);
         type->rawClass = clz;
@@ -80,13 +82,14 @@ fr_Obj fr_toTypeObj(fr_Env __env, fr_Class clz) {
     return clz->typeObj;
 }
 
-fr_Class fr_fromSysType(fr_Env __env, fr_Obj clz) {
+fr_Type fr_fromSysType(fr_Env __env, fr_Obj clz) {
     return ((sys_Type)clz)->rawClass;
 }
 
 ////////////////////////////////////////////////////////////////
 void fr_throwNPE(fr_Env __env) {
     sys_NullErr npe = FR_ALLOC(sys_NullErr);
+    sys_NullErr_make0(__env, npe);
     FR_THROW(npe);
 }
 ////////////////////////////////////////////////////////////////

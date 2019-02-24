@@ -257,6 +257,9 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
     int staticSize = 0;
     for (int i=0; i<type->fields.size(); ++i) {
         FField &f = type->fields[i];
+        if ((f.flags & FFlags::Storage) == 0) {
+            continue;
+        }
         if (f.flags & FFlags::Static) {
             f.c_offset = staticSize;
             staticSize += d;

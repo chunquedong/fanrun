@@ -165,10 +165,6 @@ fr_Obj sys_Str_chars_f(fr_Env env, fr_Obj self) {
     return 0;
 }
 
-fr_Obj sys_Str_replace_f(fr_Env env, fr_Obj self, fr_Obj from, fr_Obj to) {
-    return 0;
-}
-
 //TODO
 fr_Obj sys_Str_format_f(fr_Env env, fr_Obj format, fr_Obj args) {
     return NULL;

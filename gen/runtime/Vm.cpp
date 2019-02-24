@@ -49,7 +49,7 @@ void Vm::releaseEnv(Env *env) {
 
 void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::list<GcObj*> *list) {
     fr_Obj obj = fr_fromGcObj(gcobj);
-    fr_Class type = (fr_Class)gc_getType(gcobj);
+    fr_Type type = (fr_Type)gc_getType(gcobj);
     for (int i=0; i<type->fieldCount; ++i) {
         fr_Field &f = type->fieldList[i];
         if (!f.isStatic && !f.isValType) {
@@ -127,12 +127,12 @@ void Vm::resumeWorld() {
 }
 void Vm::printObj(GcObj *gcobj) {
     fr_Obj obj = fr_fromGcObj(gcobj);
-    fr_Class type = (fr_Class)gc_getType(gcobj);
+    fr_Type type = (fr_Type)gc_getType(gcobj);
     printf("%s %p", type->name, obj);
 }
 
 int Vm::allocSize(void *type) {
-    fr_Class t = (fr_Class)type;
+    fr_Type t = (fr_Type)type;
     return t->allocSize;
 }
 
@@ -141,7 +141,7 @@ void Vm::addStaticRef(fr_Obj *objAddress) {
     staticFieldRef.push_back(objAddress);
 }
 
-void Vm::registerClass(const char *pod, const char *clz, fr_Class type) {
+void Vm::registerClass(const char *pod, const char *clz, fr_Type type) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
     std::string podName = pod;
     std::string clzName = clz;
@@ -155,7 +155,7 @@ void Vm::registerClass(const char *pod, const char *clz, fr_Class type) {
         }
     }
 }
-fr_Class Vm::findClass(const char *pod, const char *clz) {
+fr_Type Vm::findClass(const char *pod, const char *clz) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
     auto itr = typeDb.find(pod);
     if (itr == typeDb.end()) return NULL;

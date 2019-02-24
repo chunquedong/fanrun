@@ -17,7 +17,7 @@ sys_List sys_Func_params0(fr_Env __env, sys_Func_ref __self){ return 0; }
 sys_Obj_null sys_Func_callList1(fr_Env __env, sys_Func_ref __self, sys_List_null args){ return 0; }
 sys_Obj_null sys_Func_callOn2(fr_Env __env, sys_Func_ref __self, sys_Obj_null target, sys_List_null args){ return 0; }
 sys_Obj_null sys_Func_call0(fr_Env __env, sys_Func_ref __self){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -53,7 +53,7 @@ sys_Obj_null sys_Func_call0(fr_Env __env, sys_Func_ref __self){
     return NULL;
 }
 sys_Obj_null sys_Func_call1(fr_Env __env, sys_Func_ref __self, sys_Obj_null a){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -89,7 +89,7 @@ sys_Obj_null sys_Func_call1(fr_Env __env, sys_Func_ref __self, sys_Obj_null a){
     return NULL;
 }
 sys_Obj_null sys_Func_call2(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -125,7 +125,7 @@ sys_Obj_null sys_Func_call2(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
     return NULL;
 }
 sys_Obj_null sys_Func_call3(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -161,7 +161,7 @@ sys_Obj_null sys_Func_call3(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
     return NULL;
 }
 sys_Obj_null sys_Func_call4(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -197,7 +197,7 @@ sys_Obj_null sys_Func_call4(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
     return NULL;
 }
 sys_Obj_null sys_Func_call5(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -233,7 +233,7 @@ sys_Obj_null sys_Func_call5(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
     return NULL;
 }
 sys_Obj_null sys_Func_call6(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e, sys_Obj_null f){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -269,7 +269,7 @@ sys_Obj_null sys_Func_call6(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
     return NULL;
 }
 sys_Obj_null sys_Func_call7(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e, sys_Obj_null f, sys_Obj_null g){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
@@ -305,7 +305,7 @@ sys_Obj_null sys_Func_call7(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, s
     return NULL;
 }
 sys_Obj_null sys_Func_call8(fr_Env __env, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e, sys_Obj_null f, sys_Obj_null g, sys_Obj_null h){
-    fr_Class clz = fr_getClass(__env, __self);
+    fr_Type clz = fr_getClass(__env, __self);
     switch (fr_getFuncArity(__env, clz)) {
         case 0:
             return FR_VCALL(sys_Func, call0, __self);
