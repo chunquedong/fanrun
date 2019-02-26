@@ -21,18 +21,9 @@ static bool isPointer(Vm *vm, Gc *gc, int64_t pointer) {
     if (pointer == 0) return false;
     if (pointer % 8 != 0) return false;
     GcObj *gcobj = fr_toGcObj((fr_Obj)(pointer));
-    if (gcobj < gc->minAddress || gcobj > gc->maxAddress) {
-        return false;
-    }
-//#if GC_POINTER_TEST
-    //test is Obj ptr
-    int64_t type = (int64_t)gc_getType(gcobj);
-    if (type % 8 != 0) return false;
-    if (vm->classSet.find((fr_Type)type) == vm->classSet.end()) {
-        return false;
-    }
-//#endif
-    return true;
+    
+    //must is heaer of pointer
+    return gc->isRef(gcobj);
 }
 
 void Env::walkLocalRoot(Gc *gc) {

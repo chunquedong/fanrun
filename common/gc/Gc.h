@@ -40,7 +40,6 @@ class Gc {
     GcObj *allRefHead;
     //GcObj *allRefTail;
     //GcObj *newRefHead;
-    
     std::vector<GcObj*> tempGcRoot;
     
     std::recursive_mutex lock;
@@ -55,9 +54,20 @@ public:
     long allocSize;
     bool trace;
     
-    GcObj *maxAddress;
-    GcObj *minAddress;
-    
+#ifdef GC_REF_TABLE
+private:
+    //for lock shard
+    std::set<void*> allRefs;
+public:
+    bool isRef(void *p) {
+        lock.lock();
+        bool found = allRefs.find(p) != allRefs.end();
+        lock.unlock();
+        return found;
+    }
+#endif
+
+public:
     Gc();
     ~Gc();
     

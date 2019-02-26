@@ -146,7 +146,7 @@ void Vm::registerClass(const char *pod, const char *clz, fr_Type type) {
     std::string podName = pod;
     std::string clzName = clz;
     typeDb[podName][clzName] = type;
-    classSet.insert(type);
+    //classSet.insert(type);
     for (int i=0; i<type->fieldCount; ++i) {
         fr_Field &f = type->fieldList[i];
         if (f.isStatic && !f.isValType) {

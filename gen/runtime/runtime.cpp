@@ -72,7 +72,7 @@ void fr_yieldGc(fr_Env self) {
     System_barrier();
 }
 
-fr_Obj fr_malloc(fr_Env self, fr_Type vtable) {
+fr_Obj fr_alloc(fr_Env self, fr_Type vtable) {
     Env *env = (Env*)self;
     GcObj *gcobj = env->vm->getGc()->alloc(vtable, vtable->allocSize);
     fr_Obj obj = fr_fromGcObj(gcobj);

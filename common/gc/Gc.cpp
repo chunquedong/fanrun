@@ -13,13 +13,10 @@
 #include <assert.h>
 
 Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr)
-    , maxAddress(NULL), minAddress(NULL){
+    {
     lastAllocSize = 29;
     collectLimit = 1000;
     allRefHead = NULL;
-    //allRefTail = NULL;
-    //newRefHead = NULL;
-    //newRefTail = NULL;
 }
 
 Gc::~Gc() {
@@ -39,20 +36,14 @@ void Gc::onRoot(GcObj* obj) {
     }
     tempGcRoot.push_back(obj);
 }
-/*
-void Gc::mergeNewAlloc() {
-    allRefTail->next = newRefHead;
-    newRefHead = NULL;
-    //newRefTail = NULL;
-}
-*/
+
 GcObj* Gc::alloc(void *type, int asize) {
     //int size = asize + sizeof(GcObj);
     int size = asize;
-    if (allocSize > collectLimit && allocSize + size > lastAllocSize * 1.5) {
+    if (allocSize > collectLimit && allocSize + size > lastAllocSize * 2) {
         collect();
     } else {
-        lastAllocSize -= 8;
+        lastAllocSize -= 1;
     }
     
     GcObj* obj = (GcObj*)calloc(1, size);
@@ -67,16 +58,15 @@ GcObj* Gc::alloc(void *type, int asize) {
     gc_setDirty(obj, 1);
     
     lock.lock();
-    if (maxAddress == NULL || obj > maxAddress) {
-        maxAddress = obj;
-    }
-    if (minAddress == NULL || obj < minAddress) {
-        minAddress = obj;
-    }
+
     gc_setNext(obj, this->allRefHead);
     allRefHead = obj;
     //newAllocRef.push_back(obj);
     allocSize += size;
+#ifdef GC_REF_TABLE
+    allRefs.insert(obj);
+#endif
+    
     lock.unlock();
     
     if (trace) {
@@ -195,9 +185,7 @@ void Gc::sweep() {
 void Gc::remove(GcObj* obj) {
     
     int size = gcSupport->allocSize(gc_getType(obj));
-    allocSize -= size;
     
-    //it = allRef.erase(it);
     gcSupport->finalizeObj(obj);
     
     if (trace) {
@@ -205,6 +193,13 @@ void Gc::remove(GcObj* obj) {
         gcSupport->printObj(obj);
         printf("\n");
     }
+    
+    lock.lock();
+    allocSize -= size;
+#ifdef GC_REF_TABLE
+    allRefs.erase(obj);
+#endif
+    lock.unlock();
     
     obj->type = NULL;
     obj->next = NULL;
@@ -215,21 +210,12 @@ bool Gc::markNode(GcObj* obj) {
     if (obj == NULL) {
         return false;
     }
-    /*
-    if (allRef.find(obj) == allRef.end()) {
-        //printf("ERROR: unknow obj %p", obj);
-        return false;
-    }
-     */
+
     if (!gc_isDirty(obj) && gc_getMark(obj) == marker) {
         return false;
     }
     gc_setMark(obj, marker);
     gc_setDirty(obj, 0);
-//    printf("mark %d:", marker);
-//    gcSupport->printObj(obj);
-//    if (gc_getMark(obj) != marker) {
-//        printf("ERROR");
-//    }
+
     return true;
 }

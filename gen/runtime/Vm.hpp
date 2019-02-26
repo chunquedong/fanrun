@@ -28,12 +28,13 @@ class Vm : public GcSupport {
     std::unordered_map<std::thread::id, Env*> threads;
     std::vector<fr_Obj*> staticFieldRef;
     std::recursive_mutex lock;
+    
     //typedef std::unordered_map<std::string, std::unordered_map<std::string, fr_Class> > ClassMap;
     typedef std::map<std::string, fr_Type> ClassMap;
     typedef std::map<std::string, ClassMap > PodMap;
     PodMap typeDb;
 public:
-    std::set<fr_Type> classSet;
+    //std::set<fr_Type> classSet;
 public:
     Vm();
     ~Vm();

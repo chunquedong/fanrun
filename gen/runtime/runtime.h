@@ -62,7 +62,7 @@ fr_Obj fr_addGlobalRef(fr_Env self, fr_Obj obj);
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
 void fr_addStaticRef(fr_Env self, fr_Obj *obj);
     
-fr_Obj fr_malloc(fr_Env self, fr_Type vtable);
+fr_Obj fr_alloc(fr_Env self, fr_Type vtable);
 void fr_gc(fr_Env self);
 //GcObj *fr_toGcObj(fr_Obj obj);
 //fr_Obj fr_fromGcObj(GcObj *g);
@@ -103,7 +103,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
 #define FR_CAST(obj, type, toType) (FR_TYPE_IS(obj, type)?(toType)obj:(fr_throwNPE(__env),(toType)0) )
 
-#define FR_ALLOC(type) ((type##_ref)fr_malloc(__env, type##_class__))
+#define FR_ALLOC(type) ((type##_ref)fr_alloc(__env, type##_class__))
 #define FR_INIT_VAL(val, type) (memset(&val, 0, sizeof(struct type##_struct)))
 
 #define FR_TRY try
