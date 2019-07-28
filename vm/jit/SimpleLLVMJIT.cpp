@@ -29,9 +29,9 @@ std::unique_ptr<Module> SimpleLLVMJIT::gen(Env *env, FMethod *method
     FPod *curPod = method->c_parent->c_pod;
     //method->code.initOps();
     IRMethod com(curPod, method);
-    com.compile();
+    //com.compile();
     
-    jitLocalCount = com.refLocalsCount;
+    //jitLocalCount = com.refLocalsCount;
     
     //Printer printer;
     //com.print(env->podManager, printer, 0);

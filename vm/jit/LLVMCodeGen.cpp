@@ -83,99 +83,68 @@ Value *LLVMCodeGen::ptrConst(void *ptr) {
 
 void LLVMCodeGen::genStmt(Stmt *stmt) {
     FPod *curPod = irMethod->curPod;
-    StmtType type =  stmt->getType();
-    switch (type) {
-        case StmtType::store: {
-            StoreStmt *s = dynamic_cast<StoreStmt*>(stmt);
-            Value *val = genExpr(&s->src);
-            
-            int index = 0;
-            if (s->dst.type == ExprType::localVar) {
-                index = s->dst.varRef.index;
-            } else if (s->dst.type == ExprType::tempVar) {
-                Expr::VarRef &varRef = s->dst.varRef;
-                index = irMethod->blocks[varRef.block]->locals[varRef.index].newIndex;
-            }
-            //fr_Value *locals = ((fr_Value*)(env->curFrame+1)) + index;
+    
+    if (StoreStmt *s = dynamic_cast<StoreStmt*>(stmt)) {
+        //StoreStmt *s = dynamic_cast<StoreStmt*>(stmt);
+        Value *val = genExpr(&s->src);
+        
+        int index = s->dst.index;
+        //fr_Value *locals = ((fr_Value*)(env->curFrame+1)) + index;
+        Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
+        Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
+        Value *v = Builder.CreateBitOrPointerCast(val, valueType);
+        Builder.CreateStore(v, ptr);
+    }
+    else if (FieldStmt *s = dynamic_cast<FieldStmt*>(stmt)) {
+    }
+    else if (CallStmt *s = dynamic_cast<CallStmt*>(stmt)) {
+        //int paramCount;
+        FMethod *method = env->podManager->getMethod(env, curPod, *s->methodRef);
+        /*
+        for (int i=0; i<s->params.size(); ++i) {
+            Expr &expr = s->params[i];
+            Value *val = genExpr(&expr);
+            int index = irMethod->refLocalsCount + i;
             Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
             Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
             Value *v = Builder.CreateBitOrPointerCast(val, valueType);
             Builder.CreateStore(v, ptr);
         }
-            
-            break;
-            
-        case StmtType::field: {
-            FieldStmt *s = dynamic_cast<FieldStmt*>(stmt);
-        }
-            
-            break;
-            
-        case StmtType::call: {
-            CallStmt *s = dynamic_cast<CallStmt*>(stmt);
-            int paramCount;
-            FMethod *method = env->podManager->getMethod(env, curPod, s->methodRefId, &paramCount);
-            
-            for (int i=0; i<s->params.size(); ++i) {
-                Expr &expr = s->params[i];
-                Value *val = genExpr(&expr);
-                int index = irMethod->refLocalsCount + i;
-                Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
-                Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
-                Value *v = Builder.CreateBitOrPointerCast(val, valueType);
-                Builder.CreateStore(v, ptr);
+
+        Builder.CreateCall(callee, {envValue, ptrConst(method)
+            , Builder.getInt32(paramCount), Builder.getInt32(s->isVirtual)});
+        
+        if (!s->isVoid) {
+            int index = 0;
+            if (s->retValue.type == ExprType::localVar) {
+                index = s->retValue.varRef.index;
+            } else if (s->retValue.type == ExprType::tempVar) {
+                Expr::VarRef &varRef = s->retValue.varRef;
+                index = irMethod->blocks[varRef.block]->locals[varRef.index].newIndex;
             }
 
-            Builder.CreateCall(callee, {envValue, ptrConst(method)
-                , Builder.getInt32(paramCount), Builder.getInt32(s->isVirtual)});
+            Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
+            Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
             
-            if (!s->isVoid) {
-                int index = 0;
-                if (s->retValue.type == ExprType::localVar) {
-                    index = s->retValue.varRef.index;
-                } else if (s->retValue.type == ExprType::tempVar) {
-                    Expr::VarRef &varRef = s->retValue.varRef;
-                    index = irMethod->blocks[varRef.block]->locals[varRef.index].newIndex;
-                }
-
-                Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
-                Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
-                
-                Value *vp = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * irMethod->refLocalsCount));
-                Value *vvp = Builder.CreateBitOrPointerCast(vp, pvalueType);
-                Value *v = Builder.CreateLoad(vvp);
-                Builder.CreateStore(v, ptr);
-            }
+            Value *vp = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * irMethod->refLocalsCount));
+            Value *vvp = Builder.CreateBitOrPointerCast(vp, pvalueType);
+            Value *v = Builder.CreateLoad(vvp);
+            Builder.CreateStore(v, ptr);
         }
-            
-            break;
-            
-        case StmtType::cmp: {
-            CmpStmt *s = dynamic_cast<CmpStmt*>(stmt);
-        }
-            
-            break;
-            
-        case StmtType::ret: {
-            RetStmt *s = dynamic_cast<RetStmt*>(stmt);
-        }
-            
-            break;
-            
-        case StmtType::jmp: {
-            JmpStmt *s = dynamic_cast<JmpStmt*>(stmt);
-        }
-            
-            break;
-            
-        default:
-            break;
+         */
+    }
+    else if (CmpStmt *s = dynamic_cast<CmpStmt*>(stmt)) {
+    }
+    else if (RetStmt *s = dynamic_cast<RetStmt*>(stmt)) {
+    }
+    else if (JmpStmt *s = dynamic_cast<JmpStmt*>(stmt)) {
     }
 }
 
 llvm::Value *LLVMCodeGen::genExpr(Expr *expr) {
     FPod *curPod = irMethod->curPod;
     llvm::Value *val = nullptr;
+    /*
     switch (expr->type) {
         case ExprType::constant: {
             FOpObj &opObj = expr->opObj;
@@ -248,6 +217,7 @@ llvm::Value *LLVMCodeGen::genExpr(Expr *expr) {
         default:
             break;
     }
+     */
     return val;
 }
 
