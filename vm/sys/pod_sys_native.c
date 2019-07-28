@@ -2801,6 +2801,19 @@ void sys_Type_toNonNullable(fr_Env env, void *param, void *ret) {
     *((fr_Value*)ret) = retValue;
 }
 
+void sys_Type_emptyList(fr_Env env, void *param, void *ret) {
+    fr_Value value_0;
+    fr_Obj arg_0; 
+    fr_Value retValue;
+
+    fr_getParam(env, param, &value_0, 0);
+    arg_0 = value_0.h;
+
+
+    retValue.h = sys_Type_emptyList_f(env, arg_0);
+    *((fr_Value*)ret) = retValue;
+}
+
 void sys_Type_isAbstract(fr_Env env, void *param, void *ret) {
     fr_Value value_0;
     fr_Obj arg_0; 

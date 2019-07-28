@@ -165,6 +165,7 @@ fr_Bool sys_Type_isVal_f(fr_Env env, fr_Obj self);
 fr_Bool sys_Type_isNullable_f(fr_Env env, fr_Obj self);
 fr_Obj sys_Type_toNullable_f(fr_Env env, fr_Obj self);
 fr_Obj sys_Type_toNonNullable_f(fr_Env env, fr_Obj self);
+fr_Obj sys_Type_emptyList_f(fr_Env env, fr_Obj self);
 fr_Bool sys_Type_isAbstract_f(fr_Env env, fr_Obj self);
 fr_Bool sys_Type_isClass_f(fr_Env env, fr_Obj self);
 fr_Bool sys_Type_isConst_f(fr_Env env, fr_Obj self);

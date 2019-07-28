@@ -177,6 +177,7 @@ void sys_Type_isVal(fr_Env env, void *param, void *ret);
 void sys_Type_isNullable(fr_Env env, void *param, void *ret);
 void sys_Type_toNullable(fr_Env env, void *param, void *ret);
 void sys_Type_toNonNullable(fr_Env env, void *param, void *ret);
+void sys_Type_emptyList(fr_Env env, void *param, void *ret);
 void sys_Type_isAbstract(fr_Env env, void *param, void *ret);
 void sys_Type_isClass(fr_Env env, void *param, void *ret);
 void sys_Type_isConst(fr_Env env, void *param, void *ret);
@@ -369,6 +370,7 @@ void sys_register(fr_Fvm vm) {
     fr_registerMethod(vm, "sys_Type_isNullable", sys_Type_isNullable);
     fr_registerMethod(vm, "sys_Type_toNullable", sys_Type_toNullable);
     fr_registerMethod(vm, "sys_Type_toNonNullable", sys_Type_toNonNullable);
+    fr_registerMethod(vm, "sys_Type_emptyList", sys_Type_emptyList);
     fr_registerMethod(vm, "sys_Type_isAbstract", sys_Type_isAbstract);
     fr_registerMethod(vm, "sys_Type_isClass", sys_Type_isClass);
     fr_registerMethod(vm, "sys_Type_isConst", sys_Type_isConst);
