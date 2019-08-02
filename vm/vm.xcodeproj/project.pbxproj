@@ -74,6 +74,247 @@
 		327A0F2C22216DC6001A6EF0 /* sys_Str.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0F1C22216DC6001A6EF0 /* sys_Str.c */; };
 		327A0F2D22216DC6001A6EF0 /* sys_ByteArray.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0F1D22216DC6001A6EF0 /* sys_ByteArray.c */; };
 		327A0F2E22216DC6001A6EF0 /* sys_Func.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0F1E22216DC6001A6EF0 /* sys_Func.c */; };
+		32A654DD22F47B22003557DE /* libLLVMAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544922F47B1D003557DE /* libLLVMAsmParser.a */; };
+		32A654DE22F47B22003557DE /* libLLVMLineEditor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544A22F47B1D003557DE /* libLLVMLineEditor.a */; };
+		32A654DF22F47B22003557DE /* libLLVMFuzzMutate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544B22F47B1D003557DE /* libLLVMFuzzMutate.a */; };
+		32A654E022F47B22003557DE /* libLLVMObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544C22F47B1D003557DE /* libLLVMObject.a */; };
+		32A654E122F47B22003557DE /* libLLVMOrcJIT.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544D22F47B1D003557DE /* libLLVMOrcJIT.a */; };
+		32A654E222F47B22003557DE /* libLLVMXCoreInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544E22F47B1D003557DE /* libLLVMXCoreInfo.a */; };
+		32A654E322F47B22003557DE /* libLLVMTableGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6544F22F47B1D003557DE /* libLLVMTableGen.a */; };
+		32A654E422F47B22003557DE /* libLLVMBinaryFormat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545022F47B1D003557DE /* libLLVMBinaryFormat.a */; };
+		32A654E522F47B22003557DE /* libLLVMAArch64Utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545122F47B1D003557DE /* libLLVMAArch64Utils.a */; };
+		32A654E622F47B22003557DE /* libLLVMBPFDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545222F47B1D003557DE /* libLLVMBPFDisassembler.a */; };
+		32A654E722F47B22003557DE /* libLLVMAMDGPUDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545322F47B1D003557DE /* libLLVMAMDGPUDesc.a */; };
+		32A654E822F47B22003557DE /* libLLVMAggressiveInstCombine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545422F47B1D003557DE /* libLLVMAggressiveInstCombine.a */; };
+		32A654E922F47B22003557DE /* libLLVMWebAssemblyDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545522F47B1D003557DE /* libLLVMWebAssemblyDisassembler.a */; };
+		32A654EA22F47B22003557DE /* libLLVMSystemZAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545622F47B1D003557DE /* libLLVMSystemZAsmParser.a */; };
+		32A654EB22F47B22003557DE /* libLLVMExecutionEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545722F47B1D003557DE /* libLLVMExecutionEngine.a */; };
+		32A654EC22F47B22003557DE /* libLLVMMipsCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545822F47B1D003557DE /* libLLVMMipsCodeGen.a */; };
+		32A654ED22F47B22003557DE /* libLLVMLanaiAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545922F47B1D003557DE /* libLLVMLanaiAsmParser.a */; };
+		32A654EE22F47B22003557DE /* libLLVMAMDGPUCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545A22F47B1D003557DE /* libLLVMAMDGPUCodeGen.a */; };
+		32A654EF22F47B22003557DE /* libLLVMProfileData.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545B22F47B1D003557DE /* libLLVMProfileData.a */; };
+		32A654F022F47B22003557DE /* libLLVMDemangle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545C22F47B1E003557DE /* libLLVMDemangle.a */; };
+		32A654F122F47B22003557DE /* libLLVMScalarOpts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545D22F47B1E003557DE /* libLLVMScalarOpts.a */; };
+		32A654F222F47B22003557DE /* libLLVMSystemZDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545E22F47B1E003557DE /* libLLVMSystemZDesc.a */; };
+		32A654F322F47B22003557DE /* libLLVMPowerPCAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6545F22F47B1E003557DE /* libLLVMPowerPCAsmPrinter.a */; };
+		32A654F422F47B23003557DE /* libLLVMX86Utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546022F47B1E003557DE /* libLLVMX86Utils.a */; };
+		32A654F522F47B23003557DE /* libLLVMAMDGPUDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546122F47B1E003557DE /* libLLVMAMDGPUDisassembler.a */; };
+		32A654F622F47B23003557DE /* libLLVMGlobalISel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546222F47B1E003557DE /* libLLVMGlobalISel.a */; };
+		32A654F722F47B23003557DE /* libLLVMSystemZInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546322F47B1E003557DE /* libLLVMSystemZInfo.a */; };
+		32A654F822F47B23003557DE /* libLLVMBPFAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546422F47B1E003557DE /* libLLVMBPFAsmPrinter.a */; };
+		32A654F922F47B23003557DE /* libLLVMXCoreCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546522F47B1E003557DE /* libLLVMXCoreCodeGen.a */; };
+		32A654FA22F47B23003557DE /* libLLVMHexagonAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546622F47B1E003557DE /* libLLVMHexagonAsmParser.a */; };
+		32A654FB22F47B23003557DE /* libLLVMSelectionDAG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546722F47B1E003557DE /* libLLVMSelectionDAG.a */; };
+		32A654FC22F47B23003557DE /* libLLVMAMDGPUAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546822F47B1E003557DE /* libLLVMAMDGPUAsmParser.a */; };
+		32A654FD22F47B23003557DE /* libLLVMMCDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546922F47B1E003557DE /* libLLVMMCDisassembler.a */; };
+		32A654FE22F47B23003557DE /* libLLVMMSP430Disassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546A22F47B1E003557DE /* libLLVMMSP430Disassembler.a */; };
+		32A654FF22F47B23003557DE /* libLLVMNVPTXInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546B22F47B1E003557DE /* libLLVMNVPTXInfo.a */; };
+		32A6550022F47B23003557DE /* libLLVMXCoreAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546C22F47B1E003557DE /* libLLVMXCoreAsmPrinter.a */; };
+		32A6550122F47B23003557DE /* libLLVMHexagonDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546D22F47B1E003557DE /* libLLVMHexagonDesc.a */; };
+		32A6550222F47B23003557DE /* libLLVMX86AsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546E22F47B1E003557DE /* libLLVMX86AsmParser.a */; };
+		32A6550322F47B23003557DE /* libunwind.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6546F22F47B1E003557DE /* libunwind.a */; };
+		32A6550422F47B23003557DE /* libLLVMDebugInfoPDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547022F47B1E003557DE /* libLLVMDebugInfoPDB.a */; };
+		32A6550522F47B23003557DE /* libLLVMMSP430CodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547122F47B1E003557DE /* libLLVMMSP430CodeGen.a */; };
+		32A6550622F47B23003557DE /* libLLVMARMCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547222F47B1E003557DE /* libLLVMARMCodeGen.a */; };
+		32A6550722F47B23003557DE /* libLLVMARMInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547322F47B1E003557DE /* libLLVMARMInfo.a */; };
+		32A6550822F47B23003557DE /* libLLVMLibDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547422F47B1E003557DE /* libLLVMLibDriver.a */; };
+		32A6550922F47B23003557DE /* libLLVMWebAssemblyInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547522F47B1E003557DE /* libLLVMWebAssemblyInfo.a */; };
+		32A6550A22F47B23003557DE /* libLLVMCoroutines.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547622F47B1E003557DE /* libLLVMCoroutines.a */; };
+		32A6550B22F47B23003557DE /* libLLVMBitWriter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547722F47B1E003557DE /* libLLVMBitWriter.a */; };
+		32A6550C22F47B23003557DE /* libLLVMAArch64Desc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547822F47B1E003557DE /* libLLVMAArch64Desc.a */; };
+		32A6550D22F47B23003557DE /* libLLVMLTO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547922F47B1F003557DE /* libLLVMLTO.a */; };
+		32A6550E22F47B23003557DE /* libLLVMMipsInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547A22F47B1F003557DE /* libLLVMMipsInfo.a */; };
+		32A6550F22F47B23003557DE /* libLLVMMC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547B22F47B1F003557DE /* libLLVMMC.a */; };
+		32A6551022F47B23003557DE /* libLLVMLanaiInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547C22F47B1F003557DE /* libLLVMLanaiInfo.a */; };
+		32A6551122F47B23003557DE /* libLLVMLanaiAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547D22F47B1F003557DE /* libLLVMLanaiAsmPrinter.a */; };
+		32A6551222F47B23003557DE /* libLLVMPowerPCInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547E22F47B1F003557DE /* libLLVMPowerPCInfo.a */; };
+		32A6551322F47B23003557DE /* libLLVMSupport.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6547F22F47B1F003557DE /* libLLVMSupport.a */; };
+		32A6551422F47B23003557DE /* libLLVMWebAssemblyAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548022F47B1F003557DE /* libLLVMWebAssemblyAsmParser.a */; };
+		32A6551522F47B23003557DE /* libLLVMWindowsManifest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548122F47B1F003557DE /* libLLVMWindowsManifest.a */; };
+		32A6551622F47B23003557DE /* libLLVMAMDGPUInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548222F47B1F003557DE /* libLLVMAMDGPUInfo.a */; };
+		32A6551722F47B23003557DE /* libLLVMDebugInfoMSF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548322F47B1F003557DE /* libLLVMDebugInfoMSF.a */; };
+		32A6551822F47B23003557DE /* libLLVMMCJIT.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548422F47B1F003557DE /* libLLVMMCJIT.a */; };
+		32A6551922F47B23003557DE /* libLLVMX86CodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548522F47B1F003557DE /* libLLVMX86CodeGen.a */; };
+		32A6551A22F47B23003557DE /* libLLVMMipsDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548622F47B1F003557DE /* libLLVMMipsDisassembler.a */; };
+		32A6551B22F47B23003557DE /* libLLVMPowerPCDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548722F47B1F003557DE /* libLLVMPowerPCDesc.a */; };
+		32A6551C22F47B23003557DE /* libLLVMLanaiDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548822F47B1F003557DE /* libLLVMLanaiDisassembler.a */; };
+		32A6551D22F47B23003557DE /* libLLVMAArch64Disassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548922F47B1F003557DE /* libLLVMAArch64Disassembler.a */; };
+		32A6551E22F47B23003557DE /* libLLVMHexagonInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548A22F47B1F003557DE /* libLLVMHexagonInfo.a */; };
+		32A6551F22F47B23003557DE /* libLLVMSymbolize.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548B22F47B1F003557DE /* libLLVMSymbolize.a */; };
+		32A6552022F47B23003557DE /* libLLVMAArch64AsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548C22F47B1F003557DE /* libLLVMAArch64AsmPrinter.a */; };
+		32A6552122F47B23003557DE /* libLLVMXCoreDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548D22F47B1F003557DE /* libLLVMXCoreDisassembler.a */; };
+		32A6552222F47B23003557DE /* libLLVMLanaiDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548E22F47B1F003557DE /* libLLVMLanaiDesc.a */; };
+		32A6552322F47B23003557DE /* libLLVMDlltoolDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6548F22F47B1F003557DE /* libLLVMDlltoolDriver.a */; };
+		32A6552422F47B23003557DE /* libLLVMPasses.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549022F47B1F003557DE /* libLLVMPasses.a */; };
+		32A6552522F47B23003557DE /* libLLVMMipsAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549122F47B1F003557DE /* libLLVMMipsAsmPrinter.a */; };
+		32A6552622F47B23003557DE /* libLLVMBPFCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549222F47B1F003557DE /* libLLVMBPFCodeGen.a */; };
+		32A6552722F47B23003557DE /* libLLVMARMUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549322F47B1F003557DE /* libLLVMARMUtils.a */; };
+		32A6552822F47B23003557DE /* libLLVMAArch64AsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549422F47B1F003557DE /* libLLVMAArch64AsmParser.a */; };
+		32A6552922F47B23003557DE /* libLLVMDebugInfoCodeView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549522F47B1F003557DE /* libLLVMDebugInfoCodeView.a */; };
+		32A6552A22F47B23003557DE /* libLLVMMIRParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549622F47B20003557DE /* libLLVMMIRParser.a */; };
+		32A6552B22F47B23003557DE /* libLLVMSparcInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549722F47B20003557DE /* libLLVMSparcInfo.a */; };
+		32A6552C22F47B23003557DE /* libLLVMTransformUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549822F47B20003557DE /* libLLVMTransformUtils.a */; };
+		32A6552D22F47B23003557DE /* libLLVMVectorize.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549922F47B20003557DE /* libLLVMVectorize.a */; };
+		32A6552E22F47B23003557DE /* libLLVMDebugInfoDWARF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549A22F47B20003557DE /* libLLVMDebugInfoDWARF.a */; };
+		32A6552F22F47B23003557DE /* libLLVMBPFInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549B22F47B20003557DE /* libLLVMBPFInfo.a */; };
+		32A6553022F47B23003557DE /* libLLVMSystemZCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549C22F47B20003557DE /* libLLVMSystemZCodeGen.a */; };
+		32A6553122F47B23003557DE /* libLLVMSystemZAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549D22F47B20003557DE /* libLLVMSystemZAsmPrinter.a */; };
+		32A6553222F47B23003557DE /* libLLVMSparcDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549E22F47B20003557DE /* libLLVMSparcDesc.a */; };
+		32A6553322F47B23003557DE /* libLLVMSystemZDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6549F22F47B20003557DE /* libLLVMSystemZDisassembler.a */; };
+		32A6553422F47B23003557DE /* libLLVMTextAPI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A022F47B20003557DE /* libLLVMTextAPI.a */; };
+		32A6553522F47B23003557DE /* libLLVMXRay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A122F47B20003557DE /* libLLVMXRay.a */; };
+		32A6553622F47B23003557DE /* libLLVMInstrumentation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A222F47B20003557DE /* libLLVMInstrumentation.a */; };
+		32A6553722F47B23003557DE /* libLLVMAArch64Info.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A322F47B20003557DE /* libLLVMAArch64Info.a */; };
+		32A6553822F47B23003557DE /* libLLVMARMDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A422F47B20003557DE /* libLLVMARMDisassembler.a */; };
+		32A6553922F47B23003557DE /* libLLVMWebAssemblyDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A522F47B20003557DE /* libLLVMWebAssemblyDesc.a */; };
+		32A6553A22F47B23003557DE /* libLLVMRuntimeDyld.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A622F47B20003557DE /* libLLVMRuntimeDyld.a */; };
+		32A6553B22F47B23003557DE /* libLLVMOptRemarks.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A722F47B20003557DE /* libLLVMOptRemarks.a */; };
+		32A6553C22F47B23003557DE /* libLLVMNVPTXDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A822F47B20003557DE /* libLLVMNVPTXDesc.a */; };
+		32A6553D22F47B23003557DE /* libLLVMX86AsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654A922F47B20003557DE /* libLLVMX86AsmPrinter.a */; };
+		32A6553E22F47B23003557DE /* libLLVMNVPTXCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654AA22F47B20003557DE /* libLLVMNVPTXCodeGen.a */; };
+		32A6553F22F47B23003557DE /* libLLVMNVPTXAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654AB22F47B20003557DE /* libLLVMNVPTXAsmPrinter.a */; };
+		32A6554022F47B23003557DE /* libLLVMARMAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654AC22F47B20003557DE /* libLLVMARMAsmParser.a */; };
+		32A6554122F47B23003557DE /* libLLVMPowerPCDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654AD22F47B20003557DE /* libLLVMPowerPCDisassembler.a */; };
+		32A6554222F47B23003557DE /* libLLVMAnalysis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654AE22F47B20003557DE /* libLLVMAnalysis.a */; };
+		32A6554322F47B23003557DE /* libLLVMCoverage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654AF22F47B20003557DE /* libLLVMCoverage.a */; };
+		32A6554422F47B23003557DE /* libLLVMSparcDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B022F47B21003557DE /* libLLVMSparcDisassembler.a */; };
+		32A6554522F47B23003557DE /* libLLVMTarget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B122F47B21003557DE /* libLLVMTarget.a */; };
+		32A6554622F47B23003557DE /* libLLVMAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B222F47B21003557DE /* libLLVMAsmPrinter.a */; };
+		32A6554722F47B23003557DE /* libLLVMSparcCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B322F47B21003557DE /* libLLVMSparcCodeGen.a */; };
+		32A6554822F47B23003557DE /* libLLVMX86Info.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B422F47B21003557DE /* libLLVMX86Info.a */; };
+		32A6554922F47B23003557DE /* libLLVMBitReader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B522F47B21003557DE /* libLLVMBitReader.a */; };
+		32A6554A22F47B23003557DE /* libPolly.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B622F47B21003557DE /* libPolly.a */; };
+		32A6554B22F47B23003557DE /* libLLVMMipsAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B722F47B21003557DE /* libLLVMMipsAsmParser.a */; };
+		32A6554C22F47B23003557DE /* libLLVMBPFDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B822F47B21003557DE /* libLLVMBPFDesc.a */; };
+		32A6554D22F47B23003557DE /* libLLVMObjCARCOpts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654B922F47B21003557DE /* libLLVMObjCARCOpts.a */; };
+		32A6554E22F47B23003557DE /* libLLVMWebAssemblyCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654BA22F47B21003557DE /* libLLVMWebAssemblyCodeGen.a */; };
+		32A6554F22F47B23003557DE /* libLLVMPowerPCCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654BB22F47B21003557DE /* libLLVMPowerPCCodeGen.a */; };
+		32A6555022F47B23003557DE /* libLLVMMSP430Info.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654BC22F47B21003557DE /* libLLVMMSP430Info.a */; };
+		32A6555122F47B23003557DE /* libLLVMARMAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654BD22F47B21003557DE /* libLLVMARMAsmPrinter.a */; };
+		32A6555222F47B23003557DE /* libLLVMCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654BE22F47B21003557DE /* libLLVMCodeGen.a */; };
+		32A6555322F47B23003557DE /* libLLVMHexagonDisassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654BF22F47B21003557DE /* libLLVMHexagonDisassembler.a */; };
+		32A6555422F47B23003557DE /* libLLVMXCoreDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C022F47B21003557DE /* libLLVMXCoreDesc.a */; };
+		32A6555522F47B23003557DE /* libLLVMMCParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C122F47B21003557DE /* libLLVMMCParser.a */; };
+		32A6555622F47B23003557DE /* libLLVMMCA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C222F47B21003557DE /* libLLVMMCA.a */; };
+		32A6555722F47B23003557DE /* libLLVMInstCombine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C322F47B21003557DE /* libLLVMInstCombine.a */; };
+		32A6555822F47B23003557DE /* libLLVMInterpreter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C422F47B21003557DE /* libLLVMInterpreter.a */; };
+		32A6555922F47B23003557DE /* libLLVMAMDGPUAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C522F47B21003557DE /* libLLVMAMDGPUAsmPrinter.a */; };
+		32A6555A22F47B23003557DE /* libLLVMSparcAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C622F47B22003557DE /* libLLVMSparcAsmPrinter.a */; };
+		32A6555B22F47B23003557DE /* libLLVMBPFAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C722F47B22003557DE /* libLLVMBPFAsmParser.a */; };
+		32A6555C22F47B23003557DE /* libLLVMHexagonCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C822F47B22003557DE /* libLLVMHexagonCodeGen.a */; };
+		32A6555D22F47B23003557DE /* libLLVMMSP430Desc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654C922F47B22003557DE /* libLLVMMSP430Desc.a */; };
+		32A6555E22F47B23003557DE /* libLLVMPowerPCAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CA22F47B22003557DE /* libLLVMPowerPCAsmParser.a */; };
+		32A6555F22F47B23003557DE /* libLLVMIRReader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CB22F47B22003557DE /* libLLVMIRReader.a */; };
+		32A6556022F47B23003557DE /* libLLVMObjectYAML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CC22F47B22003557DE /* libLLVMObjectYAML.a */; };
+		32A6556122F47B23003557DE /* libLLVMSparcAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CD22F47B22003557DE /* libLLVMSparcAsmParser.a */; };
+		32A6556322F47B23003557DE /* libLLVMOption.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CF22F47B22003557DE /* libLLVMOption.a */; };
+		32A6556422F47B23003557DE /* libLLVMMSP430AsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D022F47B22003557DE /* libLLVMMSP430AsmPrinter.a */; };
+		32A6556522F47B23003557DE /* libLLVMipo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D122F47B22003557DE /* libLLVMipo.a */; };
+		32A6556622F47B23003557DE /* libLLVMX86Desc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D222F47B22003557DE /* libLLVMX86Desc.a */; };
+		32A6556722F47B23003557DE /* libLLVMAMDGPUUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D322F47B22003557DE /* libLLVMAMDGPUUtils.a */; };
+		32A6556822F47B23003557DE /* libLLVMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D422F47B22003557DE /* libLLVMCore.a */; };
+		32A6556922F47B23003557DE /* libLLVMMipsDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D522F47B22003557DE /* libLLVMMipsDesc.a */; };
+		32A6556A22F47B23003557DE /* libLLVMARMDesc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D622F47B22003557DE /* libLLVMARMDesc.a */; };
+		32A6556B22F47B23003557DE /* libLLVMWebAssemblyAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D722F47B22003557DE /* libLLVMWebAssemblyAsmPrinter.a */; };
+		32A6556C22F47B23003557DE /* libLLVMLinker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D822F47B22003557DE /* libLLVMLinker.a */; };
+		32A6556D22F47B23003557DE /* libLLVMX86Disassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654D922F47B22003557DE /* libLLVMX86Disassembler.a */; };
+		32A6556E22F47B23003557DE /* libLLVMAArch64CodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654DA22F47B22003557DE /* libLLVMAArch64CodeGen.a */; };
+		32A6556F22F47B23003557DE /* libLLVMLanaiCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654DB22F47B22003557DE /* libLLVMLanaiCodeGen.a */; };
+		32A6557022F47B23003557DE /* libLLVMMSP430AsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654DC22F47B22003557DE /* libLLVMMSP430AsmParser.a */; };
+		32A6557122F47CA0003557DE /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 32FF47071D85ACF000724EB6 /* libz.tbd */; };
+		32A655C122F47D34003557DE /* libclangTidyModernizeModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557222F47D2E003557DE /* libclangTidyModernizeModule.a */; };
+		32A655C222F47D34003557DE /* libclangEdit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557322F47D2E003557DE /* libclangEdit.a */; };
+		32A655C322F47D34003557DE /* libclangTidyAndroidModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557422F47D2E003557DE /* libclangTidyAndroidModule.a */; };
+		32A655C422F47D34003557DE /* libclangHandleCXX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557522F47D2E003557DE /* libclangHandleCXX.a */; };
+		32A655C522F47D34003557DE /* libclangBasic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557622F47D2F003557DE /* libclangBasic.a */; };
+		32A655C622F47D34003557DE /* libc++experimental.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557722F47D2F003557DE /* libc++experimental.a */; };
+		32A655C722F47D34003557DE /* libclangDaemon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557822F47D2F003557DE /* libclangDaemon.a */; };
+		32A655C822F47D34003557DE /* libclangAnalysis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557922F47D2F003557DE /* libclangAnalysis.a */; };
+		32A655C922F47D35003557DE /* libclangTidyBoostModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557A22F47D2F003557DE /* libclangTidyBoostModule.a */; };
+		32A655CA22F47D35003557DE /* libclangAST.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557B22F47D2F003557DE /* libclangAST.a */; };
+		32A655CB22F47D35003557DE /* libPollyPPCG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557C22F47D2F003557DE /* libPollyPPCG.a */; };
+		32A655CC22F47D35003557DE /* libclangHandleLLVM.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557D22F47D2F003557DE /* libclangHandleLLVM.a */; };
+		32A655CD22F47D35003557DE /* libclangFrontendTool.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557E22F47D2F003557DE /* libclangFrontendTool.a */; };
+		32A655CE22F47D35003557DE /* libclangCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6557F22F47D2F003557DE /* libclangCodeGen.a */; };
+		32A655CF22F47D35003557DE /* libclangIncludeFixer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558022F47D2F003557DE /* libclangIncludeFixer.a */; };
+		32A655D022F47D35003557DE /* libclangIndex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558122F47D2F003557DE /* libclangIndex.a */; };
+		32A655D122F47D35003557DE /* libclangdXpcTransport.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558222F47D2F003557DE /* libclangdXpcTransport.a */; };
+		32A655D222F47D35003557DE /* libclangTidy.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558322F47D30003557DE /* libclangTidy.a */; };
+		32A655D322F47D35003557DE /* libclangTidyPlugin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558422F47D30003557DE /* libclangTidyPlugin.a */; };
+		32A655D422F47D35003557DE /* libclangTidyReadabilityModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558522F47D30003557DE /* libclangTidyReadabilityModule.a */; };
+		32A655D522F47D35003557DE /* libclangMove.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558622F47D30003557DE /* libclangMove.a */; };
+		32A655D622F47D35003557DE /* libclangFormat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558722F47D30003557DE /* libclangFormat.a */; };
+		32A655D722F47D35003557DE /* libclangRewrite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558822F47D30003557DE /* libclangRewrite.a */; };
+		32A655D822F47D35003557DE /* libclangSerialization.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558922F47D30003557DE /* libclangSerialization.a */; };
+		32A655D922F47D35003557DE /* libclangTidyUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558A22F47D30003557DE /* libclangTidyUtils.a */; };
+		32A655DA22F47D35003557DE /* liblldMinGW.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558B22F47D30003557DE /* liblldMinGW.a */; };
+		32A655DB22F47D35003557DE /* liblldELF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558C22F47D30003557DE /* liblldELF.a */; };
+		32A655DC22F47D35003557DE /* libclangToolingInclusions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558D22F47D30003557DE /* libclangToolingInclusions.a */; };
+		32A655DD22F47D35003557DE /* libclangARCMigrate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558E22F47D30003557DE /* libclangARCMigrate.a */; };
+		32A655DE22F47D35003557DE /* libclangdXpcJsonConversions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6558F22F47D30003557DE /* libclangdXpcJsonConversions.a */; };
+		32A655DF22F47D35003557DE /* libclangTooling.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559022F47D30003557DE /* libclangTooling.a */; };
+		32A655E022F47D35003557DE /* libc++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559122F47D31003557DE /* libc++.a */; };
+		32A655E122F47D35003557DE /* liblldCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559222F47D31003557DE /* liblldCommon.a */; };
+		32A655E222F47D35003557DE /* liblldDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559322F47D31003557DE /* liblldDriver.a */; };
+		32A655E322F47D35003557DE /* libclangRewriteFrontend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559422F47D31003557DE /* libclangRewriteFrontend.a */; };
+		32A655E422F47D35003557DE /* libclangASTMatchers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559522F47D31003557DE /* libclangASTMatchers.a */; };
+		32A655E522F47D35003557DE /* libclangQuery.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559622F47D31003557DE /* libclangQuery.a */; };
+		32A655E622F47D35003557DE /* libclangStaticAnalyzerCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559722F47D31003557DE /* libclangStaticAnalyzerCore.a */; };
+		32A655E722F47D35003557DE /* libclangApplyReplacements.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559822F47D31003557DE /* libclangApplyReplacements.a */; };
+		32A655E822F47D35003557DE /* libclangTidyCppCoreGuidelinesModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559922F47D31003557DE /* libclangTidyCppCoreGuidelinesModule.a */; };
+		32A655E922F47D35003557DE /* libclangToolingRefactor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559A22F47D31003557DE /* libclangToolingRefactor.a */; };
+		32A655EA22F47D35003557DE /* liblldWasm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559B22F47D31003557DE /* liblldWasm.a */; };
+		32A655EB22F47D35003557DE /* libPollyISL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559C22F47D31003557DE /* libPollyISL.a */; };
+		32A655EC22F47D35003557DE /* libclangTidyGoogleModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559D22F47D31003557DE /* libclangTidyGoogleModule.a */; };
+		32A655ED22F47D35003557DE /* libclangTidyObjCModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559E22F47D31003557DE /* libclangTidyObjCModule.a */; };
+		32A655EE22F47D35003557DE /* libclangTidyPortabilityModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6559F22F47D32003557DE /* libclangTidyPortabilityModule.a */; };
+		32A655EF22F47D35003557DE /* libclangCrossTU.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A022F47D32003557DE /* libclangCrossTU.a */; };
+		32A655F022F47D35003557DE /* libclangToolingCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A122F47D32003557DE /* libclangToolingCore.a */; };
+		32A655F122F47D35003557DE /* libclangStaticAnalyzerFrontend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A222F47D32003557DE /* libclangStaticAnalyzerFrontend.a */; };
+		32A655F222F47D35003557DE /* libclangTidyCERTModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A322F47D32003557DE /* libclangTidyCERTModule.a */; };
+		32A655F322F47D35003557DE /* libclangTidyAbseilModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A422F47D32003557DE /* libclangTidyAbseilModule.a */; };
+		32A655F422F47D35003557DE /* libclangTidyBugproneModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A522F47D32003557DE /* libclangTidyBugproneModule.a */; };
+		32A655F522F47D35003557DE /* libclangTidyLLVMModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A622F47D32003557DE /* libclangTidyLLVMModule.a */; };
+		32A655F622F47D35003557DE /* liblldYAML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A722F47D32003557DE /* liblldYAML.a */; };
+		32A655F722F47D35003557DE /* libclangReorderFields.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A822F47D32003557DE /* libclangReorderFields.a */; };
+		32A655F822F47D35003557DE /* libclangDoc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655A922F47D32003557DE /* libclangDoc.a */; };
+		32A655F922F47D35003557DE /* liblldCOFF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655AA22F47D32003557DE /* liblldCOFF.a */; };
+		32A655FA22F47D35003557DE /* libc++fs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655AB22F47D32003557DE /* libc++fs.a */; };
+		32A655FB22F47D35003557DE /* libclangTidyMPIModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655AC22F47D32003557DE /* libclangTidyMPIModule.a */; };
+		32A655FC22F47D35003557DE /* libfindAllSymbols.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655AD22F47D32003557DE /* libfindAllSymbols.a */; };
+		32A655FD22F47D35003557DE /* libclangToolingASTDiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655AE22F47D33003557DE /* libclangToolingASTDiff.a */; };
+		32A655FE22F47D35003557DE /* libclangDynamicASTMatchers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655AF22F47D33003557DE /* libclangDynamicASTMatchers.a */; };
+		32A655FF22F47D35003557DE /* libclangParse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B022F47D33003557DE /* libclangParse.a */; };
+		32A6560022F47D35003557DE /* liblldMachO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B122F47D33003557DE /* liblldMachO.a */; };
+		32A6560122F47D35003557DE /* libclangStaticAnalyzerCheckers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B222F47D33003557DE /* libclangStaticAnalyzerCheckers.a */; };
+		32A6560222F47D35003557DE /* libclangTidyPerformanceModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B322F47D33003557DE /* libclangTidyPerformanceModule.a */; };
+		32A6560322F47D35003557DE /* liblldReaderWriter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B422F47D33003557DE /* liblldReaderWriter.a */; };
+		32A6560422F47D35003557DE /* libclangTidyMiscModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B522F47D33003557DE /* libclangTidyMiscModule.a */; };
+		32A6560522F47D35003557DE /* libclangSema.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B622F47D33003557DE /* libclangSema.a */; };
+		32A6560622F47D35003557DE /* libclangLex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B722F47D33003557DE /* libclangLex.a */; };
+		32A6560722F47D35003557DE /* libc++abi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B822F47D34003557DE /* libc++abi.a */; };
+		32A6560822F47D35003557DE /* libclangTidyZirconModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655B922F47D34003557DE /* libclangTidyZirconModule.a */; };
+		32A6560922F47D35003557DE /* libclangTidyFuchsiaModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655BA22F47D34003557DE /* libclangTidyFuchsiaModule.a */; };
+		32A6560A22F47D35003557DE /* libclangFrontend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655BB22F47D34003557DE /* libclangFrontend.a */; };
+		32A6560B22F47D35003557DE /* liblldCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655BC22F47D34003557DE /* liblldCore.a */; };
+		32A6560C22F47D35003557DE /* libclangTidyHICPPModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655BD22F47D34003557DE /* libclangTidyHICPPModule.a */; };
+		32A6560D22F47D35003557DE /* libclangIncludeFixerPlugin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655BE22F47D34003557DE /* libclangIncludeFixerPlugin.a */; };
+		32A6560E22F47D35003557DE /* libclangChangeNamespace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655BF22F47D34003557DE /* libclangChangeNamespace.a */; };
+		32A6560F22F47D35003557DE /* libclangDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A655C022F47D34003557DE /* libclangDriver.a */; };
+		32A6561122F481CC003557DE /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561022F481CC003557DE /* libncurses.tbd */; };
+		32A6561422F4887E003557DE /* libc++.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561222F48831003557DE /* libc++.1.0.dylib */; };
+		32A6561522F4887E003557DE /* libc++.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561222F48831003557DE /* libc++.1.0.dylib */; };
+		32A6561622F4887E003557DE /* libunwind.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CE22F47B22003557DE /* libunwind.1.0.dylib */; };
+		32A6561722F4887E003557DE /* libunwind.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CE22F47B22003557DE /* libunwind.1.0.dylib */; };
+		32A6561822F4887F003557DE /* libc++.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561222F48831003557DE /* libc++.1.0.dylib */; };
+		32A6561922F4887F003557DE /* libunwind.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A654CE22F47B22003557DE /* libunwind.1.0.dylib */; };
+		32A6562122F48880003557DE /* libClangdXPCLib.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561A22F4887F003557DE /* libClangdXPCLib.dylib */; };
+		32A6562222F48880003557DE /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561B22F48880003557DE /* libLTO.dylib */; };
+		32A6562322F48880003557DE /* libomp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561C22F48880003557DE /* libomp.dylib */; };
+		32A6562422F48880003557DE /* libOptRemarks.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561D22F48880003557DE /* libOptRemarks.dylib */; };
+		32A6562522F48880003557DE /* libc++abi.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561E22F48880003557DE /* libc++abi.1.0.dylib */; };
+		32A6562622F48880003557DE /* LLVMPolly.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561F22F48880003557DE /* LLVMPolly.so */; };
+		32A6562722F48880003557DE /* libclang.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6562022F48880003557DE /* libclang.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -220,6 +461,242 @@
 		327A0F1C22216DC6001A6EF0 /* sys_Str.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Str.c; sourceTree = "<group>"; };
 		327A0F1D22216DC6001A6EF0 /* sys_ByteArray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_ByteArray.c; sourceTree = "<group>"; };
 		327A0F1E22216DC6001A6EF0 /* sys_Func.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Func.c; sourceTree = "<group>"; };
+		32A6544922F47B1D003557DE /* libLLVMAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAsmParser.a"; sourceTree = "<group>"; };
+		32A6544A22F47B1D003557DE /* libLLVMLineEditor.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLineEditor.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLineEditor.a"; sourceTree = "<group>"; };
+		32A6544B22F47B1D003557DE /* libLLVMFuzzMutate.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMFuzzMutate.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMFuzzMutate.a"; sourceTree = "<group>"; };
+		32A6544C22F47B1D003557DE /* libLLVMObject.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMObject.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMObject.a"; sourceTree = "<group>"; };
+		32A6544D22F47B1D003557DE /* libLLVMOrcJIT.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMOrcJIT.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMOrcJIT.a"; sourceTree = "<group>"; };
+		32A6544E22F47B1D003557DE /* libLLVMXCoreInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMXCoreInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMXCoreInfo.a"; sourceTree = "<group>"; };
+		32A6544F22F47B1D003557DE /* libLLVMTableGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMTableGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMTableGen.a"; sourceTree = "<group>"; };
+		32A6545022F47B1D003557DE /* libLLVMBinaryFormat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBinaryFormat.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBinaryFormat.a"; sourceTree = "<group>"; };
+		32A6545122F47B1D003557DE /* libLLVMAArch64Utils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64Utils.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64Utils.a"; sourceTree = "<group>"; };
+		32A6545222F47B1D003557DE /* libLLVMBPFDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBPFDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBPFDisassembler.a"; sourceTree = "<group>"; };
+		32A6545322F47B1D003557DE /* libLLVMAMDGPUDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUDesc.a"; sourceTree = "<group>"; };
+		32A6545422F47B1D003557DE /* libLLVMAggressiveInstCombine.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAggressiveInstCombine.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAggressiveInstCombine.a"; sourceTree = "<group>"; };
+		32A6545522F47B1D003557DE /* libLLVMWebAssemblyDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWebAssemblyDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWebAssemblyDisassembler.a"; sourceTree = "<group>"; };
+		32A6545622F47B1D003557DE /* libLLVMSystemZAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSystemZAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSystemZAsmParser.a"; sourceTree = "<group>"; };
+		32A6545722F47B1D003557DE /* libLLVMExecutionEngine.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMExecutionEngine.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMExecutionEngine.a"; sourceTree = "<group>"; };
+		32A6545822F47B1D003557DE /* libLLVMMipsCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMipsCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMipsCodeGen.a"; sourceTree = "<group>"; };
+		32A6545922F47B1D003557DE /* libLLVMLanaiAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLanaiAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLanaiAsmParser.a"; sourceTree = "<group>"; };
+		32A6545A22F47B1D003557DE /* libLLVMAMDGPUCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUCodeGen.a"; sourceTree = "<group>"; };
+		32A6545B22F47B1D003557DE /* libLLVMProfileData.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMProfileData.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMProfileData.a"; sourceTree = "<group>"; };
+		32A6545C22F47B1E003557DE /* libLLVMDemangle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMDemangle.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMDemangle.a"; sourceTree = "<group>"; };
+		32A6545D22F47B1E003557DE /* libLLVMScalarOpts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMScalarOpts.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMScalarOpts.a"; sourceTree = "<group>"; };
+		32A6545E22F47B1E003557DE /* libLLVMSystemZDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSystemZDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSystemZDesc.a"; sourceTree = "<group>"; };
+		32A6545F22F47B1E003557DE /* libLLVMPowerPCAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPowerPCAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPowerPCAsmPrinter.a"; sourceTree = "<group>"; };
+		32A6546022F47B1E003557DE /* libLLVMX86Utils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86Utils.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86Utils.a"; sourceTree = "<group>"; };
+		32A6546122F47B1E003557DE /* libLLVMAMDGPUDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUDisassembler.a"; sourceTree = "<group>"; };
+		32A6546222F47B1E003557DE /* libLLVMGlobalISel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMGlobalISel.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMGlobalISel.a"; sourceTree = "<group>"; };
+		32A6546322F47B1E003557DE /* libLLVMSystemZInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSystemZInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSystemZInfo.a"; sourceTree = "<group>"; };
+		32A6546422F47B1E003557DE /* libLLVMBPFAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBPFAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBPFAsmPrinter.a"; sourceTree = "<group>"; };
+		32A6546522F47B1E003557DE /* libLLVMXCoreCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMXCoreCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMXCoreCodeGen.a"; sourceTree = "<group>"; };
+		32A6546622F47B1E003557DE /* libLLVMHexagonAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMHexagonAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMHexagonAsmParser.a"; sourceTree = "<group>"; };
+		32A6546722F47B1E003557DE /* libLLVMSelectionDAG.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSelectionDAG.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSelectionDAG.a"; sourceTree = "<group>"; };
+		32A6546822F47B1E003557DE /* libLLVMAMDGPUAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUAsmParser.a"; sourceTree = "<group>"; };
+		32A6546922F47B1E003557DE /* libLLVMMCDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMCDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMCDisassembler.a"; sourceTree = "<group>"; };
+		32A6546A22F47B1E003557DE /* libLLVMMSP430Disassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMSP430Disassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMSP430Disassembler.a"; sourceTree = "<group>"; };
+		32A6546B22F47B1E003557DE /* libLLVMNVPTXInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMNVPTXInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMNVPTXInfo.a"; sourceTree = "<group>"; };
+		32A6546C22F47B1E003557DE /* libLLVMXCoreAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMXCoreAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMXCoreAsmPrinter.a"; sourceTree = "<group>"; };
+		32A6546D22F47B1E003557DE /* libLLVMHexagonDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMHexagonDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMHexagonDesc.a"; sourceTree = "<group>"; };
+		32A6546E22F47B1E003557DE /* libLLVMX86AsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86AsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86AsmParser.a"; sourceTree = "<group>"; };
+		32A6546F22F47B1E003557DE /* libunwind.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libunwind.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libunwind.a"; sourceTree = "<group>"; };
+		32A6547022F47B1E003557DE /* libLLVMDebugInfoPDB.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMDebugInfoPDB.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMDebugInfoPDB.a"; sourceTree = "<group>"; };
+		32A6547122F47B1E003557DE /* libLLVMMSP430CodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMSP430CodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMSP430CodeGen.a"; sourceTree = "<group>"; };
+		32A6547222F47B1E003557DE /* libLLVMARMCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMCodeGen.a"; sourceTree = "<group>"; };
+		32A6547322F47B1E003557DE /* libLLVMARMInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMInfo.a"; sourceTree = "<group>"; };
+		32A6547422F47B1E003557DE /* libLLVMLibDriver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLibDriver.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLibDriver.a"; sourceTree = "<group>"; };
+		32A6547522F47B1E003557DE /* libLLVMWebAssemblyInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWebAssemblyInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWebAssemblyInfo.a"; sourceTree = "<group>"; };
+		32A6547622F47B1E003557DE /* libLLVMCoroutines.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMCoroutines.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMCoroutines.a"; sourceTree = "<group>"; };
+		32A6547722F47B1E003557DE /* libLLVMBitWriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBitWriter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBitWriter.a"; sourceTree = "<group>"; };
+		32A6547822F47B1E003557DE /* libLLVMAArch64Desc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64Desc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64Desc.a"; sourceTree = "<group>"; };
+		32A6547922F47B1F003557DE /* libLLVMLTO.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLTO.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLTO.a"; sourceTree = "<group>"; };
+		32A6547A22F47B1F003557DE /* libLLVMMipsInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMipsInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMipsInfo.a"; sourceTree = "<group>"; };
+		32A6547B22F47B1F003557DE /* libLLVMMC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMC.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMC.a"; sourceTree = "<group>"; };
+		32A6547C22F47B1F003557DE /* libLLVMLanaiInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLanaiInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLanaiInfo.a"; sourceTree = "<group>"; };
+		32A6547D22F47B1F003557DE /* libLLVMLanaiAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLanaiAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLanaiAsmPrinter.a"; sourceTree = "<group>"; };
+		32A6547E22F47B1F003557DE /* libLLVMPowerPCInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPowerPCInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPowerPCInfo.a"; sourceTree = "<group>"; };
+		32A6547F22F47B1F003557DE /* libLLVMSupport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSupport.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSupport.a"; sourceTree = "<group>"; };
+		32A6548022F47B1F003557DE /* libLLVMWebAssemblyAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWebAssemblyAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWebAssemblyAsmParser.a"; sourceTree = "<group>"; };
+		32A6548122F47B1F003557DE /* libLLVMWindowsManifest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWindowsManifest.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWindowsManifest.a"; sourceTree = "<group>"; };
+		32A6548222F47B1F003557DE /* libLLVMAMDGPUInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUInfo.a"; sourceTree = "<group>"; };
+		32A6548322F47B1F003557DE /* libLLVMDebugInfoMSF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMDebugInfoMSF.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMDebugInfoMSF.a"; sourceTree = "<group>"; };
+		32A6548422F47B1F003557DE /* libLLVMMCJIT.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMCJIT.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMCJIT.a"; sourceTree = "<group>"; };
+		32A6548522F47B1F003557DE /* libLLVMX86CodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86CodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86CodeGen.a"; sourceTree = "<group>"; };
+		32A6548622F47B1F003557DE /* libLLVMMipsDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMipsDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMipsDisassembler.a"; sourceTree = "<group>"; };
+		32A6548722F47B1F003557DE /* libLLVMPowerPCDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPowerPCDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPowerPCDesc.a"; sourceTree = "<group>"; };
+		32A6548822F47B1F003557DE /* libLLVMLanaiDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLanaiDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLanaiDisassembler.a"; sourceTree = "<group>"; };
+		32A6548922F47B1F003557DE /* libLLVMAArch64Disassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64Disassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64Disassembler.a"; sourceTree = "<group>"; };
+		32A6548A22F47B1F003557DE /* libLLVMHexagonInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMHexagonInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMHexagonInfo.a"; sourceTree = "<group>"; };
+		32A6548B22F47B1F003557DE /* libLLVMSymbolize.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSymbolize.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSymbolize.a"; sourceTree = "<group>"; };
+		32A6548C22F47B1F003557DE /* libLLVMAArch64AsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64AsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64AsmPrinter.a"; sourceTree = "<group>"; };
+		32A6548D22F47B1F003557DE /* libLLVMXCoreDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMXCoreDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMXCoreDisassembler.a"; sourceTree = "<group>"; };
+		32A6548E22F47B1F003557DE /* libLLVMLanaiDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLanaiDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLanaiDesc.a"; sourceTree = "<group>"; };
+		32A6548F22F47B1F003557DE /* libLLVMDlltoolDriver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMDlltoolDriver.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMDlltoolDriver.a"; sourceTree = "<group>"; };
+		32A6549022F47B1F003557DE /* libLLVMPasses.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPasses.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPasses.a"; sourceTree = "<group>"; };
+		32A6549122F47B1F003557DE /* libLLVMMipsAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMipsAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMipsAsmPrinter.a"; sourceTree = "<group>"; };
+		32A6549222F47B1F003557DE /* libLLVMBPFCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBPFCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBPFCodeGen.a"; sourceTree = "<group>"; };
+		32A6549322F47B1F003557DE /* libLLVMARMUtils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMUtils.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMUtils.a"; sourceTree = "<group>"; };
+		32A6549422F47B1F003557DE /* libLLVMAArch64AsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64AsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64AsmParser.a"; sourceTree = "<group>"; };
+		32A6549522F47B1F003557DE /* libLLVMDebugInfoCodeView.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMDebugInfoCodeView.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMDebugInfoCodeView.a"; sourceTree = "<group>"; };
+		32A6549622F47B20003557DE /* libLLVMMIRParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMIRParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMIRParser.a"; sourceTree = "<group>"; };
+		32A6549722F47B20003557DE /* libLLVMSparcInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSparcInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSparcInfo.a"; sourceTree = "<group>"; };
+		32A6549822F47B20003557DE /* libLLVMTransformUtils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMTransformUtils.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMTransformUtils.a"; sourceTree = "<group>"; };
+		32A6549922F47B20003557DE /* libLLVMVectorize.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMVectorize.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMVectorize.a"; sourceTree = "<group>"; };
+		32A6549A22F47B20003557DE /* libLLVMDebugInfoDWARF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMDebugInfoDWARF.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMDebugInfoDWARF.a"; sourceTree = "<group>"; };
+		32A6549B22F47B20003557DE /* libLLVMBPFInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBPFInfo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBPFInfo.a"; sourceTree = "<group>"; };
+		32A6549C22F47B20003557DE /* libLLVMSystemZCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSystemZCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSystemZCodeGen.a"; sourceTree = "<group>"; };
+		32A6549D22F47B20003557DE /* libLLVMSystemZAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSystemZAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSystemZAsmPrinter.a"; sourceTree = "<group>"; };
+		32A6549E22F47B20003557DE /* libLLVMSparcDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSparcDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSparcDesc.a"; sourceTree = "<group>"; };
+		32A6549F22F47B20003557DE /* libLLVMSystemZDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSystemZDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSystemZDisassembler.a"; sourceTree = "<group>"; };
+		32A654A022F47B20003557DE /* libLLVMTextAPI.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMTextAPI.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMTextAPI.a"; sourceTree = "<group>"; };
+		32A654A122F47B20003557DE /* libLLVMXRay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMXRay.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMXRay.a"; sourceTree = "<group>"; };
+		32A654A222F47B20003557DE /* libLLVMInstrumentation.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMInstrumentation.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMInstrumentation.a"; sourceTree = "<group>"; };
+		32A654A322F47B20003557DE /* libLLVMAArch64Info.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64Info.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64Info.a"; sourceTree = "<group>"; };
+		32A654A422F47B20003557DE /* libLLVMARMDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMDisassembler.a"; sourceTree = "<group>"; };
+		32A654A522F47B20003557DE /* libLLVMWebAssemblyDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWebAssemblyDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWebAssemblyDesc.a"; sourceTree = "<group>"; };
+		32A654A622F47B20003557DE /* libLLVMRuntimeDyld.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMRuntimeDyld.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMRuntimeDyld.a"; sourceTree = "<group>"; };
+		32A654A722F47B20003557DE /* libLLVMOptRemarks.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMOptRemarks.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMOptRemarks.a"; sourceTree = "<group>"; };
+		32A654A822F47B20003557DE /* libLLVMNVPTXDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMNVPTXDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMNVPTXDesc.a"; sourceTree = "<group>"; };
+		32A654A922F47B20003557DE /* libLLVMX86AsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86AsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86AsmPrinter.a"; sourceTree = "<group>"; };
+		32A654AA22F47B20003557DE /* libLLVMNVPTXCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMNVPTXCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMNVPTXCodeGen.a"; sourceTree = "<group>"; };
+		32A654AB22F47B20003557DE /* libLLVMNVPTXAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMNVPTXAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMNVPTXAsmPrinter.a"; sourceTree = "<group>"; };
+		32A654AC22F47B20003557DE /* libLLVMARMAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMAsmParser.a"; sourceTree = "<group>"; };
+		32A654AD22F47B20003557DE /* libLLVMPowerPCDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPowerPCDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPowerPCDisassembler.a"; sourceTree = "<group>"; };
+		32A654AE22F47B20003557DE /* libLLVMAnalysis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAnalysis.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAnalysis.a"; sourceTree = "<group>"; };
+		32A654AF22F47B20003557DE /* libLLVMCoverage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMCoverage.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMCoverage.a"; sourceTree = "<group>"; };
+		32A654B022F47B21003557DE /* libLLVMSparcDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSparcDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSparcDisassembler.a"; sourceTree = "<group>"; };
+		32A654B122F47B21003557DE /* libLLVMTarget.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMTarget.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMTarget.a"; sourceTree = "<group>"; };
+		32A654B222F47B21003557DE /* libLLVMAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAsmPrinter.a"; sourceTree = "<group>"; };
+		32A654B322F47B21003557DE /* libLLVMSparcCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSparcCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSparcCodeGen.a"; sourceTree = "<group>"; };
+		32A654B422F47B21003557DE /* libLLVMX86Info.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86Info.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86Info.a"; sourceTree = "<group>"; };
+		32A654B522F47B21003557DE /* libLLVMBitReader.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBitReader.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBitReader.a"; sourceTree = "<group>"; };
+		32A654B622F47B21003557DE /* libPolly.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPolly.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libPolly.a"; sourceTree = "<group>"; };
+		32A654B722F47B21003557DE /* libLLVMMipsAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMipsAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMipsAsmParser.a"; sourceTree = "<group>"; };
+		32A654B822F47B21003557DE /* libLLVMBPFDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBPFDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBPFDesc.a"; sourceTree = "<group>"; };
+		32A654B922F47B21003557DE /* libLLVMObjCARCOpts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMObjCARCOpts.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMObjCARCOpts.a"; sourceTree = "<group>"; };
+		32A654BA22F47B21003557DE /* libLLVMWebAssemblyCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWebAssemblyCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWebAssemblyCodeGen.a"; sourceTree = "<group>"; };
+		32A654BB22F47B21003557DE /* libLLVMPowerPCCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPowerPCCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPowerPCCodeGen.a"; sourceTree = "<group>"; };
+		32A654BC22F47B21003557DE /* libLLVMMSP430Info.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMSP430Info.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMSP430Info.a"; sourceTree = "<group>"; };
+		32A654BD22F47B21003557DE /* libLLVMARMAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMAsmPrinter.a"; sourceTree = "<group>"; };
+		32A654BE22F47B21003557DE /* libLLVMCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMCodeGen.a"; sourceTree = "<group>"; };
+		32A654BF22F47B21003557DE /* libLLVMHexagonDisassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMHexagonDisassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMHexagonDisassembler.a"; sourceTree = "<group>"; };
+		32A654C022F47B21003557DE /* libLLVMXCoreDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMXCoreDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMXCoreDesc.a"; sourceTree = "<group>"; };
+		32A654C122F47B21003557DE /* libLLVMMCParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMCParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMCParser.a"; sourceTree = "<group>"; };
+		32A654C222F47B21003557DE /* libLLVMMCA.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMCA.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMCA.a"; sourceTree = "<group>"; };
+		32A654C322F47B21003557DE /* libLLVMInstCombine.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMInstCombine.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMInstCombine.a"; sourceTree = "<group>"; };
+		32A654C422F47B21003557DE /* libLLVMInterpreter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMInterpreter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMInterpreter.a"; sourceTree = "<group>"; };
+		32A654C522F47B21003557DE /* libLLVMAMDGPUAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUAsmPrinter.a"; sourceTree = "<group>"; };
+		32A654C622F47B22003557DE /* libLLVMSparcAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSparcAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSparcAsmPrinter.a"; sourceTree = "<group>"; };
+		32A654C722F47B22003557DE /* libLLVMBPFAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMBPFAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMBPFAsmParser.a"; sourceTree = "<group>"; };
+		32A654C822F47B22003557DE /* libLLVMHexagonCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMHexagonCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMHexagonCodeGen.a"; sourceTree = "<group>"; };
+		32A654C922F47B22003557DE /* libLLVMMSP430Desc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMSP430Desc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMSP430Desc.a"; sourceTree = "<group>"; };
+		32A654CA22F47B22003557DE /* libLLVMPowerPCAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMPowerPCAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMPowerPCAsmParser.a"; sourceTree = "<group>"; };
+		32A654CB22F47B22003557DE /* libLLVMIRReader.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMIRReader.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMIRReader.a"; sourceTree = "<group>"; };
+		32A654CC22F47B22003557DE /* libLLVMObjectYAML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMObjectYAML.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMObjectYAML.a"; sourceTree = "<group>"; };
+		32A654CD22F47B22003557DE /* libLLVMSparcAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMSparcAsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMSparcAsmParser.a"; sourceTree = "<group>"; };
+		32A654CE22F47B22003557DE /* libunwind.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunwind.1.0.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libunwind.1.0.dylib"; sourceTree = "<group>"; };
+		32A654CF22F47B22003557DE /* libLLVMOption.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMOption.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMOption.a"; sourceTree = "<group>"; };
+		32A654D022F47B22003557DE /* libLLVMMSP430AsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMSP430AsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMSP430AsmPrinter.a"; sourceTree = "<group>"; };
+		32A654D122F47B22003557DE /* libLLVMipo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMipo.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMipo.a"; sourceTree = "<group>"; };
+		32A654D222F47B22003557DE /* libLLVMX86Desc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86Desc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86Desc.a"; sourceTree = "<group>"; };
+		32A654D322F47B22003557DE /* libLLVMAMDGPUUtils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAMDGPUUtils.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAMDGPUUtils.a"; sourceTree = "<group>"; };
+		32A654D422F47B22003557DE /* libLLVMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMCore.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMCore.a"; sourceTree = "<group>"; };
+		32A654D522F47B22003557DE /* libLLVMMipsDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMipsDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMipsDesc.a"; sourceTree = "<group>"; };
+		32A654D622F47B22003557DE /* libLLVMARMDesc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMARMDesc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMARMDesc.a"; sourceTree = "<group>"; };
+		32A654D722F47B22003557DE /* libLLVMWebAssemblyAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMWebAssemblyAsmPrinter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMWebAssemblyAsmPrinter.a"; sourceTree = "<group>"; };
+		32A654D822F47B22003557DE /* libLLVMLinker.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLinker.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLinker.a"; sourceTree = "<group>"; };
+		32A654D922F47B22003557DE /* libLLVMX86Disassembler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMX86Disassembler.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMX86Disassembler.a"; sourceTree = "<group>"; };
+		32A654DA22F47B22003557DE /* libLLVMAArch64CodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMAArch64CodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMAArch64CodeGen.a"; sourceTree = "<group>"; };
+		32A654DB22F47B22003557DE /* libLLVMLanaiCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMLanaiCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMLanaiCodeGen.a"; sourceTree = "<group>"; };
+		32A654DC22F47B22003557DE /* libLLVMMSP430AsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLLVMMSP430AsmParser.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLLVMMSP430AsmParser.a"; sourceTree = "<group>"; };
+		32A6557222F47D2E003557DE /* libclangTidyModernizeModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyModernizeModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyModernizeModule.a"; sourceTree = "<group>"; };
+		32A6557322F47D2E003557DE /* libclangEdit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangEdit.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangEdit.a"; sourceTree = "<group>"; };
+		32A6557422F47D2E003557DE /* libclangTidyAndroidModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyAndroidModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyAndroidModule.a"; sourceTree = "<group>"; };
+		32A6557522F47D2E003557DE /* libclangHandleCXX.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangHandleCXX.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangHandleCXX.a"; sourceTree = "<group>"; };
+		32A6557622F47D2F003557DE /* libclangBasic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangBasic.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangBasic.a"; sourceTree = "<group>"; };
+		32A6557722F47D2F003557DE /* libc++experimental.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libc++experimental.a"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++experimental.a"; sourceTree = "<group>"; };
+		32A6557822F47D2F003557DE /* libclangDaemon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangDaemon.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangDaemon.a"; sourceTree = "<group>"; };
+		32A6557922F47D2F003557DE /* libclangAnalysis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangAnalysis.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangAnalysis.a"; sourceTree = "<group>"; };
+		32A6557A22F47D2F003557DE /* libclangTidyBoostModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyBoostModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyBoostModule.a"; sourceTree = "<group>"; };
+		32A6557B22F47D2F003557DE /* libclangAST.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangAST.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangAST.a"; sourceTree = "<group>"; };
+		32A6557C22F47D2F003557DE /* libPollyPPCG.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPollyPPCG.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libPollyPPCG.a"; sourceTree = "<group>"; };
+		32A6557D22F47D2F003557DE /* libclangHandleLLVM.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangHandleLLVM.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangHandleLLVM.a"; sourceTree = "<group>"; };
+		32A6557E22F47D2F003557DE /* libclangFrontendTool.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangFrontendTool.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangFrontendTool.a"; sourceTree = "<group>"; };
+		32A6557F22F47D2F003557DE /* libclangCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangCodeGen.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangCodeGen.a"; sourceTree = "<group>"; };
+		32A6558022F47D2F003557DE /* libclangIncludeFixer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangIncludeFixer.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangIncludeFixer.a"; sourceTree = "<group>"; };
+		32A6558122F47D2F003557DE /* libclangIndex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangIndex.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangIndex.a"; sourceTree = "<group>"; };
+		32A6558222F47D2F003557DE /* libclangdXpcTransport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangdXpcTransport.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangdXpcTransport.a"; sourceTree = "<group>"; };
+		32A6558322F47D30003557DE /* libclangTidy.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidy.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidy.a"; sourceTree = "<group>"; };
+		32A6558422F47D30003557DE /* libclangTidyPlugin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyPlugin.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyPlugin.a"; sourceTree = "<group>"; };
+		32A6558522F47D30003557DE /* libclangTidyReadabilityModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyReadabilityModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyReadabilityModule.a"; sourceTree = "<group>"; };
+		32A6558622F47D30003557DE /* libclangMove.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangMove.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangMove.a"; sourceTree = "<group>"; };
+		32A6558722F47D30003557DE /* libclangFormat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangFormat.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangFormat.a"; sourceTree = "<group>"; };
+		32A6558822F47D30003557DE /* libclangRewrite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangRewrite.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangRewrite.a"; sourceTree = "<group>"; };
+		32A6558922F47D30003557DE /* libclangSerialization.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangSerialization.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangSerialization.a"; sourceTree = "<group>"; };
+		32A6558A22F47D30003557DE /* libclangTidyUtils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyUtils.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyUtils.a"; sourceTree = "<group>"; };
+		32A6558B22F47D30003557DE /* liblldMinGW.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldMinGW.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldMinGW.a"; sourceTree = "<group>"; };
+		32A6558C22F47D30003557DE /* liblldELF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldELF.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldELF.a"; sourceTree = "<group>"; };
+		32A6558D22F47D30003557DE /* libclangToolingInclusions.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangToolingInclusions.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangToolingInclusions.a"; sourceTree = "<group>"; };
+		32A6558E22F47D30003557DE /* libclangARCMigrate.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangARCMigrate.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangARCMigrate.a"; sourceTree = "<group>"; };
+		32A6558F22F47D30003557DE /* libclangdXpcJsonConversions.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangdXpcJsonConversions.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangdXpcJsonConversions.a"; sourceTree = "<group>"; };
+		32A6559022F47D30003557DE /* libclangTooling.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTooling.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTooling.a"; sourceTree = "<group>"; };
+		32A6559122F47D31003557DE /* libc++.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libc++.a"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++.a"; sourceTree = "<group>"; };
+		32A6559222F47D31003557DE /* liblldCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldCommon.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldCommon.a"; sourceTree = "<group>"; };
+		32A6559322F47D31003557DE /* liblldDriver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldDriver.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldDriver.a"; sourceTree = "<group>"; };
+		32A6559422F47D31003557DE /* libclangRewriteFrontend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangRewriteFrontend.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangRewriteFrontend.a"; sourceTree = "<group>"; };
+		32A6559522F47D31003557DE /* libclangASTMatchers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangASTMatchers.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangASTMatchers.a"; sourceTree = "<group>"; };
+		32A6559622F47D31003557DE /* libclangQuery.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangQuery.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangQuery.a"; sourceTree = "<group>"; };
+		32A6559722F47D31003557DE /* libclangStaticAnalyzerCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangStaticAnalyzerCore.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangStaticAnalyzerCore.a"; sourceTree = "<group>"; };
+		32A6559822F47D31003557DE /* libclangApplyReplacements.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangApplyReplacements.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangApplyReplacements.a"; sourceTree = "<group>"; };
+		32A6559922F47D31003557DE /* libclangTidyCppCoreGuidelinesModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyCppCoreGuidelinesModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyCppCoreGuidelinesModule.a"; sourceTree = "<group>"; };
+		32A6559A22F47D31003557DE /* libclangToolingRefactor.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangToolingRefactor.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangToolingRefactor.a"; sourceTree = "<group>"; };
+		32A6559B22F47D31003557DE /* liblldWasm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldWasm.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldWasm.a"; sourceTree = "<group>"; };
+		32A6559C22F47D31003557DE /* libPollyISL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPollyISL.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libPollyISL.a"; sourceTree = "<group>"; };
+		32A6559D22F47D31003557DE /* libclangTidyGoogleModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyGoogleModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyGoogleModule.a"; sourceTree = "<group>"; };
+		32A6559E22F47D31003557DE /* libclangTidyObjCModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyObjCModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyObjCModule.a"; sourceTree = "<group>"; };
+		32A6559F22F47D32003557DE /* libclangTidyPortabilityModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyPortabilityModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyPortabilityModule.a"; sourceTree = "<group>"; };
+		32A655A022F47D32003557DE /* libclangCrossTU.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangCrossTU.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangCrossTU.a"; sourceTree = "<group>"; };
+		32A655A122F47D32003557DE /* libclangToolingCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangToolingCore.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangToolingCore.a"; sourceTree = "<group>"; };
+		32A655A222F47D32003557DE /* libclangStaticAnalyzerFrontend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangStaticAnalyzerFrontend.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangStaticAnalyzerFrontend.a"; sourceTree = "<group>"; };
+		32A655A322F47D32003557DE /* libclangTidyCERTModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyCERTModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyCERTModule.a"; sourceTree = "<group>"; };
+		32A655A422F47D32003557DE /* libclangTidyAbseilModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyAbseilModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyAbseilModule.a"; sourceTree = "<group>"; };
+		32A655A522F47D32003557DE /* libclangTidyBugproneModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyBugproneModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyBugproneModule.a"; sourceTree = "<group>"; };
+		32A655A622F47D32003557DE /* libclangTidyLLVMModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyLLVMModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyLLVMModule.a"; sourceTree = "<group>"; };
+		32A655A722F47D32003557DE /* liblldYAML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldYAML.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldYAML.a"; sourceTree = "<group>"; };
+		32A655A822F47D32003557DE /* libclangReorderFields.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangReorderFields.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangReorderFields.a"; sourceTree = "<group>"; };
+		32A655A922F47D32003557DE /* libclangDoc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangDoc.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangDoc.a"; sourceTree = "<group>"; };
+		32A655AA22F47D32003557DE /* liblldCOFF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldCOFF.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldCOFF.a"; sourceTree = "<group>"; };
+		32A655AB22F47D32003557DE /* libc++fs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libc++fs.a"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++fs.a"; sourceTree = "<group>"; };
+		32A655AC22F47D32003557DE /* libclangTidyMPIModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyMPIModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyMPIModule.a"; sourceTree = "<group>"; };
+		32A655AD22F47D32003557DE /* libfindAllSymbols.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfindAllSymbols.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libfindAllSymbols.a"; sourceTree = "<group>"; };
+		32A655AE22F47D33003557DE /* libclangToolingASTDiff.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangToolingASTDiff.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangToolingASTDiff.a"; sourceTree = "<group>"; };
+		32A655AF22F47D33003557DE /* libclangDynamicASTMatchers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangDynamicASTMatchers.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangDynamicASTMatchers.a"; sourceTree = "<group>"; };
+		32A655B022F47D33003557DE /* libclangParse.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangParse.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangParse.a"; sourceTree = "<group>"; };
+		32A655B122F47D33003557DE /* liblldMachO.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldMachO.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldMachO.a"; sourceTree = "<group>"; };
+		32A655B222F47D33003557DE /* libclangStaticAnalyzerCheckers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangStaticAnalyzerCheckers.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangStaticAnalyzerCheckers.a"; sourceTree = "<group>"; };
+		32A655B322F47D33003557DE /* libclangTidyPerformanceModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyPerformanceModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyPerformanceModule.a"; sourceTree = "<group>"; };
+		32A655B422F47D33003557DE /* liblldReaderWriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldReaderWriter.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldReaderWriter.a"; sourceTree = "<group>"; };
+		32A655B522F47D33003557DE /* libclangTidyMiscModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyMiscModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyMiscModule.a"; sourceTree = "<group>"; };
+		32A655B622F47D33003557DE /* libclangSema.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangSema.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangSema.a"; sourceTree = "<group>"; };
+		32A655B722F47D33003557DE /* libclangLex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangLex.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangLex.a"; sourceTree = "<group>"; };
+		32A655B822F47D34003557DE /* libc++abi.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libc++abi.a"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++abi.a"; sourceTree = "<group>"; };
+		32A655B922F47D34003557DE /* libclangTidyZirconModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyZirconModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyZirconModule.a"; sourceTree = "<group>"; };
+		32A655BA22F47D34003557DE /* libclangTidyFuchsiaModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyFuchsiaModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyFuchsiaModule.a"; sourceTree = "<group>"; };
+		32A655BB22F47D34003557DE /* libclangFrontend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangFrontend.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangFrontend.a"; sourceTree = "<group>"; };
+		32A655BC22F47D34003557DE /* liblldCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblldCore.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/liblldCore.a"; sourceTree = "<group>"; };
+		32A655BD22F47D34003557DE /* libclangTidyHICPPModule.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangTidyHICPPModule.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangTidyHICPPModule.a"; sourceTree = "<group>"; };
+		32A655BE22F47D34003557DE /* libclangIncludeFixerPlugin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangIncludeFixerPlugin.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangIncludeFixerPlugin.a"; sourceTree = "<group>"; };
+		32A655BF22F47D34003557DE /* libclangChangeNamespace.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangChangeNamespace.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangChangeNamespace.a"; sourceTree = "<group>"; };
+		32A655C022F47D34003557DE /* libclangDriver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclangDriver.a; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclangDriver.a"; sourceTree = "<group>"; };
+		32A6561022F481CC003557DE /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
+		32A6561222F48831003557DE /* libc++.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.1.0.dylib"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++.1.0.dylib"; sourceTree = "<group>"; };
+		32A6561A22F4887F003557DE /* libClangdXPCLib.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libClangdXPCLib.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libClangdXPCLib.dylib"; sourceTree = "<group>"; };
+		32A6561B22F48880003557DE /* libLTO.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLTO.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libLTO.dylib"; sourceTree = "<group>"; };
+		32A6561C22F48880003557DE /* libomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libomp.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libomp.dylib"; sourceTree = "<group>"; };
+		32A6561D22F48880003557DE /* libOptRemarks.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOptRemarks.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libOptRemarks.dylib"; sourceTree = "<group>"; };
+		32A6561E22F48880003557DE /* libc++abi.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++abi.1.0.dylib"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++abi.1.0.dylib"; sourceTree = "<group>"; };
+		32A6561F22F48880003557DE /* LLVMPolly.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = LLVMPolly.so; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/LLVMPolly.so"; sourceTree = "<group>"; };
+		32A6562022F48880003557DE /* libclang.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclang.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclang.dylib"; sourceTree = "<group>"; };
 		32FF47071D85ACF000724EB6 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -228,6 +705,247 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32A6562122F48880003557DE /* libClangdXPCLib.dylib in Frameworks */,
+				32A6562222F48880003557DE /* libLTO.dylib in Frameworks */,
+				32A6562322F48880003557DE /* libomp.dylib in Frameworks */,
+				32A6562422F48880003557DE /* libOptRemarks.dylib in Frameworks */,
+				32A6562522F48880003557DE /* libc++abi.1.0.dylib in Frameworks */,
+				32A6562622F48880003557DE /* LLVMPolly.so in Frameworks */,
+				32A6562722F48880003557DE /* libclang.dylib in Frameworks */,
+				32A655F922F47D35003557DE /* liblldCOFF.a in Frameworks */,
+				32A655E122F47D35003557DE /* liblldCommon.a in Frameworks */,
+				32A6560B22F47D35003557DE /* liblldCore.a in Frameworks */,
+				32A655E222F47D35003557DE /* liblldDriver.a in Frameworks */,
+				32A655DB22F47D35003557DE /* liblldELF.a in Frameworks */,
+				32A6560022F47D35003557DE /* liblldMachO.a in Frameworks */,
+				32A655DA22F47D35003557DE /* liblldMinGW.a in Frameworks */,
+				32A6560322F47D35003557DE /* liblldReaderWriter.a in Frameworks */,
+				32A655EA22F47D35003557DE /* liblldWasm.a in Frameworks */,
+				32A655F622F47D35003557DE /* liblldYAML.a in Frameworks */,
+				32A6560E22F47D35003557DE /* libclangChangeNamespace.a in Frameworks */,
+				32A655C722F47D34003557DE /* libclangDaemon.a in Frameworks */,
+				32A655F822F47D35003557DE /* libclangDoc.a in Frameworks */,
+				32A655DE22F47D35003557DE /* libclangdXpcJsonConversions.a in Frameworks */,
+				32A655D122F47D35003557DE /* libclangdXpcTransport.a in Frameworks */,
+				32A655CF22F47D35003557DE /* libclangIncludeFixer.a in Frameworks */,
+				32A6560D22F47D35003557DE /* libclangIncludeFixerPlugin.a in Frameworks */,
+				32A655D522F47D35003557DE /* libclangMove.a in Frameworks */,
+				32A655E522F47D35003557DE /* libclangQuery.a in Frameworks */,
+				32A655C122F47D34003557DE /* libclangTidyModernizeModule.a in Frameworks */,
+				32A655FB22F47D35003557DE /* libclangTidyMPIModule.a in Frameworks */,
+				32A655ED22F47D35003557DE /* libclangTidyObjCModule.a in Frameworks */,
+				32A6560222F47D35003557DE /* libclangTidyPerformanceModule.a in Frameworks */,
+				32A655D322F47D35003557DE /* libclangTidyPlugin.a in Frameworks */,
+				32A655EE22F47D35003557DE /* libclangTidyPortabilityModule.a in Frameworks */,
+				32A655D422F47D35003557DE /* libclangTidyReadabilityModule.a in Frameworks */,
+				32A655D922F47D35003557DE /* libclangTidyUtils.a in Frameworks */,
+				32A6560822F47D35003557DE /* libclangTidyZirconModule.a in Frameworks */,
+				32A655FC22F47D35003557DE /* libfindAllSymbols.a in Frameworks */,
+				32A655E722F47D35003557DE /* libclangApplyReplacements.a in Frameworks */,
+				32A655F722F47D35003557DE /* libclangReorderFields.a in Frameworks */,
+				32A655D222F47D35003557DE /* libclangTidy.a in Frameworks */,
+				32A655F322F47D35003557DE /* libclangTidyAbseilModule.a in Frameworks */,
+				32A655C322F47D34003557DE /* libclangTidyAndroidModule.a in Frameworks */,
+				32A655C922F47D35003557DE /* libclangTidyBoostModule.a in Frameworks */,
+				32A655F422F47D35003557DE /* libclangTidyBugproneModule.a in Frameworks */,
+				32A655F222F47D35003557DE /* libclangTidyCERTModule.a in Frameworks */,
+				32A655E822F47D35003557DE /* libclangTidyCppCoreGuidelinesModule.a in Frameworks */,
+				32A6560922F47D35003557DE /* libclangTidyFuchsiaModule.a in Frameworks */,
+				32A655EC22F47D35003557DE /* libclangTidyGoogleModule.a in Frameworks */,
+				32A6560C22F47D35003557DE /* libclangTidyHICPPModule.a in Frameworks */,
+				32A655F522F47D35003557DE /* libclangTidyLLVMModule.a in Frameworks */,
+				32A6560422F47D35003557DE /* libclangTidyMiscModule.a in Frameworks */,
+				32A655C822F47D34003557DE /* libclangAnalysis.a in Frameworks */,
+				32A655DD22F47D35003557DE /* libclangARCMigrate.a in Frameworks */,
+				32A655E422F47D35003557DE /* libclangASTMatchers.a in Frameworks */,
+				32A655CE22F47D35003557DE /* libclangCodeGen.a in Frameworks */,
+				32A655EF22F47D35003557DE /* libclangCrossTU.a in Frameworks */,
+				32A6560F22F47D35003557DE /* libclangDriver.a in Frameworks */,
+				32A655FE22F47D35003557DE /* libclangDynamicASTMatchers.a in Frameworks */,
+				32A655C222F47D34003557DE /* libclangEdit.a in Frameworks */,
+				32A655D622F47D35003557DE /* libclangFormat.a in Frameworks */,
+				32A6560A22F47D35003557DE /* libclangFrontend.a in Frameworks */,
+				32A655CD22F47D35003557DE /* libclangFrontendTool.a in Frameworks */,
+				32A655C422F47D34003557DE /* libclangHandleCXX.a in Frameworks */,
+				32A655CC22F47D35003557DE /* libclangHandleLLVM.a in Frameworks */,
+				32A655D022F47D35003557DE /* libclangIndex.a in Frameworks */,
+				32A655D722F47D35003557DE /* libclangRewrite.a in Frameworks */,
+				32A655E322F47D35003557DE /* libclangRewriteFrontend.a in Frameworks */,
+				32A6560522F47D35003557DE /* libclangSema.a in Frameworks */,
+				32A655D822F47D35003557DE /* libclangSerialization.a in Frameworks */,
+				32A6560122F47D35003557DE /* libclangStaticAnalyzerCheckers.a in Frameworks */,
+				32A655E622F47D35003557DE /* libclangStaticAnalyzerCore.a in Frameworks */,
+				32A655F122F47D35003557DE /* libclangStaticAnalyzerFrontend.a in Frameworks */,
+				32A655DF22F47D35003557DE /* libclangTooling.a in Frameworks */,
+				32A655FD22F47D35003557DE /* libclangToolingASTDiff.a in Frameworks */,
+				32A655F022F47D35003557DE /* libclangToolingCore.a in Frameworks */,
+				32A655DC22F47D35003557DE /* libclangToolingInclusions.a in Frameworks */,
+				32A655E922F47D35003557DE /* libclangToolingRefactor.a in Frameworks */,
+				32A655CA22F47D35003557DE /* libclangAST.a in Frameworks */,
+				32A655C522F47D34003557DE /* libclangBasic.a in Frameworks */,
+				32A6560622F47D35003557DE /* libclangLex.a in Frameworks */,
+				32A655FF22F47D35003557DE /* libclangParse.a in Frameworks */,
+				32A655EB22F47D35003557DE /* libPollyISL.a in Frameworks */,
+				32A655CB22F47D35003557DE /* libPollyPPCG.a in Frameworks */,
+				32A6561422F4887E003557DE /* libc++.1.0.dylib in Frameworks */,
+				32A655E022F47D35003557DE /* libc++.a in Frameworks */,
+				32A6561522F4887E003557DE /* libc++.1.0.dylib in Frameworks */,
+				32A6560722F47D35003557DE /* libc++abi.a in Frameworks */,
+				32A655C622F47D34003557DE /* libc++experimental.a in Frameworks */,
+				32A655FA22F47D35003557DE /* libc++fs.a in Frameworks */,
+				32A654DD22F47B22003557DE /* libLLVMAsmParser.a in Frameworks */,
+				32A6554322F47B23003557DE /* libLLVMCoverage.a in Frameworks */,
+				32A6552322F47B23003557DE /* libLLVMDlltoolDriver.a in Frameworks */,
+				32A6550822F47B23003557DE /* libLLVMLibDriver.a in Frameworks */,
+				32A654DE22F47B22003557DE /* libLLVMLineEditor.a in Frameworks */,
+				32A6552422F47B23003557DE /* libLLVMPasses.a in Frameworks */,
+				32A654EF22F47B22003557DE /* libLLVMProfileData.a in Frameworks */,
+				32A6553422F47B23003557DE /* libLLVMTextAPI.a in Frameworks */,
+				32A6551522F47B23003557DE /* libLLVMWindowsManifest.a in Frameworks */,
+				32A6553D22F47B23003557DE /* libLLVMX86AsmPrinter.a in Frameworks */,
+				32A6556622F47B23003557DE /* libLLVMX86Desc.a in Frameworks */,
+				32A6554822F47B23003557DE /* libLLVMX86Info.a in Frameworks */,
+				32A654F422F47B23003557DE /* libLLVMX86Utils.a in Frameworks */,
+				32A6550022F47B23003557DE /* libLLVMXCoreAsmPrinter.a in Frameworks */,
+				32A654F922F47B23003557DE /* libLLVMXCoreCodeGen.a in Frameworks */,
+				32A6555422F47B23003557DE /* libLLVMXCoreDesc.a in Frameworks */,
+				32A6552122F47B23003557DE /* libLLVMXCoreDisassembler.a in Frameworks */,
+				32A654E222F47B22003557DE /* libLLVMXCoreInfo.a in Frameworks */,
+				32A6553522F47B23003557DE /* libLLVMXRay.a in Frameworks */,
+				32A6554A22F47B23003557DE /* libPolly.a in Frameworks */,
+				32A6561622F4887E003557DE /* libunwind.1.0.dylib in Frameworks */,
+				32A6550322F47B23003557DE /* libunwind.a in Frameworks */,
+				32A6561722F4887E003557DE /* libunwind.1.0.dylib in Frameworks */,
+				32A6555922F47B23003557DE /* libLLVMAMDGPUAsmPrinter.a in Frameworks */,
+				32A654E722F47B22003557DE /* libLLVMAMDGPUDesc.a in Frameworks */,
+				32A6551622F47B23003557DE /* libLLVMAMDGPUInfo.a in Frameworks */,
+				32A6556722F47B23003557DE /* libLLVMAMDGPUUtils.a in Frameworks */,
+				32A6554022F47B23003557DE /* libLLVMARMAsmParser.a in Frameworks */,
+				32A6555122F47B23003557DE /* libLLVMARMAsmPrinter.a in Frameworks */,
+				32A6550622F47B23003557DE /* libLLVMARMCodeGen.a in Frameworks */,
+				32A6556A22F47B23003557DE /* libLLVMARMDesc.a in Frameworks */,
+				32A6553822F47B23003557DE /* libLLVMARMDisassembler.a in Frameworks */,
+				32A6550722F47B23003557DE /* libLLVMARMInfo.a in Frameworks */,
+				32A6552722F47B23003557DE /* libLLVMARMUtils.a in Frameworks */,
+				32A6555B22F47B23003557DE /* libLLVMBPFAsmParser.a in Frameworks */,
+				32A654F822F47B23003557DE /* libLLVMBPFAsmPrinter.a in Frameworks */,
+				32A6552622F47B23003557DE /* libLLVMBPFCodeGen.a in Frameworks */,
+				32A6554C22F47B23003557DE /* libLLVMBPFDesc.a in Frameworks */,
+				32A654E622F47B22003557DE /* libLLVMBPFDisassembler.a in Frameworks */,
+				32A6552F22F47B23003557DE /* libLLVMBPFInfo.a in Frameworks */,
+				32A654FA22F47B23003557DE /* libLLVMHexagonAsmParser.a in Frameworks */,
+				32A6555C22F47B23003557DE /* libLLVMHexagonCodeGen.a in Frameworks */,
+				32A6550122F47B23003557DE /* libLLVMHexagonDesc.a in Frameworks */,
+				32A6555322F47B23003557DE /* libLLVMHexagonDisassembler.a in Frameworks */,
+				32A6551E22F47B23003557DE /* libLLVMHexagonInfo.a in Frameworks */,
+				32A654ED22F47B22003557DE /* libLLVMLanaiAsmParser.a in Frameworks */,
+				32A6551122F47B23003557DE /* libLLVMLanaiAsmPrinter.a in Frameworks */,
+				32A6556F22F47B23003557DE /* libLLVMLanaiCodeGen.a in Frameworks */,
+				32A6552222F47B23003557DE /* libLLVMLanaiDesc.a in Frameworks */,
+				32A6551C22F47B23003557DE /* libLLVMLanaiDisassembler.a in Frameworks */,
+				32A6551022F47B23003557DE /* libLLVMLanaiInfo.a in Frameworks */,
+				32A6554B22F47B23003557DE /* libLLVMMipsAsmParser.a in Frameworks */,
+				32A6552522F47B23003557DE /* libLLVMMipsAsmPrinter.a in Frameworks */,
+				32A654EC22F47B22003557DE /* libLLVMMipsCodeGen.a in Frameworks */,
+				32A6556922F47B23003557DE /* libLLVMMipsDesc.a in Frameworks */,
+				32A6551A22F47B23003557DE /* libLLVMMipsDisassembler.a in Frameworks */,
+				32A6550E22F47B23003557DE /* libLLVMMipsInfo.a in Frameworks */,
+				32A6557022F47B23003557DE /* libLLVMMSP430AsmParser.a in Frameworks */,
+				32A6556422F47B23003557DE /* libLLVMMSP430AsmPrinter.a in Frameworks */,
+				32A6550522F47B23003557DE /* libLLVMMSP430CodeGen.a in Frameworks */,
+				32A6555D22F47B23003557DE /* libLLVMMSP430Desc.a in Frameworks */,
+				32A654FE22F47B23003557DE /* libLLVMMSP430Disassembler.a in Frameworks */,
+				32A6555022F47B23003557DE /* libLLVMMSP430Info.a in Frameworks */,
+				32A6553F22F47B23003557DE /* libLLVMNVPTXAsmPrinter.a in Frameworks */,
+				32A6553E22F47B23003557DE /* libLLVMNVPTXCodeGen.a in Frameworks */,
+				32A6553C22F47B23003557DE /* libLLVMNVPTXDesc.a in Frameworks */,
+				32A654FF22F47B23003557DE /* libLLVMNVPTXInfo.a in Frameworks */,
+				32A6555E22F47B23003557DE /* libLLVMPowerPCAsmParser.a in Frameworks */,
+				32A654F322F47B22003557DE /* libLLVMPowerPCAsmPrinter.a in Frameworks */,
+				32A6554F22F47B23003557DE /* libLLVMPowerPCCodeGen.a in Frameworks */,
+				32A6551B22F47B23003557DE /* libLLVMPowerPCDesc.a in Frameworks */,
+				32A6554122F47B23003557DE /* libLLVMPowerPCDisassembler.a in Frameworks */,
+				32A6551222F47B23003557DE /* libLLVMPowerPCInfo.a in Frameworks */,
+				32A6556122F47B23003557DE /* libLLVMSparcAsmParser.a in Frameworks */,
+				32A6555A22F47B23003557DE /* libLLVMSparcAsmPrinter.a in Frameworks */,
+				32A6554722F47B23003557DE /* libLLVMSparcCodeGen.a in Frameworks */,
+				32A6553222F47B23003557DE /* libLLVMSparcDesc.a in Frameworks */,
+				32A6554422F47B23003557DE /* libLLVMSparcDisassembler.a in Frameworks */,
+				32A6552B22F47B23003557DE /* libLLVMSparcInfo.a in Frameworks */,
+				32A654EA22F47B22003557DE /* libLLVMSystemZAsmParser.a in Frameworks */,
+				32A6553122F47B23003557DE /* libLLVMSystemZAsmPrinter.a in Frameworks */,
+				32A6553022F47B23003557DE /* libLLVMSystemZCodeGen.a in Frameworks */,
+				32A654F222F47B22003557DE /* libLLVMSystemZDesc.a in Frameworks */,
+				32A6553322F47B23003557DE /* libLLVMSystemZDisassembler.a in Frameworks */,
+				32A654F722F47B23003557DE /* libLLVMSystemZInfo.a in Frameworks */,
+				32A6551422F47B23003557DE /* libLLVMWebAssemblyAsmParser.a in Frameworks */,
+				32A6556B22F47B23003557DE /* libLLVMWebAssemblyAsmPrinter.a in Frameworks */,
+				32A6554E22F47B23003557DE /* libLLVMWebAssemblyCodeGen.a in Frameworks */,
+				32A6553922F47B23003557DE /* libLLVMWebAssemblyDesc.a in Frameworks */,
+				32A654E922F47B22003557DE /* libLLVMWebAssemblyDisassembler.a in Frameworks */,
+				32A6550922F47B23003557DE /* libLLVMWebAssemblyInfo.a in Frameworks */,
+				32A6550222F47B23003557DE /* libLLVMX86AsmParser.a in Frameworks */,
+				32A6551922F47B23003557DE /* libLLVMX86CodeGen.a in Frameworks */,
+				32A6556D22F47B23003557DE /* libLLVMX86Disassembler.a in Frameworks */,
+				32A6552822F47B23003557DE /* libLLVMAArch64AsmParser.a in Frameworks */,
+				32A6552022F47B23003557DE /* libLLVMAArch64AsmPrinter.a in Frameworks */,
+				32A6556E22F47B23003557DE /* libLLVMAArch64CodeGen.a in Frameworks */,
+				32A6550C22F47B23003557DE /* libLLVMAArch64Desc.a in Frameworks */,
+				32A6551D22F47B23003557DE /* libLLVMAArch64Disassembler.a in Frameworks */,
+				32A6553722F47B23003557DE /* libLLVMAArch64Info.a in Frameworks */,
+				32A654E522F47B22003557DE /* libLLVMAArch64Utils.a in Frameworks */,
+				32A654E822F47B22003557DE /* libLLVMAggressiveInstCombine.a in Frameworks */,
+				32A654FC22F47B23003557DE /* libLLVMAMDGPUAsmParser.a in Frameworks */,
+				32A654EE22F47B22003557DE /* libLLVMAMDGPUCodeGen.a in Frameworks */,
+				32A654F522F47B23003557DE /* libLLVMAMDGPUDisassembler.a in Frameworks */,
+				32A6554222F47B23003557DE /* libLLVMAnalysis.a in Frameworks */,
+				32A6554622F47B23003557DE /* libLLVMAsmPrinter.a in Frameworks */,
+				32A654E422F47B22003557DE /* libLLVMBinaryFormat.a in Frameworks */,
+				32A6554922F47B23003557DE /* libLLVMBitReader.a in Frameworks */,
+				32A6550B22F47B23003557DE /* libLLVMBitWriter.a in Frameworks */,
+				32A6555222F47B23003557DE /* libLLVMCodeGen.a in Frameworks */,
+				32A6556822F47B23003557DE /* libLLVMCore.a in Frameworks */,
+				32A6550A22F47B23003557DE /* libLLVMCoroutines.a in Frameworks */,
+				32A6552922F47B23003557DE /* libLLVMDebugInfoCodeView.a in Frameworks */,
+				32A6552E22F47B23003557DE /* libLLVMDebugInfoDWARF.a in Frameworks */,
+				32A6551722F47B23003557DE /* libLLVMDebugInfoMSF.a in Frameworks */,
+				32A6550422F47B23003557DE /* libLLVMDebugInfoPDB.a in Frameworks */,
+				32A654EB22F47B22003557DE /* libLLVMExecutionEngine.a in Frameworks */,
+				32A654DF22F47B22003557DE /* libLLVMFuzzMutate.a in Frameworks */,
+				32A654F622F47B23003557DE /* libLLVMGlobalISel.a in Frameworks */,
+				32A6555722F47B23003557DE /* libLLVMInstCombine.a in Frameworks */,
+				32A6553622F47B23003557DE /* libLLVMInstrumentation.a in Frameworks */,
+				32A6555822F47B23003557DE /* libLLVMInterpreter.a in Frameworks */,
+				32A6556522F47B23003557DE /* libLLVMipo.a in Frameworks */,
+				32A6555F22F47B23003557DE /* libLLVMIRReader.a in Frameworks */,
+				32A6556C22F47B23003557DE /* libLLVMLinker.a in Frameworks */,
+				32A6550D22F47B23003557DE /* libLLVMLTO.a in Frameworks */,
+				32A6550F22F47B23003557DE /* libLLVMMC.a in Frameworks */,
+				32A6555622F47B23003557DE /* libLLVMMCA.a in Frameworks */,
+				32A654FD22F47B23003557DE /* libLLVMMCDisassembler.a in Frameworks */,
+				32A6551822F47B23003557DE /* libLLVMMCJIT.a in Frameworks */,
+				32A6555522F47B23003557DE /* libLLVMMCParser.a in Frameworks */,
+				32A6552A22F47B23003557DE /* libLLVMMIRParser.a in Frameworks */,
+				32A6554D22F47B23003557DE /* libLLVMObjCARCOpts.a in Frameworks */,
+				32A654E022F47B22003557DE /* libLLVMObject.a in Frameworks */,
+				32A6556022F47B23003557DE /* libLLVMObjectYAML.a in Frameworks */,
+				32A6556322F47B23003557DE /* libLLVMOption.a in Frameworks */,
+				32A6553B22F47B23003557DE /* libLLVMOptRemarks.a in Frameworks */,
+				32A654E122F47B22003557DE /* libLLVMOrcJIT.a in Frameworks */,
+				32A6553A22F47B23003557DE /* libLLVMRuntimeDyld.a in Frameworks */,
+				32A654F122F47B22003557DE /* libLLVMScalarOpts.a in Frameworks */,
+				32A654FB22F47B23003557DE /* libLLVMSelectionDAG.a in Frameworks */,
+				32A6551F22F47B23003557DE /* libLLVMSymbolize.a in Frameworks */,
+				32A6554522F47B23003557DE /* libLLVMTarget.a in Frameworks */,
+				32A6552C22F47B23003557DE /* libLLVMTransformUtils.a in Frameworks */,
+				32A6552D22F47B23003557DE /* libLLVMVectorize.a in Frameworks */,
+				32A654F022F47B22003557DE /* libLLVMDemangle.a in Frameworks */,
+				32A6551322F47B23003557DE /* libLLVMSupport.a in Frameworks */,
+				32A654E322F47B22003557DE /* libLLVMTableGen.a in Frameworks */,
+				32A6561822F4887F003557DE /* libc++.1.0.dylib in Frameworks */,
+				32A6561922F4887F003557DE /* libunwind.1.0.dylib in Frameworks */,
+				32A6561122F481CC003557DE /* libncurses.tbd in Frameworks */,
+				32A6557122F47CA0003557DE /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +980,7 @@
 				32FF47071D85ACF000724EB6 /* libz.tbd */,
 				323668F41BB64DE60030F788 /* vm */,
 				323668F31BB64DE60030F788 /* Products */,
+				32A6544822F47B1C003557DE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -463,6 +1182,249 @@
 				327A0F1E22216DC6001A6EF0 /* sys_Func.c */,
 			);
 			path = sys;
+			sourceTree = "<group>";
+		};
+		32A6544822F47B1C003557DE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				32A6561E22F48880003557DE /* libc++abi.1.0.dylib */,
+				32A6562022F48880003557DE /* libclang.dylib */,
+				32A6561A22F4887F003557DE /* libClangdXPCLib.dylib */,
+				32A6561B22F48880003557DE /* libLTO.dylib */,
+				32A6561C22F48880003557DE /* libomp.dylib */,
+				32A6561D22F48880003557DE /* libOptRemarks.dylib */,
+				32A6561F22F48880003557DE /* LLVMPolly.so */,
+				32A6561222F48831003557DE /* libc++.1.0.dylib */,
+				32A6561022F481CC003557DE /* libncurses.tbd */,
+				32A6559122F47D31003557DE /* libc++.a */,
+				32A655B822F47D34003557DE /* libc++abi.a */,
+				32A6557722F47D2F003557DE /* libc++experimental.a */,
+				32A655AB22F47D32003557DE /* libc++fs.a */,
+				32A6557922F47D2F003557DE /* libclangAnalysis.a */,
+				32A6559822F47D31003557DE /* libclangApplyReplacements.a */,
+				32A6558E22F47D30003557DE /* libclangARCMigrate.a */,
+				32A6557B22F47D2F003557DE /* libclangAST.a */,
+				32A6559522F47D31003557DE /* libclangASTMatchers.a */,
+				32A6557622F47D2F003557DE /* libclangBasic.a */,
+				32A655BF22F47D34003557DE /* libclangChangeNamespace.a */,
+				32A6557F22F47D2F003557DE /* libclangCodeGen.a */,
+				32A655A022F47D32003557DE /* libclangCrossTU.a */,
+				32A6557822F47D2F003557DE /* libclangDaemon.a */,
+				32A655A922F47D32003557DE /* libclangDoc.a */,
+				32A655C022F47D34003557DE /* libclangDriver.a */,
+				32A6558F22F47D30003557DE /* libclangdXpcJsonConversions.a */,
+				32A6558222F47D2F003557DE /* libclangdXpcTransport.a */,
+				32A655AF22F47D33003557DE /* libclangDynamicASTMatchers.a */,
+				32A6557322F47D2E003557DE /* libclangEdit.a */,
+				32A6558722F47D30003557DE /* libclangFormat.a */,
+				32A655BB22F47D34003557DE /* libclangFrontend.a */,
+				32A6557E22F47D2F003557DE /* libclangFrontendTool.a */,
+				32A6557522F47D2E003557DE /* libclangHandleCXX.a */,
+				32A6557D22F47D2F003557DE /* libclangHandleLLVM.a */,
+				32A6558022F47D2F003557DE /* libclangIncludeFixer.a */,
+				32A655BE22F47D34003557DE /* libclangIncludeFixerPlugin.a */,
+				32A6558122F47D2F003557DE /* libclangIndex.a */,
+				32A655B722F47D33003557DE /* libclangLex.a */,
+				32A6558622F47D30003557DE /* libclangMove.a */,
+				32A655B022F47D33003557DE /* libclangParse.a */,
+				32A6559622F47D31003557DE /* libclangQuery.a */,
+				32A655A822F47D32003557DE /* libclangReorderFields.a */,
+				32A6558822F47D30003557DE /* libclangRewrite.a */,
+				32A6559422F47D31003557DE /* libclangRewriteFrontend.a */,
+				32A655B622F47D33003557DE /* libclangSema.a */,
+				32A6558922F47D30003557DE /* libclangSerialization.a */,
+				32A655B222F47D33003557DE /* libclangStaticAnalyzerCheckers.a */,
+				32A6559722F47D31003557DE /* libclangStaticAnalyzerCore.a */,
+				32A655A222F47D32003557DE /* libclangStaticAnalyzerFrontend.a */,
+				32A6558322F47D30003557DE /* libclangTidy.a */,
+				32A655A422F47D32003557DE /* libclangTidyAbseilModule.a */,
+				32A6557422F47D2E003557DE /* libclangTidyAndroidModule.a */,
+				32A6557A22F47D2F003557DE /* libclangTidyBoostModule.a */,
+				32A655A522F47D32003557DE /* libclangTidyBugproneModule.a */,
+				32A655A322F47D32003557DE /* libclangTidyCERTModule.a */,
+				32A6559922F47D31003557DE /* libclangTidyCppCoreGuidelinesModule.a */,
+				32A655BA22F47D34003557DE /* libclangTidyFuchsiaModule.a */,
+				32A6559D22F47D31003557DE /* libclangTidyGoogleModule.a */,
+				32A655BD22F47D34003557DE /* libclangTidyHICPPModule.a */,
+				32A655A622F47D32003557DE /* libclangTidyLLVMModule.a */,
+				32A655B522F47D33003557DE /* libclangTidyMiscModule.a */,
+				32A6557222F47D2E003557DE /* libclangTidyModernizeModule.a */,
+				32A655AC22F47D32003557DE /* libclangTidyMPIModule.a */,
+				32A6559E22F47D31003557DE /* libclangTidyObjCModule.a */,
+				32A655B322F47D33003557DE /* libclangTidyPerformanceModule.a */,
+				32A6558422F47D30003557DE /* libclangTidyPlugin.a */,
+				32A6559F22F47D32003557DE /* libclangTidyPortabilityModule.a */,
+				32A6558522F47D30003557DE /* libclangTidyReadabilityModule.a */,
+				32A6558A22F47D30003557DE /* libclangTidyUtils.a */,
+				32A655B922F47D34003557DE /* libclangTidyZirconModule.a */,
+				32A6559022F47D30003557DE /* libclangTooling.a */,
+				32A655AE22F47D33003557DE /* libclangToolingASTDiff.a */,
+				32A655A122F47D32003557DE /* libclangToolingCore.a */,
+				32A6558D22F47D30003557DE /* libclangToolingInclusions.a */,
+				32A6559A22F47D31003557DE /* libclangToolingRefactor.a */,
+				32A655AD22F47D32003557DE /* libfindAllSymbols.a */,
+				32A655AA22F47D32003557DE /* liblldCOFF.a */,
+				32A6559222F47D31003557DE /* liblldCommon.a */,
+				32A655BC22F47D34003557DE /* liblldCore.a */,
+				32A6559322F47D31003557DE /* liblldDriver.a */,
+				32A6558C22F47D30003557DE /* liblldELF.a */,
+				32A655B122F47D33003557DE /* liblldMachO.a */,
+				32A6558B22F47D30003557DE /* liblldMinGW.a */,
+				32A655B422F47D33003557DE /* liblldReaderWriter.a */,
+				32A6559B22F47D31003557DE /* liblldWasm.a */,
+				32A655A722F47D32003557DE /* liblldYAML.a */,
+				32A6559C22F47D31003557DE /* libPollyISL.a */,
+				32A6557C22F47D2F003557DE /* libPollyPPCG.a */,
+				32A6549422F47B1F003557DE /* libLLVMAArch64AsmParser.a */,
+				32A6548C22F47B1F003557DE /* libLLVMAArch64AsmPrinter.a */,
+				32A654DA22F47B22003557DE /* libLLVMAArch64CodeGen.a */,
+				32A6547822F47B1E003557DE /* libLLVMAArch64Desc.a */,
+				32A6548922F47B1F003557DE /* libLLVMAArch64Disassembler.a */,
+				32A654A322F47B20003557DE /* libLLVMAArch64Info.a */,
+				32A6545122F47B1D003557DE /* libLLVMAArch64Utils.a */,
+				32A6545422F47B1D003557DE /* libLLVMAggressiveInstCombine.a */,
+				32A6546822F47B1E003557DE /* libLLVMAMDGPUAsmParser.a */,
+				32A654C522F47B21003557DE /* libLLVMAMDGPUAsmPrinter.a */,
+				32A6545A22F47B1D003557DE /* libLLVMAMDGPUCodeGen.a */,
+				32A6545322F47B1D003557DE /* libLLVMAMDGPUDesc.a */,
+				32A6546122F47B1E003557DE /* libLLVMAMDGPUDisassembler.a */,
+				32A6548222F47B1F003557DE /* libLLVMAMDGPUInfo.a */,
+				32A654D322F47B22003557DE /* libLLVMAMDGPUUtils.a */,
+				32A654AE22F47B20003557DE /* libLLVMAnalysis.a */,
+				32A654AC22F47B20003557DE /* libLLVMARMAsmParser.a */,
+				32A654BD22F47B21003557DE /* libLLVMARMAsmPrinter.a */,
+				32A6547222F47B1E003557DE /* libLLVMARMCodeGen.a */,
+				32A654D622F47B22003557DE /* libLLVMARMDesc.a */,
+				32A654A422F47B20003557DE /* libLLVMARMDisassembler.a */,
+				32A6547322F47B1E003557DE /* libLLVMARMInfo.a */,
+				32A6549322F47B1F003557DE /* libLLVMARMUtils.a */,
+				32A6544922F47B1D003557DE /* libLLVMAsmParser.a */,
+				32A654B222F47B21003557DE /* libLLVMAsmPrinter.a */,
+				32A6545022F47B1D003557DE /* libLLVMBinaryFormat.a */,
+				32A654B522F47B21003557DE /* libLLVMBitReader.a */,
+				32A6547722F47B1E003557DE /* libLLVMBitWriter.a */,
+				32A654C722F47B22003557DE /* libLLVMBPFAsmParser.a */,
+				32A6546422F47B1E003557DE /* libLLVMBPFAsmPrinter.a */,
+				32A6549222F47B1F003557DE /* libLLVMBPFCodeGen.a */,
+				32A654B822F47B21003557DE /* libLLVMBPFDesc.a */,
+				32A6545222F47B1D003557DE /* libLLVMBPFDisassembler.a */,
+				32A6549B22F47B20003557DE /* libLLVMBPFInfo.a */,
+				32A654BE22F47B21003557DE /* libLLVMCodeGen.a */,
+				32A654D422F47B22003557DE /* libLLVMCore.a */,
+				32A6547622F47B1E003557DE /* libLLVMCoroutines.a */,
+				32A654AF22F47B20003557DE /* libLLVMCoverage.a */,
+				32A6549522F47B1F003557DE /* libLLVMDebugInfoCodeView.a */,
+				32A6549A22F47B20003557DE /* libLLVMDebugInfoDWARF.a */,
+				32A6548322F47B1F003557DE /* libLLVMDebugInfoMSF.a */,
+				32A6547022F47B1E003557DE /* libLLVMDebugInfoPDB.a */,
+				32A6545C22F47B1E003557DE /* libLLVMDemangle.a */,
+				32A6548F22F47B1F003557DE /* libLLVMDlltoolDriver.a */,
+				32A6545722F47B1D003557DE /* libLLVMExecutionEngine.a */,
+				32A6544B22F47B1D003557DE /* libLLVMFuzzMutate.a */,
+				32A6546222F47B1E003557DE /* libLLVMGlobalISel.a */,
+				32A6546622F47B1E003557DE /* libLLVMHexagonAsmParser.a */,
+				32A654C822F47B22003557DE /* libLLVMHexagonCodeGen.a */,
+				32A6546D22F47B1E003557DE /* libLLVMHexagonDesc.a */,
+				32A654BF22F47B21003557DE /* libLLVMHexagonDisassembler.a */,
+				32A6548A22F47B1F003557DE /* libLLVMHexagonInfo.a */,
+				32A654C322F47B21003557DE /* libLLVMInstCombine.a */,
+				32A654A222F47B20003557DE /* libLLVMInstrumentation.a */,
+				32A654C422F47B21003557DE /* libLLVMInterpreter.a */,
+				32A654D122F47B22003557DE /* libLLVMipo.a */,
+				32A654CB22F47B22003557DE /* libLLVMIRReader.a */,
+				32A6545922F47B1D003557DE /* libLLVMLanaiAsmParser.a */,
+				32A6547D22F47B1F003557DE /* libLLVMLanaiAsmPrinter.a */,
+				32A654DB22F47B22003557DE /* libLLVMLanaiCodeGen.a */,
+				32A6548E22F47B1F003557DE /* libLLVMLanaiDesc.a */,
+				32A6548822F47B1F003557DE /* libLLVMLanaiDisassembler.a */,
+				32A6547C22F47B1F003557DE /* libLLVMLanaiInfo.a */,
+				32A6547422F47B1E003557DE /* libLLVMLibDriver.a */,
+				32A6544A22F47B1D003557DE /* libLLVMLineEditor.a */,
+				32A654D822F47B22003557DE /* libLLVMLinker.a */,
+				32A6547922F47B1F003557DE /* libLLVMLTO.a */,
+				32A6547B22F47B1F003557DE /* libLLVMMC.a */,
+				32A654C222F47B21003557DE /* libLLVMMCA.a */,
+				32A6546922F47B1E003557DE /* libLLVMMCDisassembler.a */,
+				32A6548422F47B1F003557DE /* libLLVMMCJIT.a */,
+				32A654C122F47B21003557DE /* libLLVMMCParser.a */,
+				32A654B722F47B21003557DE /* libLLVMMipsAsmParser.a */,
+				32A6549122F47B1F003557DE /* libLLVMMipsAsmPrinter.a */,
+				32A6545822F47B1D003557DE /* libLLVMMipsCodeGen.a */,
+				32A654D522F47B22003557DE /* libLLVMMipsDesc.a */,
+				32A6548622F47B1F003557DE /* libLLVMMipsDisassembler.a */,
+				32A6547A22F47B1F003557DE /* libLLVMMipsInfo.a */,
+				32A6549622F47B20003557DE /* libLLVMMIRParser.a */,
+				32A654DC22F47B22003557DE /* libLLVMMSP430AsmParser.a */,
+				32A654D022F47B22003557DE /* libLLVMMSP430AsmPrinter.a */,
+				32A6547122F47B1E003557DE /* libLLVMMSP430CodeGen.a */,
+				32A654C922F47B22003557DE /* libLLVMMSP430Desc.a */,
+				32A6546A22F47B1E003557DE /* libLLVMMSP430Disassembler.a */,
+				32A654BC22F47B21003557DE /* libLLVMMSP430Info.a */,
+				32A654AB22F47B20003557DE /* libLLVMNVPTXAsmPrinter.a */,
+				32A654AA22F47B20003557DE /* libLLVMNVPTXCodeGen.a */,
+				32A654A822F47B20003557DE /* libLLVMNVPTXDesc.a */,
+				32A6546B22F47B1E003557DE /* libLLVMNVPTXInfo.a */,
+				32A654B922F47B21003557DE /* libLLVMObjCARCOpts.a */,
+				32A6544C22F47B1D003557DE /* libLLVMObject.a */,
+				32A654CC22F47B22003557DE /* libLLVMObjectYAML.a */,
+				32A654CF22F47B22003557DE /* libLLVMOption.a */,
+				32A654A722F47B20003557DE /* libLLVMOptRemarks.a */,
+				32A6544D22F47B1D003557DE /* libLLVMOrcJIT.a */,
+				32A6549022F47B1F003557DE /* libLLVMPasses.a */,
+				32A654CA22F47B22003557DE /* libLLVMPowerPCAsmParser.a */,
+				32A6545F22F47B1E003557DE /* libLLVMPowerPCAsmPrinter.a */,
+				32A654BB22F47B21003557DE /* libLLVMPowerPCCodeGen.a */,
+				32A6548722F47B1F003557DE /* libLLVMPowerPCDesc.a */,
+				32A654AD22F47B20003557DE /* libLLVMPowerPCDisassembler.a */,
+				32A6547E22F47B1F003557DE /* libLLVMPowerPCInfo.a */,
+				32A6545B22F47B1D003557DE /* libLLVMProfileData.a */,
+				32A654A622F47B20003557DE /* libLLVMRuntimeDyld.a */,
+				32A6545D22F47B1E003557DE /* libLLVMScalarOpts.a */,
+				32A6546722F47B1E003557DE /* libLLVMSelectionDAG.a */,
+				32A654CD22F47B22003557DE /* libLLVMSparcAsmParser.a */,
+				32A654C622F47B22003557DE /* libLLVMSparcAsmPrinter.a */,
+				32A654B322F47B21003557DE /* libLLVMSparcCodeGen.a */,
+				32A6549E22F47B20003557DE /* libLLVMSparcDesc.a */,
+				32A654B022F47B21003557DE /* libLLVMSparcDisassembler.a */,
+				32A6549722F47B20003557DE /* libLLVMSparcInfo.a */,
+				32A6547F22F47B1F003557DE /* libLLVMSupport.a */,
+				32A6548B22F47B1F003557DE /* libLLVMSymbolize.a */,
+				32A6545622F47B1D003557DE /* libLLVMSystemZAsmParser.a */,
+				32A6549D22F47B20003557DE /* libLLVMSystemZAsmPrinter.a */,
+				32A6549C22F47B20003557DE /* libLLVMSystemZCodeGen.a */,
+				32A6545E22F47B1E003557DE /* libLLVMSystemZDesc.a */,
+				32A6549F22F47B20003557DE /* libLLVMSystemZDisassembler.a */,
+				32A6546322F47B1E003557DE /* libLLVMSystemZInfo.a */,
+				32A6544F22F47B1D003557DE /* libLLVMTableGen.a */,
+				32A654B122F47B21003557DE /* libLLVMTarget.a */,
+				32A654A022F47B20003557DE /* libLLVMTextAPI.a */,
+				32A6549822F47B20003557DE /* libLLVMTransformUtils.a */,
+				32A6549922F47B20003557DE /* libLLVMVectorize.a */,
+				32A6548022F47B1F003557DE /* libLLVMWebAssemblyAsmParser.a */,
+				32A654D722F47B22003557DE /* libLLVMWebAssemblyAsmPrinter.a */,
+				32A654BA22F47B21003557DE /* libLLVMWebAssemblyCodeGen.a */,
+				32A654A522F47B20003557DE /* libLLVMWebAssemblyDesc.a */,
+				32A6545522F47B1D003557DE /* libLLVMWebAssemblyDisassembler.a */,
+				32A6547522F47B1E003557DE /* libLLVMWebAssemblyInfo.a */,
+				32A6548122F47B1F003557DE /* libLLVMWindowsManifest.a */,
+				32A6546E22F47B1E003557DE /* libLLVMX86AsmParser.a */,
+				32A654A922F47B20003557DE /* libLLVMX86AsmPrinter.a */,
+				32A6548522F47B1F003557DE /* libLLVMX86CodeGen.a */,
+				32A654D222F47B22003557DE /* libLLVMX86Desc.a */,
+				32A654D922F47B22003557DE /* libLLVMX86Disassembler.a */,
+				32A654B422F47B21003557DE /* libLLVMX86Info.a */,
+				32A6546022F47B1E003557DE /* libLLVMX86Utils.a */,
+				32A6546C22F47B1E003557DE /* libLLVMXCoreAsmPrinter.a */,
+				32A6546522F47B1E003557DE /* libLLVMXCoreCodeGen.a */,
+				32A654C022F47B21003557DE /* libLLVMXCoreDesc.a */,
+				32A6548D22F47B1F003557DE /* libLLVMXCoreDisassembler.a */,
+				32A6544E22F47B1D003557DE /* libLLVMXCoreInfo.a */,
+				32A654A122F47B20003557DE /* libLLVMXRay.a */,
+				32A654B622F47B21003557DE /* libPolly.a */,
+				32A654CE22F47B22003557DE /* libunwind.1.0.dylib */,
+				32A6546F22F47B1E003557DE /* libunwind.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
