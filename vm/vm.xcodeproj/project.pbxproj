@@ -8,10 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		32124950221305CF00EF1830 /* NativeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3212494E221305CF00EF1830 /* NativeGen.cpp */; };
-		3224384A22EC37D300B652AD /* LLVMJIT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3224384222EC37D300B652AD /* LLVMJIT.cpp */; };
-		3224384B22EC37D300B652AD /* LLVMCodeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3224384322EC37D300B652AD /* LLVMCodeGen.cpp */; };
-		3224384C22EC37D300B652AD /* LLVMTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3224384822EC37D300B652AD /* LLVMTest.cpp */; };
-		3224384D22EC37D300B652AD /* SimpleLLVMJIT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3224384922EC37D300B652AD /* SimpleLLVMJIT.cpp */; };
 		323668F61BB64DE60030F788 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 323668F51BB64DE60030F788 /* main.cpp */; };
 		3236694D1BB64F1A0030F788 /* PodManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3236694B1BB64F1A0030F788 /* PodManager.cpp */; };
 		323669501BB64F470030F788 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3236694E1BB64F470030F788 /* Env.cpp */; };
@@ -315,6 +311,11 @@
 		32A6562522F48880003557DE /* libc++abi.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561E22F48880003557DE /* libc++abi.1.0.dylib */; };
 		32A6562622F48880003557DE /* LLVMPolly.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6561F22F48880003557DE /* LLVMPolly.so */; };
 		32A6562722F48880003557DE /* libclang.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A6562022F48880003557DE /* libclang.dylib */; };
+		32A6563122F5BD2F003557DE /* LLVMJIT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32A6562922F5BD2F003557DE /* LLVMJIT.cpp */; };
+		32A6563222F5BD2F003557DE /* LLVMCodeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32A6562A22F5BD2F003557DE /* LLVMCodeGen.cpp */; };
+		32A6563322F5BD2F003557DE /* LLVMTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32A6562F22F5BD2F003557DE /* LLVMTest.cpp */; };
+		32A6563422F5BD2F003557DE /* SimpleLLVMJIT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32A6563022F5BD2F003557DE /* SimpleLLVMJIT.cpp */; };
+		32A6563722F5BD61003557DE /* LLVMStruct.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32A6563522F5BD61003557DE /* LLVMStruct.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -333,14 +334,6 @@
 		3212494E221305CF00EF1830 /* NativeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NativeGen.cpp; sourceTree = "<group>"; };
 		3212494F221305CF00EF1830 /* NativeGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeGen.h; sourceTree = "<group>"; };
 		321249512213067B00EF1830 /* vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vm.h; sourceTree = "<group>"; };
-		3224384222EC37D300B652AD /* LLVMJIT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMJIT.cpp; sourceTree = "<group>"; };
-		3224384322EC37D300B652AD /* LLVMCodeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMCodeGen.cpp; sourceTree = "<group>"; };
-		3224384422EC37D300B652AD /* LLVMTest.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMTest.hpp; sourceTree = "<group>"; };
-		3224384522EC37D300B652AD /* SimpleLLVMJIT.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SimpleLLVMJIT.hpp; sourceTree = "<group>"; };
-		3224384622EC37D300B652AD /* LLVMCodeGen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMCodeGen.hpp; sourceTree = "<group>"; };
-		3224384722EC37D300B652AD /* LLVMJIT.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMJIT.hpp; sourceTree = "<group>"; };
-		3224384822EC37D300B652AD /* LLVMTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMTest.cpp; sourceTree = "<group>"; };
-		3224384922EC37D300B652AD /* SimpleLLVMJIT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleLLVMJIT.cpp; sourceTree = "<group>"; };
 		323668F21BB64DE60030F788 /* vm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vm; sourceTree = BUILT_PRODUCTS_DIR; };
 		323668F51BB64DE60030F788 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3236694B1BB64F1A0030F788 /* PodManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PodManager.cpp; sourceTree = "<group>"; };
@@ -697,6 +690,16 @@
 		32A6561E22F48880003557DE /* libc++abi.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++abi.1.0.dylib"; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libc++abi.1.0.dylib"; sourceTree = "<group>"; };
 		32A6561F22F48880003557DE /* LLVMPolly.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = LLVMPolly.so; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/LLVMPolly.so"; sourceTree = "<group>"; };
 		32A6562022F48880003557DE /* libclang.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclang.dylib; path = "../../../source/llvm_bin/clang+llvm-8.0.0-x86_64-apple-darwin/lib/libclang.dylib"; sourceTree = "<group>"; };
+		32A6562922F5BD2F003557DE /* LLVMJIT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMJIT.cpp; sourceTree = "<group>"; };
+		32A6562A22F5BD2F003557DE /* LLVMCodeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMCodeGen.cpp; sourceTree = "<group>"; };
+		32A6562B22F5BD2F003557DE /* LLVMTest.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMTest.hpp; sourceTree = "<group>"; };
+		32A6562C22F5BD2F003557DE /* SimpleLLVMJIT.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SimpleLLVMJIT.hpp; sourceTree = "<group>"; };
+		32A6562D22F5BD2F003557DE /* LLVMCodeGen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMCodeGen.hpp; sourceTree = "<group>"; };
+		32A6562E22F5BD2F003557DE /* LLVMJIT.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMJIT.hpp; sourceTree = "<group>"; };
+		32A6562F22F5BD2F003557DE /* LLVMTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMTest.cpp; sourceTree = "<group>"; };
+		32A6563022F5BD2F003557DE /* SimpleLLVMJIT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleLLVMJIT.cpp; sourceTree = "<group>"; };
+		32A6563522F5BD61003557DE /* LLVMStruct.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMStruct.cpp; sourceTree = "<group>"; };
+		32A6563622F5BD61003557DE /* LLVMStruct.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LLVMStruct.hpp; sourceTree = "<group>"; };
 		32FF47071D85ACF000724EB6 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -952,25 +955,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3224384122EC37D300B652AD /* jit */ = {
-			isa = PBXGroup;
-			children = (
-				3224384222EC37D300B652AD /* LLVMJIT.cpp */,
-				3224384322EC37D300B652AD /* LLVMCodeGen.cpp */,
-				3224384422EC37D300B652AD /* LLVMTest.hpp */,
-				3224384522EC37D300B652AD /* SimpleLLVMJIT.hpp */,
-				3224384622EC37D300B652AD /* LLVMCodeGen.hpp */,
-				3224384722EC37D300B652AD /* LLVMJIT.hpp */,
-				3224384822EC37D300B652AD /* LLVMTest.cpp */,
-				3224384922EC37D300B652AD /* SimpleLLVMJIT.cpp */,
-			);
-			path = jit;
-			sourceTree = "<group>";
-		};
 		323668E91BB64DE60030F788 = {
 			isa = PBXGroup;
 			children = (
-				3224384122EC37D300B652AD /* jit */,
+				32A6562822F5BD2F003557DE /* llvm */,
 				327A0F0C22216DC6001A6EF0 /* sys */,
 				327A0E04221950F2001A6EF0 /* thirdparty */,
 				327A0DC7221950E3001A6EF0 /* util */,
@@ -1427,6 +1415,23 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		32A6562822F5BD2F003557DE /* llvm */ = {
+			isa = PBXGroup;
+			children = (
+				32A6562922F5BD2F003557DE /* LLVMJIT.cpp */,
+				32A6562D22F5BD2F003557DE /* LLVMCodeGen.hpp */,
+				32A6562A22F5BD2F003557DE /* LLVMCodeGen.cpp */,
+				32A6562B22F5BD2F003557DE /* LLVMTest.hpp */,
+				32A6562C22F5BD2F003557DE /* SimpleLLVMJIT.hpp */,
+				32A6562E22F5BD2F003557DE /* LLVMJIT.hpp */,
+				32A6562F22F5BD2F003557DE /* LLVMTest.cpp */,
+				32A6563022F5BD2F003557DE /* SimpleLLVMJIT.cpp */,
+				32A6563522F5BD61003557DE /* LLVMStruct.cpp */,
+				32A6563622F5BD61003557DE /* LLVMStruct.hpp */,
+			);
+			path = llvm;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1496,7 +1501,7 @@
 				327A0F2722216DC6001A6EF0 /* sys_Err.c in Sources */,
 				327A0DF6221950E3001A6EF0 /* LinkedList.c in Sources */,
 				327A0E37221950F2001A6EF0 /* unzip.c in Sources */,
-				3224384C22EC37D300B652AD /* LLVMTest.cpp in Sources */,
+				32A6563322F5BD2F003557DE /* LLVMTest.cpp in Sources */,
 				327A0DF9221950E3001A6EF0 /* FPod.cpp in Sources */,
 				323669501BB64F470030F788 /* Env.cpp in Sources */,
 				327A0F1F22216DC6001A6EF0 /* sys_Void.c in Sources */,
@@ -1515,9 +1520,9 @@
 				327A0E44221950F2001A6EF0 /* crc32.c in Sources */,
 				327A0F2E22216DC6001A6EF0 /* sys_Func.c in Sources */,
 				327A0E3A221950F2001A6EF0 /* ioapi.c in Sources */,
-				3224384A22EC37D300B652AD /* LLVMJIT.cpp in Sources */,
+				32A6563122F5BD2F003557DE /* LLVMJIT.cpp in Sources */,
 				327A0DFB221950E3001A6EF0 /* FType.cpp in Sources */,
-				3224384D22EC37D300B652AD /* SimpleLLVMJIT.cpp in Sources */,
+				32A6563422F5BD2F003557DE /* SimpleLLVMJIT.cpp in Sources */,
 				327A0DFC221950E3001A6EF0 /* ZipFile.cpp in Sources */,
 				327A0DFF221950E3001A6EF0 /* Gc.cpp in Sources */,
 				327A0E3E221950F2001A6EF0 /* iowin32.c in Sources */,
@@ -1527,6 +1532,7 @@
 				327A0E38221950F2001A6EF0 /* zip.c in Sources */,
 				327A0E48221950F2001A6EF0 /* uncompr.c in Sources */,
 				327A0F2A22216DC6001A6EF0 /* sys_Bool.c in Sources */,
+				32A6563722F5BD61003557DE /* LLVMStruct.cpp in Sources */,
 				327A0E4A221950F2001A6EF0 /* inffast.c in Sources */,
 				327A0DF5221950E3001A6EF0 /* utf8.c in Sources */,
 				323C30B81BC0AC0600F15091 /* ObjFactory.cpp in Sources */,
@@ -1536,7 +1542,7 @@
 				327A0E40221950F2001A6EF0 /* miniunz.c in Sources */,
 				327A0E3F221950F2001A6EF0 /* minizip.c in Sources */,
 				327A0DFD221950E3001A6EF0 /* Code.cpp in Sources */,
-				3224384B22EC37D300B652AD /* LLVMCodeGen.cpp in Sources */,
+				32A6563222F5BD2F003557DE /* LLVMCodeGen.cpp in Sources */,
 				3236694D1BB64F1A0030F788 /* PodManager.cpp in Sources */,
 				327A0DF3221950E3001A6EF0 /* tinycthread.c in Sources */,
 				323668F61BB64DE60030F788 /* main.cpp in Sources */,

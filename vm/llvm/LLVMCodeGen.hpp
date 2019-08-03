@@ -27,17 +27,46 @@
 #include <cassert>
 #include <memory>
 #include <vector>
+#include <map>
+#include <string>
+#include "LLVMStruct.hpp"
 
 class Env;
 
+class LLVMGenCtx {
+public:
+    llvm::LLVMContext *context;
+    std::map<std::string, LLVMStruct*> structMap;
+    
+    llvm::Type *ptrType;
+    llvm::Type *pptrType;
+    llvm::Type *valueType;
+    llvm::Type *pvalueType;
+    
+    LLVMGenCtx(llvm::LLVMContext *context);
+    
+    llvm::Type *toLlvmType(FPod *curPod, int16_t type);
+    
+    int fieldIndex(FPod *curPod, FFieldRef *ref);
+private:
+    LLVMStruct *getLLVMStruct(FType *ftype);
+};
+
 class LLVMCodeGen {
-    std::string &name;
+    std::string name;
     IRMethod *irMethod;
     llvm::IRBuilder<> Builder;
+    
     llvm::LLVMContext &Context;
+    LLVMGenCtx *ctx;
+    llvm::Module *module;
     
     llvm::Function *function;
-    llvm::Function *callee;
+    //llvm::Function *callee;
+    
+    
+    
+    std::vector<llvm::Value*> locals;
     
     std::vector<llvm::Value*> primLocals;
     llvm::Value *refLocals;
@@ -45,24 +74,21 @@ class LLVMCodeGen {
     //temp
     llvm::Value *envValue;
     llvm::Value *localsPtr;
-    
-    llvm::Type *ptrType;
-    llvm::Type *pptrType;
-    llvm::Type *valueType;
-    llvm::Type *pvalueType;
+
     
 public:
     Env *env;
     
-    LLVMCodeGen(llvm::LLVMContext &Context, Env *env, IRMethod *irMethod, std::string &name);
+    LLVMCodeGen(llvm::LLVMContext &Context, IRMethod *irMethod, std::string &name);
     
     llvm::Function *gen(llvm::Module *M);
     
 private:
+    llvm::Function* getFunctionProto(IRMethod *irMethod);
     void genBlock(Block *block);
     void genStmt(Stmt *stmt);
     llvm::Value *genExpr(Expr *expr);
-    llvm::Value *ptrConst(void *ptr);
+    //llvm::Value *ptrConst(void *ptr);
 };
 
 #endif /* LLVMCodeGen_hpp */

@@ -34,6 +34,8 @@ public:
     
     FPod *curPod;
     
+    void *llvmBlock;
+    
     Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false) {
     }
     
@@ -63,6 +65,7 @@ public:
 
 
 class IRMethod {
+public:
     FMethod *method;
 public:
     std::vector<Block *> blocks;

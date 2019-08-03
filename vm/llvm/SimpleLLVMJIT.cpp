@@ -39,7 +39,7 @@ std::unique_ptr<Module> SimpleLLVMJIT::gen(Env *env, FMethod *method
     std::unique_ptr<Module> Owner = make_unique<Module>("test", Context);
     Module *M = Owner.get();
     
-    LLVMCodeGen codeGen(Context, env, &com, name);
+    LLVMCodeGen codeGen(Context, &com, name);
     Function *function = function = codeGen.gen(M);
     return std::move(Owner);
 }
