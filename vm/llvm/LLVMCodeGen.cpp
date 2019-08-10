@@ -15,8 +15,6 @@ using namespace llvm;
 LLVMGenCtx::LLVMGenCtx(llvm::LLVMContext *context) : context(context) {
     ptrType = Type::getInt8PtrTy(*context);
     pptrType = ptrType->getPointerTo();
-    valueType = Type::getInt64Ty(*context);
-    pvalueType = valueType->getPointerTo();
 }
 
 LLVMStruct *LLVMGenCtx::getLLVMStruct(FType *ftype) {
@@ -86,13 +84,28 @@ llvm::Function* LLVMCodeGen::getFunctionProto(IRMethod *irMethod) {
     return function;
 }
 
+llvm::Function* LLVMCodeGen::getFunctionProtoByRef(FPod *curPod, FMethodRef *ref) {
+    std::string name = curPod->names[ref->name];
+    if (auto* function = module->getFunction(name)) return function;
+    
+    llvm::SmallVector<llvm::Type*, 16> paramTypes;
+    for (int i=0; i < ref->paramCount; ++i) {
+        uint16_t tf = ref->params[i];
+        paramTypes.push_back(ctx->toLlvmType(curPod, tf));
+    }
+    llvm::Type *returnType = ctx->toLlvmType(curPod, ref->retType);
+    
+    auto* llvmFunctionType = llvm::FunctionType::get(returnType, paramTypes, false);
+    auto* function = llvm::Function::Create(llvmFunctionType, llvm::Function::ExternalLinkage, name, module);
+    
+    return function;
+}
+
 llvm::Function *LLVMCodeGen::gen(Module *M) {
     module = M;
     function = getFunctionProto(irMethod);
     
-    //BasicBlock *BB = BasicBlock::Create(Context, "entry", function);
-    //Builder.SetInsertPoint(BB);
-
+    //set args name
     Argument *argx = &*function->arg_begin();// Get the arg
     argx->setName("env");
     ++argx;
@@ -102,29 +115,16 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
         ++argx;
     }
     
-    /*
-    envValue = ArgX;
-    
-    int frameOffset = offsetof(Env, curFrame);
-    Value *framePtr = Builder.CreateGEP(envValue, Builder.getInt32(frameOffset));
-    Value *framePtr2 = Builder.CreateBitOrPointerCast(framePtr, pptrType);
-    Value *frameValue = Builder.CreateLoad(framePtr2);
-    localsPtr = Builder.CreateGEP(frameValue, Builder.getInt32(sizeof(StackFrame)));
-    */
-        /*
-    for (Var &var : irMethod->locals) {
-        Value *v = Builder.CreateAlloca(Type::getInt32Ty(Context), nullptr, var.name);
-        primLocals.push_back(v);
-    }
-    ArrayType *type = ArrayType::get(Type::getInt8PtrTy(Context), irMethod->refLocalsCount);
-    refLocals = Builder.CreateAlloca(type, nullptr, "refLocals");
-*/
-    
     //init for branch
     for (int i=0; i<irMethod->blocks.size(); ++i) {
         Block *b = irMethod->blocks[i];
         BasicBlock *BB = BasicBlock::Create(Context, "", function);
         b->llvmBlock = BB;
+        
+        for (int i=0; i<b->locals.size(); ++i) {
+            llvm::Value *var = Builder.CreateAlloca(ctx->ptrType);
+            locals.push_back(var);
+        }
     }
     
     for (int i=0; i<irMethod->blocks.size(); ++i) {
@@ -132,7 +132,6 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
         genBlock(b);
     }
     
-    //Builder.CreateRetVoid();
     return function;
 }
 
@@ -147,14 +146,7 @@ void LLVMCodeGen::genBlock(Block *block) {
         genStmt(t);
     }
 }
-/*
-Value *LLVMCodeGen::ptrConst(void *ptr) {
-    ConstantInt* CI = ConstantInt::get(Type::getInt64Ty(Context),
-                                       uint64_t(ptr));
-    Value *val = ConstantExpr::getIntToPtr(CI, ptrType);
-    return val;
-}
-*/
+
 void LLVMCodeGen::genStmt(Stmt *stmt) {
     FPod *curPod = irMethod->curPod;
     
@@ -190,6 +182,12 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
             }
             case FOp::LoadStr: {
                 //res.name = "Str";
+                const std::string &str = curPod->constantas.strings[s->opObj.i1];
+                llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
+                llvm::Type *t = llvm::Type::getInt32Ty(*ctx->context);
+                llvm::Value *size = llvm::ConstantInt::get(t, str.size());
+                
+                //TODO
                 break;
             }
             case FOp::LoadDuration: {
@@ -217,10 +215,6 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
         Value *src = genExpr(&s->src);
         Value *dst = genExpr(&s->dst);
         
-        //fr_Value *locals = ((fr_Value*)(env->curFrame+1)) + index;
-        //Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
-        //Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
-        //Value *v = Builder.CreateBitOrPointerCast(val, valueType);
         Builder.CreateStore(src, dst);
     }
     else if (FieldStmt *s = dynamic_cast<FieldStmt*>(stmt)) {
@@ -235,49 +229,27 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
         
         llvm::Value *value = genExpr(&s->value);
         if (s->isLoad) {
-            Builder.CreateStore(pos, value);
+            llvm::Value *new_value = Builder.CreateLoad(pos);
+            Builder.CreateStore(new_value, value);
         }
         else {
             Builder.CreateStore(value, pos);
         }
     }
     else if (CallStmt *s = dynamic_cast<CallStmt*>(stmt)) {
-        //int paramCount;
-        FMethod *method = env->podManager->getMethod(env, curPod, *s->methodRef);
-        /*
+        llvm::Function *callee = getFunctionProtoByRef(curPod, s->methodRef);
+        
+        llvm::SmallVector<llvm::Value*, 16> args;
         for (int i=0; i<s->params.size(); ++i) {
             Expr &expr = s->params[i];
             Value *val = genExpr(&expr);
-            int index = irMethod->refLocalsCount + i;
-            Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
-            Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
-            Value *v = Builder.CreateBitOrPointerCast(val, valueType);
-            Builder.CreateStore(v, ptr);
+            args.push_back(val);
         }
 
-        Builder.CreateCall(callee, {envValue, ptrConst(method)
-            , Builder.getInt32(paramCount), Builder.getInt32(s->isVirtual)});
-        
-        if (!s->isVoid) {
-            int index = 0;
-            if (s->retValue.type == ExprType::localVar) {
-                index = s->retValue.varRef.index;
-            } else if (s->retValue.type == ExprType::tempVar) {
-                Expr::VarRef &varRef = s->retValue.varRef;
-                index = irMethod->blocks[varRef.block]->locals[varRef.index].newIndex;
-            }
-
-            Value *CI = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * index));
-            Value *ptr = Builder.CreateBitOrPointerCast(CI, pvalueType);
-            
-            Value *vp = Builder.CreateGEP(localsPtr, Builder.getInt32(sizeof(fr_Value) * irMethod->refLocalsCount));
-            Value *vvp = Builder.CreateBitOrPointerCast(vp, pvalueType);
-            Value *v = Builder.CreateLoad(vvp);
-            Builder.CreateStore(v, ptr);
-        }
-         */
+        Builder.CreateCall(callee, args);
     }
     else if (CmpStmt *s = dynamic_cast<CmpStmt*>(stmt)) {
+        //TODO
     }
     else if (RetStmt *s = dynamic_cast<RetStmt*>(stmt)) {
         if (s->isVoid) {
@@ -288,21 +260,34 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
         }
     }
     else if (JmpStmt *s = dynamic_cast<JmpStmt*>(stmt)) {
-        llvm::Value *condition = NULL;
-        if (s->trueJmp) {
-            condition = genExpr(&s->expr);
+        if (s->jmpType == JmpStmt::trueJmp) {
+            llvm::Value *condition = genExpr(&s->expr);
             Builder.CreateCondBr(condition, (llvm::BasicBlock*)s->targetBlock->llvmBlock, NULL);
         }
-        else if (s->falseJmp) {
+        else if (s->jmpType == JmpStmt::falseJmp) {
             //condition = Builder.CreateNot(genExpr(&s->expr));
-            condition = genExpr(&s->expr);
+            llvm::Value *condition = genExpr(&s->expr);
             Builder.CreateCondBr(condition, NULL, (llvm::BasicBlock*)s->targetBlock->llvmBlock);
         }
         else {
             Builder.CreateBr((llvm::BasicBlock*)s->targetBlock->llvmBlock);
             //return;
         }
-        //Builder.CreateCondBr(condition, thenBlock, elseBlock);
+    }
+    else if (AllocStmt *s = dynamic_cast<AllocStmt*>(stmt)) {
+        
+    }
+    else if (ThrowStmt *s = dynamic_cast<ThrowStmt*>(stmt)) {
+        
+    }
+    else if (ExceptionStmt *s = dynamic_cast<ExceptionStmt*>(stmt)) {
+        
+    }
+    else if (CoerceStmt *s = dynamic_cast<CoerceStmt*>(stmt)) {
+        
+    }
+    else if (TypeCheckStmt *s = dynamic_cast<TypeCheckStmt*>(stmt)) {
+        
     }
 }
 

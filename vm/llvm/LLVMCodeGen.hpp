@@ -40,8 +40,8 @@ public:
     
     llvm::Type *ptrType;
     llvm::Type *pptrType;
-    llvm::Type *valueType;
-    llvm::Type *pvalueType;
+    //llvm::Type *valueType;
+    //llvm::Type *pvalueType;
     
     LLVMGenCtx(llvm::LLVMContext *context);
     
@@ -62,22 +62,10 @@ class LLVMCodeGen {
     llvm::Module *module;
     
     llvm::Function *function;
-    //llvm::Function *callee;
-    
-    
     
     std::vector<llvm::Value*> locals;
     
-    std::vector<llvm::Value*> primLocals;
-    llvm::Value *refLocals;
-    
-    //temp
-    llvm::Value *envValue;
-    llvm::Value *localsPtr;
-
-    
 public:
-    Env *env;
     
     LLVMCodeGen(llvm::LLVMContext &Context, IRMethod *irMethod, std::string &name);
     
@@ -85,6 +73,7 @@ public:
     
 private:
     llvm::Function* getFunctionProto(IRMethod *irMethod);
+    llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref);
     void genBlock(Block *block);
     void genStmt(Stmt *stmt);
     llvm::Value *genExpr(Expr *expr);
