@@ -29,28 +29,10 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "LLVMStruct.hpp"
 
-class Env;
-
-class LLVMGenCtx {
-public:
-    llvm::LLVMContext *context;
-    std::map<std::string, LLVMStruct*> structMap;
-    
-    llvm::Type *ptrType;
-    llvm::Type *pptrType;
-    //llvm::Type *valueType;
-    //llvm::Type *pvalueType;
-    
-    LLVMGenCtx(llvm::LLVMContext *context);
-    
-    llvm::Type *toLlvmType(FPod *curPod, int16_t type);
-    
-    int fieldIndex(FPod *curPod, FFieldRef *ref);
-private:
-    LLVMStruct *getLLVMStruct(FType *ftype);
-};
+//class Env;
+class LLVMStruct;
+class LLVMGenCtx;
 
 class LLVMCodeGen {
     std::string name;

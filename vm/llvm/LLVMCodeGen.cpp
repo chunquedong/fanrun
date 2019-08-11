@@ -9,58 +9,10 @@
 #include "LLVMCodeGen.hpp"
 #include "Env.h"
 #include "FCodeUtil.hpp"
+#include "LLVMGenCtx.hpp"
+#include "LLVMStruct.hpp"
 
 using namespace llvm;
-
-LLVMGenCtx::LLVMGenCtx(llvm::LLVMContext *context) : context(context) {
-    ptrType = Type::getInt8PtrTy(*context);
-    pptrType = ptrType->getPointerTo();
-}
-
-LLVMStruct *LLVMGenCtx::getLLVMStruct(FType *ftype) {
-    std::string name = ftype->c_name;
-    std::map<std::string, LLVMStruct*>::iterator itr  = structMap.find(name);
-    if (itr != structMap.end()) {
-        return itr->second;
-    }
-    
-    LLVMStruct *sty = new LLVMStruct();
-    sty->ftype = ftype;
-    sty->structTy = llvm::StructType::create(*context, name);
-    
-    structMap[name] = sty;
-    
-    std::vector<llvm::Type*> fieldTypes;
-    fieldTypes.push_back(ptrType);
-    for (int i=0; i<ftype->fields.size(); ++i) {
-        FField &field = ftype->fields[i];
-        llvm::Type *t = toLlvmType(ftype->c_pod, field.type);
-        fieldTypes.push_back(t);
-    }
-    
-    sty->structTy->setBody(std::move(fieldTypes));
-    
-    return sty;
-}
-
-llvm::Type *LLVMGenCtx::toLlvmType(FPod *curPod, int16_t type) {
-    FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, type);
-    std::string name = ftype->c_name;
-    if (name == "sys_Void") {
-        return Type::getVoidTy(*context);
-    }
-    
-    LLVMStruct *sty = getLLVMStruct(ftype);
-    return sty->structTy;
-}
-
-int LLVMGenCtx::fieldIndex(FPod *curPod, FFieldRef *ref) {
-    FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, ref->parent);
-    LLVMStruct *s = getLLVMStruct(ftype);
-    
-    std::string name = curPod->names[ref->name];
-    return s->fieldIndex[name];
-}
 
 LLVMCodeGen::LLVMCodeGen(llvm::LLVMContext &Context, IRMethod *irMethod, std::string &name)
     : Context(Context), Builder(Context), irMethod(irMethod), name(name) {
