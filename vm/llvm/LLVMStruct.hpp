@@ -30,10 +30,13 @@ class LLVMGenCtx;
 
 struct VirtualMethod {
     llvm::Function *realMethod;
+    bool fromObj;
     int offsetVTable;
 };
 
 class LLVMStruct {
+    bool isVTableInited;
+    bool isVTableGened;
 public:
     FPod *fpod;
     FType *ftype;
@@ -44,22 +47,24 @@ public:
     
     
     std::vector<llvm::GlobalVariable*> vtables;
-    int classVtableSize;
     
     std::map<std::string, int> fieldIndex;
-    std::map<std::string, VirtualMethod> methodMap;
-    std::map<std::string, int> ivtableOffset;
+    std::map<std::string, llvm::Function *> declMethods;
+    std::map<std::string, VirtualMethod> resolvedMethods;
+    std::map<std::string, VirtualMethod> vtableMethods;
     
     
     LLVMStruct(LLVMGenCtx *ctx, FType *ftype, std::string &name);
     
     void init();
 private:
-    void initVTableAt(llvm::Value *vtablePos);
-    void overrideMethod(llvm::Value *vtablePos, std::string &name, llvm::Function *func);
+    void genVTableInit();
+    void genVTableAt(llvm::Value *vtablePos, std::map<std::string, VirtualMethod> &resolvedMethods);
     
     void initVTable();
     void initVTableLayout();
+    void resolveMethod();
+    void inheritMethod(LLVMStruct *base, bool isMixin);
 };
 
 #endif /* LLVMStruct_hpp */
