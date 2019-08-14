@@ -9,12 +9,23 @@
 #include "LLVMGenCtx.hpp"
 #include "FCodeUtil.hpp"
 #include "LLVMStruct.hpp"
+#include "llvm/IRReader/IRReader.h"
+#include "llvm/Support/SourceMgr.h"
 
 using namespace llvm;
 
 LLVMGenCtx::LLVMGenCtx(llvm::LLVMContext *context) : context(context) {
     ptrType = Type::getInt8PtrTy(*context);
     pptrType = ptrType->getPointerTo();
+    
+    llvm::SMDiagnostic err;
+    runtimeModule = parseIRFile("runtime.ll", err, *context);
+}
+
+llvm::Function *LLVMGenCtx::getRuntimeFunc(const std::string &name) {
+    llvm::Function *func = runtimeModule->getFunction(name);
+    //TODO
+    return func;
 }
 
 LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {

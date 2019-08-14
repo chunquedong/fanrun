@@ -16,6 +16,7 @@
 		3237F7771BB773B500A58B54 /* fni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3237F7751BB773B500A58B54 /* fni.cpp */; };
 		323C30B81BC0AC0600F15091 /* ObjFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 323C30B61BC0AC0600F15091 /* ObjFactory.cpp */; };
 		323EF23E230010FA00B27E68 /* LLVMGenCtx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 323EF23C230010FA00B27E68 /* LLVMGenCtx.cpp */; };
+		323EF24123045C9800B27E68 /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 323EF24023045C9800B27E68 /* runtime.c */; };
 		327A0DF2221950E3001A6EF0 /* escape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 327A0DC8221950E3001A6EF0 /* escape.cpp */; };
 		327A0DF3221950E3001A6EF0 /* tinycthread.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0DC9221950E3001A6EF0 /* tinycthread.c */; };
 		327A0DF4221950E3001A6EF0 /* system.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0DCA221950E3001A6EF0 /* system.c */; };
@@ -351,6 +352,8 @@
 		323C30B71BC0AC0600F15091 /* ObjFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjFactory.h; sourceTree = "<group>"; };
 		323EF23C230010FA00B27E68 /* LLVMGenCtx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMGenCtx.cpp; sourceTree = "<group>"; };
 		323EF23D230010FA00B27E68 /* LLVMGenCtx.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LLVMGenCtx.hpp; sourceTree = "<group>"; };
+		323EF23F23045C9800B27E68 /* runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
+		323EF24023045C9800B27E68 /* runtime.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = runtime.c; sourceTree = "<group>"; };
 		325231111DAC88940044DBF8 /* ExeEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExeEngine.h; sourceTree = "<group>"; };
 		327A0DC8221950E3001A6EF0 /* escape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = escape.cpp; sourceTree = "<group>"; };
 		327A0DC9221950E3001A6EF0 /* tinycthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tinycthread.c; sourceTree = "<group>"; };
@@ -1433,6 +1436,8 @@
 				32A6563622F5BD61003557DE /* LLVMStruct.hpp */,
 				323EF23C230010FA00B27E68 /* LLVMGenCtx.cpp */,
 				323EF23D230010FA00B27E68 /* LLVMGenCtx.hpp */,
+				323EF23F23045C9800B27E68 /* runtime.h */,
+				323EF24023045C9800B27E68 /* runtime.c */,
 			);
 			path = llvm;
 			sourceTree = "<group>";
@@ -1550,6 +1555,7 @@
 				327A0DFD221950E3001A6EF0 /* Code.cpp in Sources */,
 				32A6563222F5BD2F003557DE /* LLVMCodeGen.cpp in Sources */,
 				3236694D1BB64F1A0030F788 /* PodManager.cpp in Sources */,
+				323EF24123045C9800B27E68 /* runtime.c in Sources */,
 				327A0DF3221950E3001A6EF0 /* tinycthread.c in Sources */,
 				323668F61BB64DE60030F788 /* main.cpp in Sources */,
 				327A0F2522216DC6001A6EF0 /* sys_Num.c in Sources */,

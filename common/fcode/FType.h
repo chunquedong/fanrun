@@ -21,6 +21,8 @@ struct FSlot {
     uint32_t flags;
     uint16_t attrCount;
     std::vector<FAttr*> attrs;
+    
+    bool isStatic();
 };
 
 struct FField : public FSlot {

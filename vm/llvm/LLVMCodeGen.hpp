@@ -55,11 +55,13 @@ public:
     
 private:
     llvm::Function* getFunctionProto(IRMethod *irMethod);
-    llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref);
+    llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool isStatic);
     void genBlock(Block *block);
     void genStmt(Stmt *stmt);
     llvm::Value *genExpr(Expr *expr);
     //llvm::Value *ptrConst(void *ptr);
+    
+    void genCall(CallStmt *stmt);
 };
 
 #endif /* LLVMCodeGen_hpp */

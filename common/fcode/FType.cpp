@@ -8,6 +8,8 @@
 #include "FType.h"
 #include "FPod.h"
 
+bool FSlot::isStatic() { return (flags & FFlags::Static); }
+
 void FType::readMethod(FMethod &method, Buffer &buffer) {
     method.name = buffer.readUInt16();
     method.flags = buffer.readUInt32();

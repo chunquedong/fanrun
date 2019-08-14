@@ -38,6 +38,8 @@ public:
     llvm::LLVMContext *context;
     llvm::Module *module;
     
+    std::unique_ptr<llvm::Module> runtimeModule;
+    
     std::map<std::string, LLVMStruct*> structMap;
     
     llvm::Type *ptrType;
@@ -52,6 +54,8 @@ public:
     LLVMStruct *getStruct(FPod *curPod, int16_t type);
     
     int fieldIndex(FPod *curPod, FFieldRef *ref);
+    
+    llvm::Function *getRuntimeFunc(const std::string &name);
 private:
     LLVMStruct *getLLVMStruct(FType *ftype);
 };

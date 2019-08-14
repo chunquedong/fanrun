@@ -52,7 +52,7 @@ public:
     std::map<std::string, llvm::Function *> declMethods;
     std::map<std::string, VirtualMethod> resolvedMethods;
     std::map<std::string, VirtualMethod> vtableMethods;
-    
+    std::map<LLVMStruct*, int> allMinxin;
     
     LLVMStruct(LLVMGenCtx *ctx, FType *ftype, std::string &name);
     

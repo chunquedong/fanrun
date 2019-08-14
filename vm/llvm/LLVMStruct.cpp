@@ -35,6 +35,9 @@ void LLVMStruct::initVTableLayout() {
         //copy vtable
         vtableMethods = base->vtableMethods;
         virtaulCount = (int)vtableMethods.size();
+        
+        allMinxin = base->allMinxin;
+        allMinxin[base] = 0;
     }
     
     for (int i =0; i<ftype->methods.size(); ++i) {
@@ -53,6 +56,15 @@ void LLVMStruct::initVTableLayout() {
                 vtableMethods[name] = vm;
             }
         }
+    }
+    
+    for (int i=0; i<ftype->meta.mixinCount; ++i) {
+        LLVMStruct *mixin = ctx->getStruct(fpod, ftype->meta.mixin[i]);
+        mixin->initVTable();
+        for (std::map<LLVMStruct*, int>::iterator itr = mixin->allMinxin.begin(); itr != mixin->allMinxin.end(); ++itr) {
+            allMinxin[itr->first] = itr->second;
+        }
+        allMinxin[mixin] = 0;
     }
 }
 
@@ -152,9 +164,8 @@ void LLVMStruct::initVTable() {
     vtables.push_back(vtable);
     
     //init interface vtable var
-    for (int i=0; i<ftype->meta.mixinCount; ++i) {
-        LLVMStruct *base = ctx->getStruct(fpod, ftype->meta.mixin[i]);
-        base->initVTable();
+    for (std::map<LLVMStruct*, int>::iterator itr = allMinxin.begin(); itr != allMinxin.end(); ++itr) {
+        LLVMStruct *base = itr->first;
         
         llvm::Type *arrayTy = llvm::ArrayType::get(ctx->ptrType, base->vtableMethods.size());
         llvm::GlobalVariable *vtable = new llvm::GlobalVariable(*ctx->module, arrayTy, false

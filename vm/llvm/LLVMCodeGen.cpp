@@ -36,7 +36,7 @@ llvm::Function* LLVMCodeGen::getFunctionProto(IRMethod *irMethod) {
     return function;
 }
 
-llvm::Function* LLVMCodeGen::getFunctionProtoByRef(FPod *curPod, FMethodRef *ref) {
+llvm::Function* LLVMCodeGen::getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool isStatic) {
     std::string name = curPod->names[ref->name];
     if (auto* function = module->getFunction(name)) return function;
     
@@ -97,6 +97,36 @@ void LLVMCodeGen::genBlock(Block *block) {
     for (Stmt *t : block->stmts) {
         genStmt(t);
     }
+}
+
+void LLVMCodeGen::genCall(CallStmt *s) {
+    llvm::Function *callee = getFunctionProtoByRef(irMethod->curPod, s->methodRef, s->isStatic);
+    
+    if (s->isVirtual || s->isMixin) {
+        llvm::Value *vtable = NULL;
+        LLVMStruct *clz = ctx->getStruct(irMethod->curPod, s->methodRef->parent);
+        
+        llvm::Value *instance = genExpr(&s->params.at(0));
+        llvm::Value *vtablePtr = Builder.CreateBitCast(instance, clz->structPtr);
+        vtable = Builder.CreateLoad(vtablePtr);
+    
+        std::map<std::string, VirtualMethod>::iterator it = clz->vtableMethods.find(s->mthName);
+        if (it == clz->vtableMethods.end()) {
+            printf("ERROR: not found method:%s\n", s->mthName.c_str());
+            return;
+        }
+        llvm::Value *mth = Builder.CreateStructGEP(vtable, it->second.offsetVTable);
+        callee = (llvm::Function*)Builder.CreateBitCast(mth, callee->getType());
+    }
+    
+    llvm::SmallVector<llvm::Value*, 16> args;
+    for (int i=0; i<s->params.size(); ++i) {
+        Expr &expr = s->params[i];
+        Value *val = genExpr(&expr);
+        args.push_back(val);
+    }
+    
+    Builder.CreateCall(callee, args);
 }
 
 void LLVMCodeGen::genStmt(Stmt *stmt) {
@@ -189,16 +219,7 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
         }
     }
     else if (CallStmt *s = dynamic_cast<CallStmt*>(stmt)) {
-        llvm::Function *callee = getFunctionProtoByRef(curPod, s->methodRef);
-        
-        llvm::SmallVector<llvm::Value*, 16> args;
-        for (int i=0; i<s->params.size(); ++i) {
-            Expr &expr = s->params[i];
-            Value *val = genExpr(&expr);
-            args.push_back(val);
-        }
-
-        Builder.CreateCall(callee, args);
+        genCall(s);
     }
     else if (CmpStmt *s = dynamic_cast<CmpStmt*>(stmt)) {
         //TODO
