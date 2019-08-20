@@ -19,6 +19,7 @@ class IRVirtualMethod {
 public:
     IRType *parent;
     FMethod *method;
+    int offsetVTable;
     
     IRVirtualMethod();
     
@@ -42,6 +43,7 @@ class IRModule {
 public:
     std::map<std::string, IRType*> types;
     IRType *getType(FPod *pod, uint16_t typeRefId);
+    //IRType *getTypeByName(const std::string &name);
 };
 
 
@@ -52,6 +54,7 @@ public:
     FType *ftype;
     FPod *fpod;
     IRModule *module;
+    void *llvmStruct;
     
     std::vector<IRVTable*> vtables;
     
@@ -67,7 +70,7 @@ private:
     void resolveMethod();
     void inheritMethod(IRType *base, bool isMixin);
     void setVTable(IRVTable *vtable);
-    void initMixinVTable();
+    void initITable();
     void initMainVTable();
 };
 

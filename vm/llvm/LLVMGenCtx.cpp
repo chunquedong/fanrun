@@ -29,6 +29,13 @@ llvm::Function *LLVMGenCtx::getRuntimeFunc(const std::string &name) {
 }
 
 LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
+    
+    IRType *irType = irModule->getType(curPod, type);
+    if (irType->llvmStruct == NULL) {
+        irType->llvmStruct = new LLVMStruct(this, irType, irType->ftype->c_name);
+    }
+    return (LLVMStruct*)irType->llvmStruct;
+    /*
     //FTypeRef &ref = curPod->typeRefs[type];
     std::string name = FCodeUtil::getTypeRefName(curPod, type, false);
     std::map<std::string, LLVMStruct*>::iterator itr  = structMap.find(name);
@@ -42,20 +49,7 @@ LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
     
     sty->init();
     return sty;
-}
-
-LLVMStruct *LLVMGenCtx::getLLVMStruct(FType *ftype) {
-    std::string name = ftype->c_name;
-    std::map<std::string, LLVMStruct*>::iterator itr  = structMap.find(name);
-    if (itr != structMap.end()) {
-        return itr->second;
-    }
-    
-    LLVMStruct *sty = new LLVMStruct(this, ftype, name);
-    structMap[name] = sty;
-    
-    sty->init();
-    return sty;
+     */
 }
 
 llvm::Type *LLVMGenCtx::toLlvmType(FPod *curPod, int16_t type) {
@@ -65,13 +59,12 @@ llvm::Type *LLVMGenCtx::toLlvmType(FPod *curPod, int16_t type) {
         return Type::getVoidTy(*context);
     }
     
-    LLVMStruct *sty = getLLVMStruct(ftype);
+    LLVMStruct *sty = getStruct(curPod, type);
     return sty->structTy;
 }
 
 int LLVMGenCtx::fieldIndex(FPod *curPod, FFieldRef *ref) {
-    FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, ref->parent);
-    LLVMStruct *s = getLLVMStruct(ftype);
+    LLVMStruct *s = getStruct(curPod, ref->parent);
     
     std::string name = curPod->names[ref->name];
     return s->fieldIndex[name];

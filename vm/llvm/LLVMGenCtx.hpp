@@ -29,7 +29,7 @@
 #include <string>
 
 #include "IRMethod.h"
-
+#include "IRType.hpp"
 
 class LLVMStruct;
 
@@ -37,6 +37,8 @@ class LLVMGenCtx {
 public:
     llvm::LLVMContext *context;
     llvm::Module *module;
+    
+    IRModule *irModule;
     
     std::unique_ptr<llvm::Module> runtimeModule;
     
@@ -57,7 +59,6 @@ public:
     
     llvm::Function *getRuntimeFunc(const std::string &name);
 private:
-    LLVMStruct *getLLVMStruct(FType *ftype);
 };
 
 #endif /* LLVMGenCtx_hpp */

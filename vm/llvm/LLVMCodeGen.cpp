@@ -110,8 +110,8 @@ void LLVMCodeGen::genCall(CallStmt *s) {
         llvm::Value *vtablePtr = Builder.CreateBitCast(instance, clz->structPtr);
         vtable = Builder.CreateLoad(vtablePtr);
     
-        std::map<std::string, VirtualMethod>::iterator it = clz->vtableMethods.find(s->mthName);
-        if (it == clz->vtableMethods.end()) {
+        std::map<std::string, IRVirtualMethod>::iterator it = clz->irType->resolvedMethods.find(s->mthName);
+        if (it == clz->irType->resolvedMethods.end()) {
             printf("ERROR: not found method:%s\n", s->mthName.c_str());
             return;
         }

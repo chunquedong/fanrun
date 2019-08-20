@@ -10,7 +10,7 @@
 #include "FCodeUtil.hpp"
 
 
-IRVirtualMethod::IRVirtualMethod() : parent(nullptr), method(nullptr) {
+IRVirtualMethod::IRVirtualMethod() : parent(nullptr), method(nullptr), offsetVTable(-1) {
 
 }
 
@@ -39,6 +39,7 @@ IRType *IRModule::getType(FPod *pod, uint16_t typeRefId) {
     types[name] = irtype;
     return irtype;
 }
+
 
 /////////////////////////////////////////////////////////////////////
 
@@ -95,11 +96,12 @@ void IRType::setVTable(IRVTable *vtable) {
             continue;
         }
         //override method
+        itr->second.offsetVTable = i;
         vm = itr->second;
     }
 }
 
-void IRType::initMixinVTable() {
+void IRType::initITable() {
     //get mixin from base
     if (ftype->meta.base != 0xFFFF) {
         IRType *base = module->getType(fpod, ftype->meta.base);
@@ -143,9 +145,6 @@ void IRType::initMainVTable() {
         vtable = new IRVTable(this, base);
         vtables.push_back(vtable);
         vtable->functions = base->vtables.at(0)->functions;
-        
-        allMinxin = base->allMinxin;
-        allMinxin[base] = 0;
     }
     else {
         vtable = new IRVTable(this, nullptr);
@@ -183,5 +182,5 @@ void IRType::initVTable() {
     
     initMainVTable();
     
-    initMixinVTable();
+    initITable();
 }

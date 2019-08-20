@@ -22,24 +22,17 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "FPod.h"
+#include "IRType.hpp"
 
 #include <map>
 #include <string>
 
 class LLVMGenCtx;
 
-struct VirtualMethod {
-    llvm::Function *realMethod;
-    bool fromObj;
-    int offsetVTable;
-};
-
 class LLVMStruct {
-    bool isVTableInited;
-    bool isVTableGened;
 public:
-    FPod *fpod;
-    FType *ftype;
+    IRType *irType;
+    
     llvm::StructType *structTy;
     llvm::PointerType *structPtr;
     LLVMGenCtx *ctx;
@@ -50,21 +43,15 @@ public:
     
     std::map<std::string, int> fieldIndex;
     std::map<std::string, llvm::Function *> declMethods;
-    std::map<std::string, VirtualMethod> resolvedMethods;
-    std::map<std::string, VirtualMethod> vtableMethods;
-    std::map<LLVMStruct*, int> allMinxin;
     
-    LLVMStruct(LLVMGenCtx *ctx, FType *ftype, std::string &name);
+    LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name);
     
-    void init();
 private:
-    void genVTableInit();
-    void genVTableAt(llvm::Value *vtablePos, std::map<std::string, VirtualMethod> &resolvedMethods);
-    
-    void initVTable();
-    void initVTableLayout();
-    void resolveMethod();
-    void inheritMethod(LLVMStruct *base, bool isMixin);
+    void init();
+public:
+    void genVTable();
+private:
+    void genVTableAt(llvm::Value *vtablePos, IRVTable *irVTable);
 };
 
 #endif /* LLVMStruct_hpp */
