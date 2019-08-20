@@ -24,6 +24,10 @@ llvm::Function* LLVMCodeGen::getFunctionProto(IRMethod *irMethod) {
     if (auto* function = module->getFunction(name)) return function;
     
     llvm::SmallVector<llvm::Type*, 16> paramTypes;
+    if (!irMethod->method->isStatic()) {
+        paramTypes.push_back(ctx->toLlvmType(irMethod->curPod, irMethod->method->c_parent->meta.self));
+    }
+    
     for (int i=0; i < irMethod->method->paramCount; ++i) {
         FMethodVar &v = irMethod->method->vars[i];
         paramTypes.push_back(ctx->toLlvmType(irMethod->curPod, v.type));
@@ -41,6 +45,9 @@ llvm::Function* LLVMCodeGen::getFunctionProtoByRef(FPod *curPod, FMethodRef *ref
     if (auto* function = module->getFunction(name)) return function;
     
     llvm::SmallVector<llvm::Type*, 16> paramTypes;
+    if (!isStatic) {
+        paramTypes.push_back(ctx->toLlvmType(curPod, ref->parent));
+    }
     for (int i=0; i < ref->paramCount; ++i) {
         uint16_t tf = ref->params[i];
         paramTypes.push_back(ctx->toLlvmType(curPod, tf));
@@ -129,138 +136,173 @@ void LLVMCodeGen::genCall(CallStmt *s) {
     Builder.CreateCall(callee, args);
 }
 
+void LLVMCodeGen::genCompare(CompareStmt *stmt) {
+    
+}
+
+void LLVMCodeGen::getConst(ConstStmt *s) {
+    FPod *curPod = irMethod->curPod;
+    llvm::Value *v = NULL;
+    switch (s->opObj.opcode) {
+        case FOp::LoadNull: {
+            llvm::PointerType *t = Type::getInt8PtrTy(*ctx->context);
+            v = llvm::ConstantPointerNull::get(t);
+            break;
+        }
+        case FOp::LoadFalse: {
+            v = llvm::ConstantInt::getFalse(*ctx->context);
+            break;
+        }
+        case FOp::LoadTrue: {
+            v = llvm::ConstantInt::getTrue(*ctx->context);
+            break;
+        }
+        case FOp::LoadInt: {
+            llvm::Type *t = llvm::Type::getInt64Ty(*ctx->context);
+            v = llvm::ConstantInt::get(t, curPod->constantas.ints[s->opObj.i1]);
+            break;
+        }
+        case FOp::LoadFloat: {
+            llvm::Type *t = llvm::Type::getDoubleTy(*ctx->context);
+            v = llvm::ConstantFP::get(t, curPod->constantas.reals[s->opObj.i1]);
+            break;
+        }
+        case FOp::LoadDecimal: {
+            //res.name = "Decimal";
+            break;
+        }
+        case FOp::LoadStr: {
+            //res.name = "Str";
+            const std::string &str = curPod->constantas.strings[s->opObj.i1];
+            llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
+            llvm::Type *t = llvm::Type::getInt32Ty(*ctx->context);
+            llvm::Value *size = llvm::ConstantInt::get(t, str.size());
+            
+            //TODO
+            break;
+        }
+        case FOp::LoadDuration: {
+            //res.name = "Duration";
+            break;
+        }
+        case FOp::LoadUri: {
+            //res.name = "Uri";
+            break;
+        }
+        case FOp::LoadType: {
+            //res.name = "Type";
+            break;
+        }
+        default: {
+            //res.name = "Obj";
+            break;
+        }
+    }
+    int pos = s->dst.block->locals[s->dst.index].newIndex;
+    locals[pos] = v;
+}
+
 void LLVMCodeGen::genStmt(Stmt *stmt) {
     FPod *curPod = irMethod->curPod;
     
-    if (ConstStmt *s = dynamic_cast<ConstStmt*>(stmt)) {
-        llvm::Value *v = NULL;
-        switch (s->opObj.opcode) {
-            case FOp::LoadNull: {
-                llvm::PointerType *t = Type::getInt8PtrTy(*ctx->context);
-                v = llvm::ConstantPointerNull::get(t);
-                break;
+    StmtType stmtType = stmt->stmtType();
+    switch (stmtType) {
+        case StmtType::Const:
+            if (ConstStmt *s = dynamic_cast<ConstStmt*>(stmt)) {
+                getConst(s);
             }
-            case FOp::LoadFalse: {
-                v = llvm::ConstantInt::getFalse(*ctx->context);
-                break;
-            }
-            case FOp::LoadTrue: {
-                v = llvm::ConstantInt::getTrue(*ctx->context);
-                break;
-            }
-            case FOp::LoadInt: {
-                llvm::Type *t = llvm::Type::getInt64Ty(*ctx->context);
-                v = llvm::ConstantInt::get(t, curPod->constantas.ints[s->opObj.i1]);
-                break;
-            }
-            case FOp::LoadFloat: {
-                llvm::Type *t = llvm::Type::getDoubleTy(*ctx->context);
-                v = llvm::ConstantFP::get(t, curPod->constantas.reals[s->opObj.i1]);
-                break;
-            }
-            case FOp::LoadDecimal: {
-                //res.name = "Decimal";
-                break;
-            }
-            case FOp::LoadStr: {
-                //res.name = "Str";
-                const std::string &str = curPod->constantas.strings[s->opObj.i1];
-                llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
-                llvm::Type *t = llvm::Type::getInt32Ty(*ctx->context);
-                llvm::Value *size = llvm::ConstantInt::get(t, str.size());
+            break;
+        case StmtType::Store:
+            if (StoreStmt *s = dynamic_cast<StoreStmt*>(stmt)) {
+                //StoreStmt *s = dynamic_cast<StoreStmt*>(stmt);
+                Value *src = genExpr(&s->src);
+                Value *dst = genExpr(&s->dst);
                 
-                //TODO
-                break;
+                Builder.CreateStore(src, dst);
             }
-            case FOp::LoadDuration: {
-                //res.name = "Duration";
-                break;
+        break;
+        case StmtType::Field:
+            if (FieldStmt *s = dynamic_cast<FieldStmt*>(stmt)) {
+                
+                FFieldRef *fref = s->fieldRef;
+                int index = ctx->fieldIndex(irMethod->curPod, fref);
+                llvm::Type *t = ctx->toLlvmType(irMethod->curPod, fref->parent);
+                llvm::Value *baseValue = genExpr(&s->instance);
+                
+                std::string memberName = curPod->names[fref->name];
+                llvm::Value *pos = Builder.CreateStructGEP(t, baseValue, index, memberName);
+                
+                llvm::Value *value = genExpr(&s->value);
+                if (s->isLoad) {
+                    llvm::Value *new_value = Builder.CreateLoad(pos);
+                    Builder.CreateStore(new_value, value);
+                }
+                else {
+                    Builder.CreateStore(value, pos);
+                }
             }
-            case FOp::LoadUri: {
-                //res.name = "Uri";
-                break;
+            break;
+        case StmtType::Call:
+            if (CallStmt *s = dynamic_cast<CallStmt*>(stmt)) {
+                genCall(s);
             }
-            case FOp::LoadType: {
-                //res.name = "Type";
-                break;
+            break;
+        case StmtType::Compare:
+            if (CompareStmt *s = dynamic_cast<CompareStmt*>(stmt)) {
+            genCompare(s);
+        }
+            break;
+        case StmtType::Return:
+            if (ReturnStmt *s = dynamic_cast<ReturnStmt*>(stmt)) {
+                if (s->isVoid) {
+                    Builder.CreateRetVoid();
+                }
+                else {
+                    Builder.CreateRet(genExpr(&s->retValue));
+                }
             }
-            default: {
-                //res.name = "Obj";
-                break;
+            break;
+        case StmtType::Jump:
+            if (JumpStmt *s = dynamic_cast<JumpStmt*>(stmt)) {
+                if (s->jmpType == JumpStmt::trueJmp) {
+                    llvm::Value *condition = genExpr(&s->expr);
+                    Builder.CreateCondBr(condition, (llvm::BasicBlock*)s->targetBlock->llvmBlock, NULL);
+                }
+                else if (s->jmpType == JumpStmt::falseJmp) {
+                    //condition = Builder.CreateNot(genExpr(&s->expr));
+                    llvm::Value *condition = genExpr(&s->expr);
+                    Builder.CreateCondBr(condition, NULL, (llvm::BasicBlock*)s->targetBlock->llvmBlock);
+                }
+                else {
+                    Builder.CreateBr((llvm::BasicBlock*)s->targetBlock->llvmBlock);
+                    //return;
+                }
             }
-        }
-        int pos = s->dst.block->locals[s->dst.index].newIndex;
-        locals[pos] = v;
-    }
-    else if (StoreStmt *s = dynamic_cast<StoreStmt*>(stmt)) {
-        //StoreStmt *s = dynamic_cast<StoreStmt*>(stmt);
-        Value *src = genExpr(&s->src);
-        Value *dst = genExpr(&s->dst);
-        
-        Builder.CreateStore(src, dst);
-    }
-    else if (FieldStmt *s = dynamic_cast<FieldStmt*>(stmt)) {
-        
-        FFieldRef *fref = s->fieldRef;
-        int index = ctx->fieldIndex(irMethod->curPod, fref);
-        llvm::Type *t = ctx->toLlvmType(irMethod->curPod, fref->parent);
-        llvm::Value *baseValue = genExpr(&s->instance);
-        
-        std::string memberName = curPod->names[fref->name];
-        llvm::Value *pos = Builder.CreateStructGEP(t, baseValue, index, memberName);
-        
-        llvm::Value *value = genExpr(&s->value);
-        if (s->isLoad) {
-            llvm::Value *new_value = Builder.CreateLoad(pos);
-            Builder.CreateStore(new_value, value);
-        }
-        else {
-            Builder.CreateStore(value, pos);
-        }
-    }
-    else if (CallStmt *s = dynamic_cast<CallStmt*>(stmt)) {
-        genCall(s);
-    }
-    else if (CmpStmt *s = dynamic_cast<CmpStmt*>(stmt)) {
-        //TODO
-    }
-    else if (RetStmt *s = dynamic_cast<RetStmt*>(stmt)) {
-        if (s->isVoid) {
-            Builder.CreateRetVoid();
-        }
-        else {
-            Builder.CreateRet(genExpr(&s->retValue));
-        }
-    }
-    else if (JmpStmt *s = dynamic_cast<JmpStmt*>(stmt)) {
-        if (s->jmpType == JmpStmt::trueJmp) {
-            llvm::Value *condition = genExpr(&s->expr);
-            Builder.CreateCondBr(condition, (llvm::BasicBlock*)s->targetBlock->llvmBlock, NULL);
-        }
-        else if (s->jmpType == JmpStmt::falseJmp) {
-            //condition = Builder.CreateNot(genExpr(&s->expr));
-            llvm::Value *condition = genExpr(&s->expr);
-            Builder.CreateCondBr(condition, NULL, (llvm::BasicBlock*)s->targetBlock->llvmBlock);
-        }
-        else {
-            Builder.CreateBr((llvm::BasicBlock*)s->targetBlock->llvmBlock);
-            //return;
-        }
-    }
-    else if (AllocStmt *s = dynamic_cast<AllocStmt*>(stmt)) {
-        
-    }
-    else if (ThrowStmt *s = dynamic_cast<ThrowStmt*>(stmt)) {
-        
-    }
-    else if (ExceptionStmt *s = dynamic_cast<ExceptionStmt*>(stmt)) {
-        
-    }
-    else if (CoerceStmt *s = dynamic_cast<CoerceStmt*>(stmt)) {
-        
-    }
-    else if (TypeCheckStmt *s = dynamic_cast<TypeCheckStmt*>(stmt)) {
-        
+            break;
+        case StmtType::Alloc:
+            if (AllocStmt *s = dynamic_cast<AllocStmt*>(stmt)) {
+                
+            }
+            break;
+        case StmtType::Throw:
+            if (ThrowStmt *s = dynamic_cast<ThrowStmt*>(stmt)) {
+                
+            }
+            break;
+        case StmtType::Exception:
+            if (ExceptionStmt *s = dynamic_cast<ExceptionStmt*>(stmt)) {
+            
+            }
+            break;
+        case StmtType::Coerce:
+            if (CoerceStmt *s = dynamic_cast<CoerceStmt*>(stmt)) {
+                
+            }
+            break;
+        case StmtType::TypeCheck:
+            if (TypeCheckStmt *s = dynamic_cast<TypeCheckStmt*>(stmt)) {
+                
+            }
     }
 }
 

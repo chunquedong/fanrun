@@ -85,12 +85,17 @@ struct Var {
     Expr asRef();
 };
 
+enum class StmtType {
+  Const, Store, Field, Call, Alloc, Compare, Return, Jump, Throw, Exception, Coerce, TypeCheck
+};
+
 class Stmt {
 public:
     FPod *curPod;
     IRMethod *method;
     virtual void print(Printer& printer) = 0;
     Stmt() : curPod(nullptr), method(nullptr) {}
+    virtual StmtType stmtType() = 0;
 };
 
 class ConstStmt : public Stmt {
@@ -100,6 +105,8 @@ public:
     
     virtual void print(Printer& printer) override;
     TypeInfo getType();
+    
+    virtual StmtType stmtType() override { return StmtType::Const; }
 };
 
 class StoreStmt : public Stmt {
@@ -108,6 +115,8 @@ public:
     Expr dst;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Store; }
 };
 
 class FieldStmt : public Stmt {
@@ -119,6 +128,8 @@ public:
     Expr value;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Field; }
 };
 
 class CallStmt : public Stmt {
@@ -141,6 +152,8 @@ public:
     CallStmt() : methodRef(NULL) {}
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Call; }
 };
 
 class AllocStmt : public Stmt {
@@ -149,9 +162,11 @@ public:
     Expr obj;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Alloc; }
 };
 
-class CmpStmt : public Stmt {
+class CompareStmt : public Stmt {
 public:
     Expr param1;
     Expr param2;
@@ -159,18 +174,22 @@ public:
     FOpObj opObj;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Compare; }
 };
 
-class RetStmt : public Stmt {
+class ReturnStmt : public Stmt {
 public:
     Expr retValue;
     bool isVoid;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Return; }
 };
 
 class Block;
-class JmpStmt : public Stmt {
+class JumpStmt : public Stmt {
 public:
     enum JmpType {
         allJmp,
@@ -188,6 +207,8 @@ public:
     Block *targetBlock;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Jump; }
 };
 
 class ThrowStmt : public Stmt {
@@ -195,6 +216,8 @@ public:
     Expr var;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Throw; }
 };
 
 class ExceptionStmt : public Stmt {
@@ -212,6 +235,8 @@ public:
     ExceptionStmt() : catchType(-1), handler(-1), pos(-1) {}
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Exception; }
 };
 
 class CoerceStmt : public Stmt {
@@ -232,6 +257,8 @@ public:
     CoerceStmt() : safe(true), checked(true), fromType(-1), toType(-1) {}
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::Coerce; }
 };
 
 class TypeCheckStmt : public Stmt {
@@ -241,6 +268,8 @@ public:
     Expr result;
     
     virtual void print(Printer& printer) override;
+    
+    virtual StmtType stmtType() override { return StmtType::TypeCheck; }
 };
 
 

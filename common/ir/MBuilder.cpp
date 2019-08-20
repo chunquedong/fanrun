@@ -643,9 +643,9 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
                 
             case FOp::Jump: {
-                JmpStmt *stmt = new JmpStmt();
+                JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
-                stmt->jmpType = JmpStmt::allJmp;
+                stmt->jmpType = JumpStmt::allJmp;
                 //stmt->opObj = opObj;
                 stmt->selfPos = opObj.pos;
                 stmt->targetPos = opObj.i1;
@@ -655,9 +655,9 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::JumpTrue:{
-                JmpStmt *stmt = new JmpStmt();
+                JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
-                stmt->jmpType = JmpStmt::trueJmp;
+                stmt->jmpType = JumpStmt::trueJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
                 stmt->selfPos = opObj.pos;
@@ -668,9 +668,9 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::JumpFalse:{
-                JmpStmt *stmt = new JmpStmt();
+                JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
-                stmt->jmpType = JmpStmt::falseJmp;
+                stmt->jmpType = JumpStmt::falseJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
                 stmt->selfPos = opObj.pos;
@@ -681,7 +681,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Compare: {
-                CmpStmt *stmt = new CmpStmt();
+                CompareStmt *stmt = new CompareStmt();
                 stmt->curPod = curPod;
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
@@ -702,7 +702,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::CompareGT:
             case FOp::CompareSame:
             case FOp::CompareNotSame: {
-                CmpStmt *stmt = new CmpStmt();
+                CompareStmt *stmt = new CompareStmt();
                 stmt->curPod = curPod;
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
@@ -717,7 +717,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             }
             case FOp::CompareNull:
             case FOp::CompareNotNull:{
-                CmpStmt *stmt = new CmpStmt();
+                CompareStmt *stmt = new CompareStmt();
                 stmt->curPod = curPod;
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
@@ -730,7 +730,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Return: {
-                RetStmt *stmt = new RetStmt();
+                ReturnStmt *stmt = new ReturnStmt();
                 stmt->curPod = curPod;
                 TypeInfo type(curPod, irMethod.returnType);
                 stmt->isVoid = type.isVoid();
@@ -815,9 +815,9 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::Leave: {
-                JmpStmt *stmt = new JmpStmt();
+                JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
-                stmt->jmpType = JmpStmt::leaveJmp;
+                stmt->jmpType = JumpStmt::leaveJmp;
                 //stmt->opObj = opObj;
                 stmt->selfPos =
                 stmt->targetPos = opObj.i1;
@@ -827,9 +827,9 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 break;
             }
             case FOp::_JumpFinally:{
-                JmpStmt *stmt = new JmpStmt();
+                JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
-                stmt->jmpType = JmpStmt::finallyJmp;
+                stmt->jmpType = JumpStmt::finallyJmp;
                 //stmt->opObj = opObj;
                 stmt->selfPos = opObj.pos;
                 stmt->targetPos = opObj.i1;

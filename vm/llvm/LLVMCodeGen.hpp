@@ -62,6 +62,8 @@ private:
     //llvm::Value *ptrConst(void *ptr);
     
     void genCall(CallStmt *stmt);
+    void genCompare(CompareStmt *stmt);
+    void getConst(ConstStmt *stmt);
 };
 
 #endif /* LLVMCodeGen_hpp */

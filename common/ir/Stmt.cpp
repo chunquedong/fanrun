@@ -322,7 +322,7 @@ void FieldStmt::print(Printer& printer) {
     }
 }
 
-void JmpStmt::print(Printer& printer) {
+void JumpStmt::print(Printer& printer) {
     switch (jmpType) {
         case trueJmp:{
             if (targetPos < selfPos) {
@@ -369,7 +369,7 @@ void AllocStmt::print(Printer& printer) {
     }
 }
 
-void CmpStmt::print(Printer& printer) {
+void CompareStmt::print(Printer& printer) {
     int cmpType = 0;
     bool isVal1 = false;
     bool isVal2 = false;
@@ -561,7 +561,7 @@ void CmpStmt::print(Printer& printer) {
     }
 }
 
-void RetStmt::print(Printer& printer) {
+void ReturnStmt::print(Printer& printer) {
     if (isVoid) {
         printer.printf("return;");
     } else {
