@@ -242,6 +242,7 @@ void MBuilder::linkBlock() {
     
     for (int i=0; i<blocks.size(); ++i) {
         Block *b = blocks[i];
+        if (b->endOp == 0) continue;
         FOpObj &lastOp = code.ops[b->endOp-1];
         switch (lastOp.opcode) {
             case FOp::JumpTrue:

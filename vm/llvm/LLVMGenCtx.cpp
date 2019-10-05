@@ -42,7 +42,9 @@ LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
     
     IRType *irType = irModule->getType(curPod, type);
     if (irType->llvmStruct == NULL) {
-        irType->llvmStruct = new LLVMStruct(this, irType, irType->ftype->c_mangledName);
+        LLVMStruct *s = new LLVMStruct(this, irType, irType->ftype->c_mangledName);
+        irType->llvmStruct = s;
+        return s;
     }
     return (LLVMStruct*)irType->llvmStruct;
     /*

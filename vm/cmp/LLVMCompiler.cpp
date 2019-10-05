@@ -36,9 +36,10 @@ bool LLVMCompiler::complie(FPod *fpod) {
         }
     }
     
-    ctx.module->print(dbgs(), nullptr,
+    if (true) {
+      ctx.module->print(dbgs(), nullptr,
                       /*ShouldPreserveUseListOrder=*/false, /*IsForDebug=*/true);
-    
+    }
     // Output the bitcode file to stdout
     //llvm::WriteBitcodeToFile(*ctx.module, outs());
     return true;

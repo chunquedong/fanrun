@@ -68,6 +68,10 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
     Argument *argx = &*function->arg_begin();// Get the arg
     //argx->setName("env");
     //++argx;
+    if (!irMethod->method->isStatic()) {
+        argx->setName("self");
+        ++argx;
+    }
     for (int i=0; i < irMethod->method->paramCount; ++i) {
         FMethodVar &v = irMethod->method->vars[i];
         argx->setName(irMethod->curPod->names[v.name]);
@@ -80,7 +84,13 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
         BasicBlock *BB = BasicBlock::Create(*ctx->context, "", function);
         b->llvmBlock = BB;
         Builder.SetInsertPoint(BB);
-        for (int i=0; i<b->locals.size(); ++i) {
+        for (int j=0; j<b->locals.size(); ++j) {
+            //args in block0
+            if (i == 0 && j < function->arg_size()) {
+                Argument *argx = (function->arg_begin()+j);
+                locals.push_back(argx);
+                continue;
+            }
             llvm::Value *var = Builder.CreateAlloca(ctx->ptrType);
             locals.push_back(var);
         }
@@ -97,7 +107,7 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
 void LLVMCodeGen::genBlock(Block *block) {
     //BasicBlock *parent = Builder.GetInsertBlock();
     BasicBlock *BB = (BasicBlock*)block->llvmBlock;
-    Builder.CreateBr(BB);
+    //Builder.CreateBr(BB);
     
     Builder.SetInsertPoint(BB);
     

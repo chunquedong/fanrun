@@ -36,7 +36,7 @@ IRType *IRModule::getType(FPod *pod, uint16_t typeRefId) {
         return itr->second;
     
     FType *ftype = FCodeUtil::getFTypeFromTypeRef(pod, typeRefId);
-    IRType *irtype = new IRType(ftype);
+    IRType *irtype = new IRType(ftype, this);
     types[name] = irtype;
     return irtype;
 }
@@ -44,7 +44,7 @@ IRType *IRModule::getType(FPod *pod, uint16_t typeRefId) {
 
 /////////////////////////////////////////////////////////////////////
 
-IRType::IRType(FType *ftype) : isVTableInited(false), ftype(ftype) {
+IRType::IRType(FType *ftype, IRModule *module) : isVTableInited(false), ftype(ftype), module(module), llvmStruct(nullptr) {
     fpod = ftype->c_pod;
 }
 

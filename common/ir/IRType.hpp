@@ -63,7 +63,7 @@ public:
     std::map<IRType*, int> allMinxin;
     
 public:
-    IRType(FType *ftype);
+    IRType(FType *ftype, IRModule *module);
     void initVTable();
     
 private:
