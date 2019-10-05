@@ -7,6 +7,7 @@
 
 #include "FType.h"
 #include "FPod.h"
+#include "escape.h"
 
 bool FSlot::isStatic() { return (flags & FFlags::Static); }
 
@@ -84,6 +85,11 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
     this->c_pod = pod;
     FTypeRef &typeRef = pod->typeRefs[meta.self];
     this->c_name = pod->names[typeRef.typeName];
+    std::string typeName = pod->name + "_" + this->c_name;
+    escape(typeName);
+    escapeKeyword(typeName);
+    this->c_mangledName = typeName;
+    
     typeRef.c_type = this;
     
     {
@@ -124,6 +130,11 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
                 name += "$";
                 name += std::to_string(method.paramCount);
             }
+            
+            method.c_mangledName = typeName +"_"+ name;
+            escape(method.c_mangledName);
+            escapeKeyword(method.c_mangledName);
+            
             c_methodMap[name] = &method;
         }
     }

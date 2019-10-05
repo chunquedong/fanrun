@@ -60,6 +60,7 @@ struct FMethod : public FSlot {
     void *c_wrappedMethod;
     void (*c_jit)(void *env);
     uint16_t c_jitLocalCount;
+    std::string c_mangledName;
 };
 
 struct FTypeMeta {
@@ -89,7 +90,7 @@ public:
     
     //cache
     std::string c_name;
-    //std::string c_fullName;
+    std::string c_mangledName;
     //int c_sortFlag;
     std::unordered_map<std::string, FMethod*> c_methodMap;
     std::unordered_map<std::string, FField*> c_fieldMap;

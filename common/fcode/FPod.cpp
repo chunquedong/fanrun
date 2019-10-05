@@ -63,14 +63,6 @@ static void parseMeta(Buffer &file, std::unordered_map<std::string,std::string> 
 }
 
 void FPod::load(ZipFile &zip) {
-    read(zip);
-    
-    types.resize(typeMetas.size());
-    for (size_t i=0,n=typeMetas.size(); i<n; ++i) {
-        FTypeRef ref = typeRefs[typeMetas[i].self];
-        std::string &name = names[ref.typeName];
-        readType(zip, name, typeMetas[i], types[i]);
-    }
     
     ssize_t bufSize;
     unsigned char *data = zip.getFileData("meta.props", &bufSize);
@@ -94,6 +86,15 @@ void FPod::load(ZipFile &zip) {
         }
     }
     c_wrappedPod = NULL;
+    
+    read(zip);
+    
+    types.resize(typeMetas.size());
+    for (size_t i=0,n=typeMetas.size(); i<n; ++i) {
+        FTypeRef ref = typeRefs[typeMetas[i].self];
+        std::string &name = names[ref.typeName];
+        readType(zip, name, typeMetas[i], types[i]);
+    }
 }
 
 void FPod::read(ZipFile &zip) {

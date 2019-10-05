@@ -289,6 +289,7 @@
 		3297A52E234775AC005165A6 /* inffast.c in Sources */ = {isa = PBXBuildFile; fileRef = 3297A519234775AC005165A6 /* inffast.c */; };
 		3297A52F234775AC005165A6 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 3297A51A234775AC005165A6 /* adler32.c */; };
 		3297A531234776F9005165A6 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3297A530234776F9005165A6 /* libncurses.tbd */; };
+		3297A53423483606005165A6 /* LLVMCompiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3297A53223483606005165A6 /* LLVMCompiler.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -641,6 +642,8 @@
 		3297A51A234775AC005165A6 /* adler32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = adler32.c; sourceTree = "<group>"; };
 		3297A51B234775AC005165A6 /* zconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zconf.h; sourceTree = "<group>"; };
 		3297A530234776F9005165A6 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
+		3297A53223483606005165A6 /* LLVMCompiler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMCompiler.cpp; sourceTree = "<group>"; };
+		3297A53323483606005165A6 /* LLVMCompiler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LLVMCompiler.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1242,6 +1245,8 @@
 			isa = PBXGroup;
 			children = (
 				3297A4E5234773DC005165A6 /* main.cpp */,
+				3297A53223483606005165A6 /* LLVMCompiler.cpp */,
+				3297A53323483606005165A6 /* LLVMCompiler.hpp */,
 			);
 			path = cmp;
 			sourceTree = "<group>";
@@ -1383,6 +1388,7 @@
 				3297A524234775AC005165A6 /* miniunz.c in Sources */,
 				3297A4DF234772AD005165A6 /* IRMethod.cpp in Sources */,
 				3297A4D7234772AD005165A6 /* FAttr.cpp in Sources */,
+				3297A53423483606005165A6 /* LLVMCompiler.cpp in Sources */,
 				3297A527234775AC005165A6 /* deflate.c in Sources */,
 				3297A529234775AC005165A6 /* infback.c in Sources */,
 				3297A52D234775AC005165A6 /* trees.c in Sources */,

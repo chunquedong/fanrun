@@ -14,12 +14,22 @@
 
 using namespace llvm;
 
-LLVMGenCtx::LLVMGenCtx(llvm::LLVMContext *context) : context(context) {
+LLVMGenCtx::LLVMGenCtx() {
+    context = new llvm::LLVMContext();
+    module = new llvm::Module("test", *context);
     ptrType = Type::getInt8PtrTy(*context);
     pptrType = ptrType->getPointerTo();
     
     llvm::SMDiagnostic err;
     runtimeModule = parseIRFile("runtime.ll", err, *context);
+    
+    irModule = new IRModule();
+}
+
+LLVMGenCtx::~LLVMGenCtx() {
+    delete module;
+    delete context;
+    delete irModule;
 }
 
 llvm::Function *LLVMGenCtx::getRuntimeFunc(const std::string &name) {
@@ -32,7 +42,7 @@ LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
     
     IRType *irType = irModule->getType(curPod, type);
     if (irType->llvmStruct == NULL) {
-        irType->llvmStruct = new LLVMStruct(this, irType, irType->ftype->c_name);
+        irType->llvmStruct = new LLVMStruct(this, irType, irType->ftype->c_mangledName);
     }
     return (LLVMStruct*)irType->llvmStruct;
     /*
@@ -54,7 +64,7 @@ LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
 
 llvm::Type *LLVMGenCtx::toLlvmType(FPod *curPod, int16_t type) {
     FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, type);
-    std::string name = ftype->c_name;
+    std::string name = ftype->c_mangledName;
     if (name == "sys_Void") {
         return Type::getVoidTy(*context);
     }

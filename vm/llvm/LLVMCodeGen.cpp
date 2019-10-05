@@ -14,8 +14,8 @@
 
 using namespace llvm;
 
-LLVMCodeGen::LLVMCodeGen(llvm::LLVMContext &Context, IRMethod *irMethod, std::string &name)
-    : Context(Context), Builder(Context), irMethod(irMethod), name(name) {
+LLVMCodeGen::LLVMCodeGen(LLVMGenCtx *ctx, IRMethod *irMethod, std::string &name)
+    : ctx(ctx), Builder(*ctx->context), irMethod(irMethod), name(name) {
 
     FCodeUtil::escapeIdentifierName(name);
 }
@@ -66,8 +66,8 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
     
     //set args name
     Argument *argx = &*function->arg_begin();// Get the arg
-    argx->setName("env");
-    ++argx;
+    //argx->setName("env");
+    //++argx;
     for (int i=0; i < irMethod->method->paramCount; ++i) {
         FMethodVar &v = irMethod->method->vars[i];
         argx->setName(irMethod->curPod->names[v.name]);
@@ -77,9 +77,9 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
     //init for branch
     for (int i=0; i<irMethod->blocks.size(); ++i) {
         Block *b = irMethod->blocks[i];
-        BasicBlock *BB = BasicBlock::Create(Context, "", function);
+        BasicBlock *BB = BasicBlock::Create(*ctx->context, "", function);
         b->llvmBlock = BB;
-        
+        Builder.SetInsertPoint(BB);
         for (int i=0; i<b->locals.size(); ++i) {
             llvm::Value *var = Builder.CreateAlloca(ctx->ptrType);
             locals.push_back(var);

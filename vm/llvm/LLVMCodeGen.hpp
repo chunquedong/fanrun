@@ -39,7 +39,6 @@ class LLVMCodeGen {
     IRMethod *irMethod;
     llvm::IRBuilder<> Builder;
     
-    llvm::LLVMContext &Context;
     LLVMGenCtx *ctx;
     llvm::Module *module;
     
@@ -49,7 +48,7 @@ class LLVMCodeGen {
     
 public:
     
-    LLVMCodeGen(llvm::LLVMContext &Context, IRMethod *irMethod, std::string &name);
+    LLVMCodeGen(LLVMGenCtx *ctx, IRMethod *irMethod, std::string &name);
     
     llvm::Function *gen(llvm::Module *M);
     

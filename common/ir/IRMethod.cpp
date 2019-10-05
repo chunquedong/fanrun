@@ -120,6 +120,7 @@ IRMethod::IRMethod(FPod *curPod, FMethod *method) :
     returnType = method->returnType;
     selfType = method->c_parent->meta.self;
     paramCount = method->paramCount;
+    name = curPod->names[method->name];
 }
 
 void IRMethod::print(Printer& printer, int pass) {

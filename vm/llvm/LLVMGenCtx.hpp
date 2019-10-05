@@ -49,7 +49,8 @@ public:
     //llvm::Type *valueType;
     //llvm::Type *pvalueType;
     
-    LLVMGenCtx(llvm::LLVMContext *context);
+    LLVMGenCtx();
+    ~LLVMGenCtx();
     
     llvm::Type *toLlvmType(FPod *curPod, int16_t type);
     

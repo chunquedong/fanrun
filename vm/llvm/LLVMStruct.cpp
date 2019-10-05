@@ -9,8 +9,11 @@
 #include "LLVMStruct.hpp"
 #include "LLVMGenCtx.hpp"
 
-LLVMStruct::LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name) : builder(*ctx->context) {
+LLVMStruct::LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name)
+    : ctx(ctx), builder(*ctx->context), irType(irType) {
     this->structTy = llvm::StructType::create(*ctx->context, name);
+    structPtr = structTy->getPointerTo();
+    //structPtr = llvm::PointerType::getUnqual(structTy);
     init();
 }
 
