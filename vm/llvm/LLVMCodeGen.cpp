@@ -85,21 +85,32 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
         ++argx;
     }
     
-    //init for branch
+    //init params
+    for (int j=0; j<irMethod->methodVars->locals.size(); ++j) {
+        //args in block0
+        if (j < function->arg_size()) {
+            Argument *argx = (function->arg_begin()+j);
+            locals.push_back(argx);
+            continue;
+        }
+        llvm::Value *var = Builder.CreateAlloca(ctx->ptrType);
+        locals.push_back(var);
+    }
+    
     for (int i=0; i<irMethod->blocks.size(); ++i) {
         Block *b = irMethod->blocks[i];
         BasicBlock *BB = BasicBlock::Create(*ctx->context, "", function);
         b->llvmBlock = BB;
-        Builder.SetInsertPoint(BB);
+        //Builder.SetInsertPoint(BB);
         for (int j=0; j<b->locals.size(); ++j) {
             //args in block0
-            if (i == 0 && j < function->arg_size()) {
-                Argument *argx = (function->arg_begin()+j);
-                locals.push_back(argx);
-                continue;
+            if (b->locals[j].isExport) {
+                llvm::Value *var = Builder.CreateAlloca(ctx->ptrType);
+                locals.push_back(var);
             }
-            llvm::Value *var = Builder.CreateAlloca(ctx->ptrType);
-            locals.push_back(var);
+            else {
+                locals.push_back(nullptr);
+            }
         }
     }
     

@@ -18,6 +18,7 @@ class MBuilder {
     std::unordered_map<int16_t, Block*> posToBlock;
 
     std::vector<Block *> blocks;
+    Block *methodVars;
     
     int allLocalsCount;
     FPod *curPod;

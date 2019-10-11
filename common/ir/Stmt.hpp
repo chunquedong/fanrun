@@ -67,9 +67,10 @@ struct Var {
     //parent block
     Block *block;
     
-    //ref by other block
+    //ref by other block, true is leftValue, false is rightValue
     bool isExport;
-    //unused
+    
+    //global index in function vars
     int newIndex;
     
     //name of var

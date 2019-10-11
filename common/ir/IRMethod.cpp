@@ -128,7 +128,7 @@ void IRMethod::print(Printer& printer, int pass) {
     if (pass == 0) {
         printer.printf("%s(", name.c_str());
         for(int i=0; i<paramCount; ++i) {
-            Var &v = blocks[0]->locals[i];
+            Var &v = methodVars->locals[i];
             if (i != 0) printer.printf(", ");
             printer.printf("%s %s", v.type.getName().c_str(), v.name.c_str());
         }
@@ -136,17 +136,17 @@ void IRMethod::print(Printer& printer, int pass) {
     }
     else if (pass == 1) {
         
-        for(int i=paramCount; i<blocks[0]->locals.size(); ++i) {
-            Var &v = blocks[0]->locals[i];
+        for(int i=paramCount; i<methodVars->locals.size(); ++i) {
+            Var &v = methodVars->locals[i];
             printer.printf("%s %s; ", v.type.getName().c_str(), v.name.c_str());
         }
         printer.newLine();
         
-        for (int i=1; i<blocks.size(); ++i) {
+        for (int i=0; i<blocks.size(); ++i) {
             Block *b = blocks[i];
             b->print(this, printer, 0);
         }
-        for (int i=1; i<blocks.size(); ++i) {
+        for (int i=0; i<blocks.size(); ++i) {
             Block *b = blocks[i];
             b->print(this, printer, 1);
         }

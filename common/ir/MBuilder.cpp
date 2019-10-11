@@ -14,11 +14,23 @@ MBuilder::MBuilder(Code &code, IRMethod &irMethod) :
         , irMethod(irMethod) {
     Block *b = new Block();
     b->curPod = curPod;
-    blocks.push_back(b);
+    methodVars = b;
 }
 
 void MBuilder::rewriteLocals() {
     allLocalsCount = 0;
+    
+    for (int j=0; j<methodVars->locals.size(); ++j) {
+        Var &var = methodVars->locals[j];
+        var.newIndex = allLocalsCount;
+        var.isExport = true;
+        ++allLocalsCount;
+        
+        if (j >= irMethod.paramCount) {
+            var.name = var.name + "_" + std::to_string(var.index);
+        }
+        FCodeUtil::escapeIdentifierName(var.name);
+    }
     
     for (int i=0; i<blocks.size(); ++i) {
         Block *b = blocks[i];
@@ -27,13 +39,7 @@ void MBuilder::rewriteLocals() {
             var.newIndex = allLocalsCount;
             ++allLocalsCount;
             
-            if (i == 0) {
-                if (j >= irMethod.paramCount) {
-                    var.name = var.name + "_" + std::to_string(var.index);
-                }
-                FCodeUtil::escapeIdentifierName(var.name);
-            }
-            else if (var.name.empty()) {
+            if (var.name.empty()) {
                 var.name = "_t_" + std::to_string(var.block->index) +"_"+ std::to_string(var.index);
             }
         }
@@ -163,11 +169,12 @@ bool MBuilder::buildMethod(FMethod *method) {
     rewriteLocals();
     //irMethod.locals.swap(this->locals);
     irMethod.blocks.swap(this->blocks);
+    irMethod.methodVars = methodVars;
     return true;
 }
 
 Var &MBuilder::newVar(int typeRef) {
-    return blocks[0]->newVar(typeRef);
+    return methodVars->newVar(typeRef);
 }
 
 void MBuilder::doBuild() {

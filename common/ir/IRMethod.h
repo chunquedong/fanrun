@@ -69,6 +69,7 @@ public:
     FMethod *method;
 public:
     std::vector<Block *> blocks;
+    Block *methodVars;//include paramCount args
     //std::vector<Var> locals;//include paramCount args
     
     uint16_t returnType;
