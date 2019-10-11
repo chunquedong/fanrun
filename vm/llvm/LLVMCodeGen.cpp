@@ -41,7 +41,14 @@ llvm::Function* LLVMCodeGen::getFunctionProto(IRMethod *irMethod) {
 }
 
 llvm::Function* LLVMCodeGen::getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool isStatic) {
-    std::string name = curPod->names[ref->name];
+    //std::string name = curPod->names[ref->name];
+    std::string typeName = FCodeUtil::getTypeRefName(curPod, ref->parent, false);
+    std::string mthName = FCodeUtil::getIdentifierName(curPod, ref->name);
+    if ((ref->flags & FFlags::RefSetter) || (ref->flags & FFlags::RefOverload)) {
+        mthName += std::to_string(ref->paramCount);
+    }
+    std::string name = typeName + "_" + mthName;
+    
     if (auto* function = module->getFunction(name)) return function;
     
     llvm::SmallVector<llvm::Type*, 16> paramTypes;
@@ -276,15 +283,15 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
             if (JumpStmt *s = dynamic_cast<JumpStmt*>(stmt)) {
                 if (s->jmpType == JumpStmt::trueJmp) {
                     llvm::Value *condition = genExpr(&s->expr);
-                    Builder.CreateCondBr(condition, (llvm::BasicBlock*)s->targetBlock->llvmBlock, NULL);
+                    Builder.CreateCondBr(condition, (llvm::BasicBlock*)(s->targetBlock->llvmBlock), NULL);
                 }
                 else if (s->jmpType == JumpStmt::falseJmp) {
                     //condition = Builder.CreateNot(genExpr(&s->expr));
                     llvm::Value *condition = genExpr(&s->expr);
-                    Builder.CreateCondBr(condition, NULL, (llvm::BasicBlock*)s->targetBlock->llvmBlock);
+                    Builder.CreateCondBr(condition, (llvm::BasicBlock*)(s->targetBlock->llvmBlock), NULL)->swapSuccessors();
                 }
                 else {
-                    Builder.CreateBr((llvm::BasicBlock*)s->targetBlock->llvmBlock);
+                    Builder.CreateBr((llvm::BasicBlock*)(s->targetBlock->llvmBlock));
                     //return;
                 }
             }

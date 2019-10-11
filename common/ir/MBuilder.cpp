@@ -415,10 +415,12 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
              */
             for (int i=0; i<previous->stack.size(); ++i) {
                 Expr &srcExpr = previous->stack[i];
+                /*
                 if (srcExpr.block) {
                     Var &tv = srcExpr.block->locals.at(srcExpr.index);
                     tv.isExport = true;
                 }
+                */
                 
                 //make receive var
                 Var newVar;

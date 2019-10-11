@@ -70,7 +70,7 @@ struct FConstantas {
 struct FTypeRef {
     uint16_t podName;//names.def
     uint16_t typeName;//names.def
-    std::string signature;//("" if not parameterized, "?" if nullable)
+    std::string extName;//("" if not parameterized, "?" if nullable)
     
     FType *c_type;
 };

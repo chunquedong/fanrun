@@ -14,16 +14,27 @@ LLVMStruct::LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name)
     this->structTy = llvm::StructType::create(*ctx->context, name);
     structPtr = structTy->getPointerTo();
     //structPtr = llvm::PointerType::getUnqual(structTy);
-    init();
 }
 
 void LLVMStruct::init() {
     std::vector<llvm::Type*> fieldTypes;
-    fieldTypes.push_back(ctx->ptrType);
+    //super class
+    if (irType->ftype->meta.base != 0xFFFF) {
+        LLVMStruct *base = ctx->getStruct(irType->fpod, irType->ftype->meta.base);
+        fieldTypes.push_back(base->structTy);
+    }
+    
     FType *ftype = irType->ftype;
     for (int i=0; i<ftype->fields.size(); ++i) {
         FField &field = ftype->fields[i];
         llvm::Type *t = ctx->toLlvmType(ftype->c_pod, field.type);
+        if (field.isStatic()) {
+            llvm::GlobalVariable *sf = new llvm::GlobalVariable(*ctx->module, t, false
+                                                                    , llvm::GlobalValue::ExternalLinkage, llvm::ConstantAggregateZero::get(t));
+            staticFields.push_back(sf);
+            continue;
+        }
+        
         fieldTypes.push_back(t);
     }
     

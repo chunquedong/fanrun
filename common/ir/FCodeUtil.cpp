@@ -65,7 +65,7 @@ namespace FCodeUtil {
             return getTypeRefName(curPod, ttid, checkNullable);
         }
         
-        std::string &sig = typeRef.signature;
+        std::string &sig = typeRef.extName;
         
         std::string res = podName + "_" + typeName;
         if (checkNullable && sig.size() > 0 && sig[sig.size()-1] == '?') {
@@ -101,7 +101,7 @@ namespace FCodeUtil {
         FTypeRef &typeRef = pod->typeRefs[tid];
         //std::string &podName = pod->names[typeRef.podName];
         //std::string &typeName = pod->names[typeRef.typeName];
-        std::string &sig = typeRef.signature;
+        std::string &sig = typeRef.extName;
         
         if (sig.size() > 0 && sig[sig.size()-1] == '?') {
             return true;

@@ -36,7 +36,7 @@ public:
     
     void *llvmBlock;
     
-    Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false) {
+    Block() : index(0), pos(0), beginOp(0), endOp(0), isVisited(false), isForward(false), curPod(NULL), llvmBlock(NULL) {
     }
     
     void print(IRMethod *method, Printer& printer, int pass);

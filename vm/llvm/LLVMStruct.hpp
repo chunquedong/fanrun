@@ -38,6 +38,8 @@ public:
     LLVMGenCtx *ctx;
     llvm::IRBuilder<> builder;
     
+    std::vector<llvm::GlobalVariable*> staticFields;
+    
     
     std::vector<llvm::GlobalVariable*> vtables;
     
@@ -46,7 +48,7 @@ public:
     
     LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name);
     
-private:
+public:
     void init();
 public:
     void genVTable();
