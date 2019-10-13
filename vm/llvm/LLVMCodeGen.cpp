@@ -444,13 +444,13 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
                 if (s->fromType == -1 || s->toType == -1) {
                     TypeInfo &tinfo = s->to.getType();
                     llvm::Type *type = ctx->getLlvmType(curPod, tinfo.pod, tinfo.name);
-                    llvm::Value *res = Builder.CreatePointerCast(from, type->getPointerTo());
+                    llvm::Value *res = Builder.CreateBitCast(from, type->getPointerTo());
                     setExpr(s->to, res);
                     return;
                 }
                 //TODO
                 llvm::Type *type = ctx->toLlvmType(curPod, s->toType);
-                llvm::Value *res = Builder.CreatePointerCast(from, type);
+                llvm::Value *res = Builder.CreateBitCast(from, type);
                 setExpr(s->to, res);
             }
             break;
@@ -475,7 +475,7 @@ llvm::Value *LLVMCodeGen::getVTable(llvm::Value *v) {
     llvm::Type *int64Ty = llvm::Type::getInt64Ty(*ctx->context);
     llvm::Value *offset = llvm::ConstantInt::get(int64Ty, 2);
     llvm::Value *headerPP = Builder.CreateSub(v, offset);
-    llvm::Value *headerPtr = Builder.CreatePointerCast(headerPP, ctx->pptrType);
+    llvm::Value *headerPtr = Builder.CreateBitCast(headerPP, ctx->pptrType);
     llvm::Value *header = Builder.CreateLoad(headerPtr);
     return header;
 }
