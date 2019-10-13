@@ -59,6 +59,8 @@ public:
     int fieldIndex(FPod *curPod, FFieldRef *ref);
     
     llvm::Function *getRuntimeFunc(const std::string &name);
+    
+    llvm::Type *getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName);
 private:
 };
 

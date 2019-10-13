@@ -65,6 +65,17 @@ LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
      */
 }
 
+llvm::Type *LLVMGenCtx::getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName) {
+    IRType *irType = irModule->getTypeByName(curPod, podName, typeName);
+    if (irType->llvmStruct == NULL) {
+        LLVMStruct *s = new LLVMStruct(this, irType, irType->ftype->c_mangledName);
+        irType->llvmStruct = s;
+        s->init();
+        return s->structTy;
+    }
+    return ((LLVMStruct*)irType->llvmStruct)->structTy;
+}
+
 llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
     FTypeRef &typeRef = pod->typeRefs[type];
     std::string &podName = pod->names[typeRef.podName];

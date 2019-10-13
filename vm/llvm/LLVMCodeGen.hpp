@@ -57,12 +57,15 @@ private:
     llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool isStatic);
     void genBlock(Block *block);
     void genStmt(Stmt *stmt);
-    llvm::Value *genExpr(Expr *expr);
-    //llvm::Value *ptrConst(void *ptr);
+    
+    llvm::Value *getExpr(Expr &expr);
+    void setExpr(Expr &expr, llvm::Value *v);
+    llvm::Value *getVTable(llvm::Value *v);
     
     void genCall(CallStmt *stmt);
     void genCompare(CompareStmt *stmt);
     void getConst(ConstStmt *stmt);
+    
 };
 
 #endif /* LLVMCodeGen_hpp */

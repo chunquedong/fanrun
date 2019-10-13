@@ -141,7 +141,7 @@ void LLVMCodeGen::genCall(CallStmt *s) {
         llvm::Value *vtable = NULL;
         LLVMStruct *clz = ctx->getStruct(irMethod->curPod, s->methodRef->parent);
         
-        llvm::Value *instance = genExpr(&s->params.at(0));
+        llvm::Value *instance = getExpr(s->params.at(0));
         llvm::Value *vtablePtr = Builder.CreateBitCast(instance, clz->structPtr);
         vtable = Builder.CreateLoad(vtablePtr);
     
@@ -157,7 +157,7 @@ void LLVMCodeGen::genCall(CallStmt *s) {
     llvm::SmallVector<llvm::Value*, 16> args;
     for (int i=0; i<s->params.size(); ++i) {
         Expr &expr = s->params[i];
-        Value *val = genExpr(&expr);
+        Value *val = getExpr(expr);
         args.push_back(val);
     }
     
@@ -166,6 +166,85 @@ void LLVMCodeGen::genCall(CallStmt *s) {
 
 void LLVMCodeGen::genCompare(CompareStmt *stmt) {
     
+    if (stmt->opObj.opcode == FOp::CompareNull) {
+        llvm::PointerType *t = Type::getInt8PtrTy(*ctx->context);
+        llvm::Value *v1 = llvm::ConstantPointerNull::get(t);
+        llvm::Value *v2 = getExpr(stmt->param1);
+        llvm::Value *res = Builder.CreateICmpEQ(v1, v2);
+        setExpr(stmt->result, res);
+        return;
+    }
+    else if (stmt->opObj.opcode == FOp::CompareNotNull) {
+        llvm::PointerType *t = Type::getInt8PtrTy(*ctx->context);
+        llvm::Value *v1 = llvm::ConstantPointerNull::get(t);
+        llvm::Value *v2 = getExpr(stmt->param1);
+        llvm::Value *res = Builder.CreateICmpNE(v1, v2);
+        setExpr(stmt->result, res);
+        return;
+    }
+    
+    //TODO
+    
+    switch (stmt->opObj.opcode) {
+        case FOp::CompareEQ: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_equals", Type::getInt1Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        case FOp::CompareNE: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_equals", Type::getInt1Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        case FOp::Compare: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_equals", Type::getInt1Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        case FOp::CompareLT: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_compare", Type::getInt64Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        case FOp::CompareLE: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_compare", Type::getInt64Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        case FOp::CompareGT: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_compare", Type::getInt64Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        case FOp::CompareGE: {
+            llvm::Type* type = ctx->getLlvmType(irMethod->curPod, "sys", "Obj");
+            Constant* equals = module->getOrInsertFunction("sys_Obj_compare", Type::getInt64Ty(*ctx->context), type, type);
+            llvm::Value *v1 = getExpr(stmt->param1);
+            llvm::Value *v2 = getExpr(stmt->param2);
+            llvm::Value *res = Builder.CreateCall(equals, { v1, v2 });
+            setExpr(stmt->result, res);
+        } break;
+        default:
+            break;
+    }
 }
 
 void LLVMCodeGen::getConst(ConstStmt *s) {
@@ -197,28 +276,56 @@ void LLVMCodeGen::getConst(ConstStmt *s) {
         }
         case FOp::LoadDecimal: {
             //res.name = "Decimal";
+            const std::string &str = curPod->constantas.strings[s->opObj.i1];
+            llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
+            llvm::Value *size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*ctx->context), str.size());
+            
+            llvm::Type* type = ctx->getLlvmType(curPod, "std", "Decimal");
+            auto* stringInit = module->getOrInsertFunction("std_Decimal_fromCStr", type, cstring->getType(), size->getType());
+            v = Builder.CreateCall(stringInit, { cstring, size });
             break;
         }
         case FOp::LoadStr: {
             //res.name = "Str";
             const std::string &str = curPod->constantas.strings[s->opObj.i1];
             llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
-            llvm::Type *t = llvm::Type::getInt32Ty(*ctx->context);
-            llvm::Value *size = llvm::ConstantInt::get(t, str.size());
+            llvm::Value *size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*ctx->context), str.size());
             
-            //TODO
+            llvm::Type* type = ctx->getLlvmType(curPod, "sys", "Str");
+            auto* stringInit = module->getOrInsertFunction("sys_Str_fromCStr", type->getPointerTo(), cstring->getType(), size->getType());
+            v = Builder.CreateCall(stringInit, { cstring, size });
             break;
         }
         case FOp::LoadDuration: {
             //res.name = "Duration";
+            int64_t mills = curPod->constantas.durations[s->opObj.i1];
+            llvm::Value *millsValue = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*ctx->context), mills);
+            
+            llvm::Type* type = ctx->getLlvmType(curPod, "std", "Duration");
+            Constant* init = module->getOrInsertFunction("std_Duration_fromMills", type, llvm::Type::getInt64Ty(*ctx->context));
+            v = Builder.CreateCall(init, { millsValue });
             break;
         }
         case FOp::LoadUri: {
             //res.name = "Uri";
+            const std::string &str = curPod->constantas.strings[s->opObj.i1];
+            llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
+            llvm::Value *size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*ctx->context), str.size());
+            
+            llvm::Type* type = ctx->getLlvmType(curPod, "std", "Uri");
+            auto* stringInit = module->getOrInsertFunction("std_Uri_fromCStr", type->getPointerTo(), cstring->getType(), size->getType());
+            v = Builder.CreateCall(stringInit, { cstring, size });
             break;
         }
         case FOp::LoadType: {
             //res.name = "Type";
+            const std::string &str = curPod->constantas.strings[s->opObj.i1];
+            llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
+            llvm::Value *size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*ctx->context), str.size());
+            
+            llvm::Type* type = ctx->getLlvmType(curPod, "sys", "Type");
+            auto* stringInit = module->getOrInsertFunction("std_Type_fromCStr", type->getPointerTo(), cstring->getType(), size->getType());
+            v = Builder.CreateCall(stringInit, { cstring, size });
             break;
         }
         default: {
@@ -226,8 +333,7 @@ void LLVMCodeGen::getConst(ConstStmt *s) {
             break;
         }
     }
-    int pos = s->dst.block->locals[s->dst.index].newIndex;
-    locals[pos] = v;
+    setExpr(s->dst, v);
 }
 
 void LLVMCodeGen::genStmt(Stmt *stmt) {
@@ -243,8 +349,8 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
         case StmtType::Store:
             if (StoreStmt *s = dynamic_cast<StoreStmt*>(stmt)) {
                 //StoreStmt *s = dynamic_cast<StoreStmt*>(stmt);
-                Value *src = genExpr(&s->src);
-                Value *dst = genExpr(&s->dst);
+                Value *src = getExpr(s->src);
+                Value *dst = getExpr(s->dst);
                 
                 Builder.CreateStore(src, dst);
             }
@@ -255,17 +361,17 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
                 FFieldRef *fref = s->fieldRef;
                 int index = ctx->fieldIndex(irMethod->curPod, fref);
                 llvm::Type *t = ctx->toLlvmType(irMethod->curPod, fref->parent);
-                llvm::Value *baseValue = genExpr(&s->instance);
+                llvm::Value *baseValue = getExpr(s->instance);
                 
                 std::string memberName = curPod->names[fref->name];
                 llvm::Value *pos = Builder.CreateStructGEP(t, baseValue, index, memberName);
                 
-                llvm::Value *value = genExpr(&s->value);
                 if (s->isLoad) {
-                    llvm::Value *new_value = Builder.CreateLoad(pos);
-                    Builder.CreateStore(new_value, value);
+                    llvm::Value *value = Builder.CreateLoad(pos);
+                    setExpr(s->value, value);
                 }
                 else {
+                    llvm::Value *value = getExpr(s->value);
                     Builder.CreateStore(value, pos);
                 }
             }
@@ -286,19 +392,19 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
                     Builder.CreateRetVoid();
                 }
                 else {
-                    Builder.CreateRet(genExpr(&s->retValue));
+                    Builder.CreateRet(getExpr(s->retValue));
                 }
             }
             break;
         case StmtType::Jump:
             if (JumpStmt *s = dynamic_cast<JumpStmt*>(stmt)) {
                 if (s->jmpType == JumpStmt::trueJmp) {
-                    llvm::Value *condition = genExpr(&s->expr);
+                    llvm::Value *condition = getExpr(s->expr);
                     Builder.CreateCondBr(condition, (llvm::BasicBlock*)(s->targetBlock->llvmBlock), NULL);
                 }
                 else if (s->jmpType == JumpStmt::falseJmp) {
                     //condition = Builder.CreateNot(genExpr(&s->expr));
-                    llvm::Value *condition = genExpr(&s->expr);
+                    llvm::Value *condition = getExpr(s->expr);
                     Builder.CreateCondBr(condition, (llvm::BasicBlock*)(s->targetBlock->llvmBlock), NULL)->swapSuccessors();
                 }
                 else {
@@ -309,12 +415,22 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
             break;
         case StmtType::Alloc:
             if (AllocStmt *s = dynamic_cast<AllocStmt*>(stmt)) {
+                LLVMStruct *structT = ctx->getStruct(curPod, s->type);
+                llvm::Type *type = structT->structTy;
+                llvm::Value *sizeValue = llvm::ConstantExpr::getSizeOf(type);
                 
+                Constant* alloc = module->getOrInsertFunction("std_alloc", type->getPointerTo()
+                                                             , structT->vtables[0]->getType(), sizeValue->getType());
+                llvm::Value *res = Builder.CreateCall(alloc, { structT->vtables[0], sizeValue });
+                setExpr(s->obj, res);
             }
             break;
         case StmtType::Throw:
             if (ThrowStmt *s = dynamic_cast<ThrowStmt*>(stmt)) {
+                llvm::Value *v = getExpr(s->var);
                 
+                Constant* std_throw = module->getOrInsertFunction("std_throw", Type::getVoidTy(*ctx->context), ctx->ptrType);
+                Builder.CreateCall(std_throw, { v });
             }
             break;
         case StmtType::Exception:
@@ -324,7 +440,18 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
             break;
         case StmtType::Coerce:
             if (CoerceStmt *s = dynamic_cast<CoerceStmt*>(stmt)) {
-                
+                llvm::Value *from = getExpr(s->from);
+                if (s->fromType == -1 || s->toType == -1) {
+                    TypeInfo &tinfo = s->to.getType();
+                    llvm::Type *type = ctx->getLlvmType(curPod, tinfo.pod, tinfo.name);
+                    llvm::Value *res = Builder.CreatePointerCast(from, type->getPointerTo());
+                    setExpr(s->to, res);
+                    return;
+                }
+                //TODO
+                llvm::Type *type = ctx->toLlvmType(curPod, s->toType);
+                llvm::Value *res = Builder.CreatePointerCast(from, type);
+                setExpr(s->to, res);
             }
             break;
         case StmtType::TypeCheck:
@@ -334,8 +461,21 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
     }
 }
 
-llvm::Value *LLVMCodeGen::genExpr(Expr *expr) {
-    int pos = expr->block->locals[expr->index].newIndex;
+llvm::Value *LLVMCodeGen::getExpr(Expr &expr) {
+    int pos = expr.block->locals[expr.index].newIndex;
     return locals[pos];
 }
 
+void LLVMCodeGen::setExpr(Expr &expr, llvm::Value *v) {
+    int pos = expr.block->locals[expr.index].newIndex;
+    locals[pos] = v;
+}
+
+llvm::Value *LLVMCodeGen::getVTable(llvm::Value *v) {
+    llvm::Type *int64Ty = llvm::Type::getInt64Ty(*ctx->context);
+    llvm::Value *offset = llvm::ConstantInt::get(int64Ty, 2);
+    llvm::Value *headerPP = Builder.CreateSub(v, offset);
+    llvm::Value *headerPtr = Builder.CreatePointerCast(headerPP, ctx->pptrType);
+    llvm::Value *header = Builder.CreateLoad(headerPtr);
+    return header;
+}

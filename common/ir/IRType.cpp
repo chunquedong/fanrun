@@ -41,6 +41,19 @@ IRType *IRModule::getType(FPod *pod, uint16_t typeRefId) {
     return irtype;
 }
 
+IRType *IRModule::getTypeByName(FPod *curPod, const std::string &podName, const std::string &typeName) {
+    std::string name = podName+"_"+typeName;
+    std::map<std::string, IRType*>::iterator itr = types.find(name);
+    if (itr != types.end())
+        return itr->second;
+    
+    FPod *tpod = curPod->c_loader->findPod(podName);
+    FType *ftype = tpod->c_typeMap[typeName];
+    IRType *irtype = new IRType(ftype, this);
+    types[name] = irtype;
+    return irtype;
+}
+
 
 /////////////////////////////////////////////////////////////////////
 
