@@ -266,7 +266,7 @@ void LLVMCodeGen::getConst(ConstStmt *s) {
         }
         case FOp::LoadInt: {
             llvm::Type *t = llvm::Type::getInt64Ty(*ctx->context);
-            v = llvm::ConstantInt::get(t, curPod->constantas.ints[s->opObj.i1]);
+            v = llvm::ConstantInt::get(t, curPod->constantas.ints[s->opObj.i1], true);
             break;
         }
         case FOp::LoadFloat: {
@@ -278,7 +278,7 @@ void LLVMCodeGen::getConst(ConstStmt *s) {
             //res.name = "Decimal";
             const std::string &str = curPod->constantas.strings[s->opObj.i1];
             llvm::Value *cstring = Builder.CreateGlobalStringPtr(str.c_str());
-            llvm::Value *size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*ctx->context), str.size());
+            llvm::Value *size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*ctx->context), str.size(), true);
             
             llvm::Type* type = ctx->getLlvmType(curPod, "std", "Decimal");
             auto* stringInit = module->getOrInsertFunction("std_Decimal_fromCStr", type, cstring->getType(), size->getType());
@@ -473,8 +473,9 @@ void LLVMCodeGen::setExpr(Expr &expr, llvm::Value *v) {
 
 llvm::Value *LLVMCodeGen::getVTable(llvm::Value *v) {
     llvm::Type *int64Ty = llvm::Type::getInt64Ty(*ctx->context);
-    llvm::Value *offset = llvm::ConstantInt::get(int64Ty, 2);
-    llvm::Value *headerPP = Builder.CreateSub(v, offset);
+    llvm::Value *offset = llvm::ConstantInt::getSigned(int64Ty, -2);
+    llvm::Value *value = Builder.CreateBitCast(v, ctx->pptrType);
+    llvm::Value *headerPP = Builder.CreateGEP(value, offset);
     llvm::Value *headerPtr = Builder.CreateBitCast(headerPP, ctx->pptrType);
     llvm::Value *header = Builder.CreateLoad(headerPtr);
     return header;

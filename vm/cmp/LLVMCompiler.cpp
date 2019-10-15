@@ -11,6 +11,8 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/Verifier.h"
+
 #include "MBuilder.hpp"
 #include "FCodeUtil.hpp"
 
@@ -40,6 +42,9 @@ bool LLVMCompiler::complie(FPod *fpod) {
       ctx.module->print(dbgs(), nullptr,
                       /*ShouldPreserveUseListOrder=*/false, /*IsForDebug=*/true);
     }
+    
+    llvm::verifyModule(*ctx.module, &llvm::errs());
+    
     // Output the bitcode file to stdout
     //llvm::WriteBitcodeToFile(*ctx.module, outs());
     return true;
