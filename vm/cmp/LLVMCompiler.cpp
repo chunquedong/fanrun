@@ -15,8 +15,9 @@
 
 #include "MBuilder.hpp"
 #include "FCodeUtil.hpp"
+#include "LLVMStruct.hpp"
 
-LLVMCompiler::LLVMCompiler() {
+LLVMCompiler::LLVMCompiler() : ctx(new IRModule()) {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
 }
@@ -28,14 +29,9 @@ LLVMCompiler::~LLVMCompiler() {
 bool LLVMCompiler::complie(FPod *fpod) {
     
     for (FType &ftype : fpod->types) {
-        for (FMethod &method : ftype.methods) {
-            IRMethod ir(fpod, &method);
-            MBuilder builder(method.code, ir);
-            builder.buildMethod(&method);
-            
-            LLVMCodeGen code(&ctx, &ir, method.c_mangledName);
-            code.gen(ctx.module);
-        }
+        IRType *irType = ctx.irModule->defType(&ftype);
+        LLVMStruct *ty = ctx.initType(irType);
+        ty->genCode();
     }
     
     if (true) {

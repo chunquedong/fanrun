@@ -8,6 +8,10 @@
 
 #include "LLVMStruct.hpp"
 #include "LLVMGenCtx.hpp"
+#include "LLVMCodeGen.hpp"
+#include "MBuilder.hpp"
+
+const int virtualTableHeader = 16;
 
 LLVMStruct::LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name)
     : ctx(ctx), builder(*ctx->context), irType(irType) {
@@ -16,7 +20,18 @@ LLVMStruct::LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name)
     //structPtr = llvm::PointerType::getUnqual(structTy);
 }
 
+llvm::GlobalValue::LinkageTypes LLVMStruct::toLinkageType(uint32_t flags) {
+    if (flags & FFlags::Private) {
+        return llvm::GlobalValue::InternalLinkage;
+    }
+    else if (flags & FFlags::Internal) {
+        return llvm::GlobalValue::InternalLinkage;
+    }
+    return llvm::GlobalValue::ExternalLinkage;
+}
+
 void LLVMStruct::init() {
+    //init struct fileds
     std::vector<llvm::Type*> fieldTypes;
     //super class
     if (irType->ftype->meta.base != 0xFFFF) {
@@ -27,24 +42,58 @@ void LLVMStruct::init() {
     FType *ftype = irType->ftype;
     for (int i=0; i<ftype->fields.size(); ++i) {
         FField &field = ftype->fields[i];
+        const std::string &name = ftype->c_pod->names[field.name];
         llvm::Type *t = ctx->toLlvmType(ftype->c_pod, field.type);
         if (field.isStatic()) {
             llvm::GlobalVariable *sf = new llvm::GlobalVariable(*ctx->module, t, false
-                                                                    , llvm::GlobalValue::ExternalLinkage, llvm::ConstantAggregateZero::get(t));
-            staticFields.push_back(sf);
+                                                                    , toLinkageType(field.flags), llvm::ConstantAggregateZero::get(t)
+                                                                    , ftype->c_mangledName+"_"+name);
+            staticFields[name] = sf;
             continue;
         }
         
         fieldTypes.push_back(t);
+        fieldIndex[name] = (int)fieldTypes.size()-1;
     }
     
     structTy->setBody(std::move(fieldTypes));
+    
+    /////////////////////////////////////////////
+    //init class var
+    irType->initVTable();
+    for (int i=0; i<irType->vtables.size(); ++i) {
+        IRVTable *irVtable = irType->vtables[i];
+        int virtaulCount = virtualTableHeader + (int)irVtable->functions.size();
+        
+        llvm::Type *arrayTy = llvm::ArrayType::get(ctx->ptrType, virtaulCount);
+        
+        llvm::GlobalVariable *classVar = new llvm::GlobalVariable(*ctx->module, arrayTy, false
+                                                                  , llvm::GlobalValue::ExternalLinkage, llvm::ConstantAggregateZero::get(arrayTy)
+                                                                  , irType->ftype->c_mangledName + "_class__");
+        vtables.push_back(classVar);
+    }
+
 }
 
-void LLVMStruct::genVTableAt(llvm::Value *vtablePos, IRVTable *irVTable) {
+void LLVMStruct::genCode() {
+    genClassInit();
+    
+    for (FMethod &method : irType->ftype->methods) {
+        IRMethod ir(irType->fpod, &method);
+        MBuilder mbuilder(method.code, ir);
+        mbuilder.buildMethod(&method);
+        
+        LLVMCodeGen code(ctx, &ir, method.c_mangledName);
+        code.gen(ctx->module);
+        //this->declMethods[method.c_mangledName] = f;
+    }
+}
+
+void LLVMStruct::genVTableAt(llvm::Value *vtable, int base, IRVTable *irVTable) {
     for (int i=0; i<irVTable->functions.size(); ++i) {
         IRVirtualMethod &vm = irVTable->functions[i];
         
+        /*
         LLVMStruct *parent = (LLVMStruct*)vm.parent->llvmStruct;
         std::string &name = parent->irType->fpod->names[vm.method->name];
         std::map<std::string, llvm::Function *>::iterator itr = parent->declMethods.find(name);
@@ -55,27 +104,27 @@ void LLVMStruct::genVTableAt(llvm::Value *vtablePos, IRVTable *irVTable) {
         else {
             printf("ERROR: not found method: %s\n", name.c_str());
         }
+         */
+        llvm::Function *func = LLVMCodeGen::getFunctionProtoByDef(ctx, builder, vm.method);
         llvm::Value *casted = builder.CreateBitCast(func, ctx->ptrType);
-        llvm::Value *ptr = builder.CreateStructGEP(vtablePos, i);
+        llvm::Value *ptr = builder.CreateStructGEP(vtable, base+i);
         builder.CreateStore(casted, ptr);
     }
 }
 
-void LLVMStruct::genVTable() {
-    int virtualTableHeader = 16;
+void LLVMStruct::genClassInit() {
     
+    llvm::FunctionType *FT = llvm::FunctionType::get(llvm::Type::getVoidTy(*ctx->context), /*not vararg*/false);
+    llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, irType->ftype->c_mangledName+"_init__", ctx->module);
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(*ctx->context, "EntryBlock", F);
+    builder.SetInsertPoint(BB);
+    
+    //init vtable
     for (int i=0; i<irType->vtables.size(); ++i) {
         IRVTable *irVtable = irType->vtables[i];
-        int virtaulCount = virtualTableHeader + (int)irVtable->functions.size();
-        
-        llvm::Type *arrayTy = llvm::ArrayType::get(ctx->ptrType, virtaulCount);
-        
-        llvm::GlobalVariable *vtable = new llvm::GlobalVariable(*ctx->module, arrayTy, false
-                                                                , llvm::GlobalValue::ExternalLinkage, llvm::ConstantAggregateZero::get(arrayTy));
-        
-        llvm::Value *pos = builder.CreateStructGEP(vtable, virtualTableHeader);
-        genVTableAt(pos, irVtable);
-        
-        vtables.push_back(vtable);
+        llvm::GlobalVariable *classVar = vtables[i];
+        genVTableAt(classVar, virtualTableHeader, irVtable);
     }
+    
+    builder.CreateRetVoid();
 }

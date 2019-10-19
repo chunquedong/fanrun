@@ -52,6 +52,8 @@ public:
     
     llvm::Function *gen(llvm::Module *M);
     
+    static llvm::Function* getFunctionProtoByDef(LLVMGenCtx *ctx, llvm::IRBuilder<> &Builder, FMethod *method);
+    
 private:
     llvm::Function* getFunctionProto(IRMethod *irMethod);
     llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool isStatic);

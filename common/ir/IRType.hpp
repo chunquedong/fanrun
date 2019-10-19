@@ -44,6 +44,8 @@ public:
     std::map<std::string, IRType*> types;
     IRType *getType(FPod *pod, uint16_t typeRefId);
     IRType *getTypeByName(FPod *curPod, const std::string &podName, const std::string &typeName);
+    
+    IRType *defType(FType *ftype);
 };
 
 

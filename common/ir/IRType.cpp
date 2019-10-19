@@ -29,6 +29,13 @@ bool IRVirtualMethod::fromObj() {
 IRVTable::IRVTable(IRType *owner, IRType *type) : owner(owner), type(type) {
 }
 
+
+IRType *IRModule::defType(FType *ftype) {
+    IRType *type = new IRType(ftype, this);
+    types[ftype->c_mangledName] = type;
+    return type;
+}
+
 IRType *IRModule::getType(FPod *pod, uint16_t typeRefId) {
     std::string name = FCodeUtil::getTypeRefName(pod, typeRefId, false);
     std::map<std::string, IRType*>::iterator itr = types.find(name);
@@ -121,7 +128,6 @@ void IRType::initITable() {
         IRType *base = module->getType(fpod, ftype->meta.base);
         base->initVTable();
         allMinxin = base->allMinxin;
-        allMinxin[base] = 0;
     }
     
     //get mixin from mixins

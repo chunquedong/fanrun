@@ -14,16 +14,16 @@
 
 using namespace llvm;
 
-LLVMGenCtx::LLVMGenCtx() {
+LLVMGenCtx::LLVMGenCtx(IRModule *ir) {
     context = new llvm::LLVMContext();
     module = new llvm::Module("test", *context);
     ptrType = Type::getInt8PtrTy(*context);
     pptrType = ptrType->getPointerTo();
     
-    llvm::SMDiagnostic err;
-    runtimeModule = parseIRFile("runtime.ll", err, *context);
+    //llvm::SMDiagnostic err;
+    //runtimeModule = parseIRFile("runtime.ll", err, *context);
     
-    irModule = new IRModule();
+    irModule = ir;
 }
 
 LLVMGenCtx::~LLVMGenCtx() {
@@ -32,15 +32,12 @@ LLVMGenCtx::~LLVMGenCtx() {
     delete irModule;
 }
 
-llvm::Function *LLVMGenCtx::getRuntimeFunc(const std::string &name) {
-    llvm::Function *func = runtimeModule->getFunction(name);
-    //TODO
-    return func;
+LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
+    IRType *irType = irModule->getType(curPod, type);
+    return initType(irType);
 }
 
-LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
-    
-    IRType *irType = irModule->getType(curPod, type);
+LLVMStruct *LLVMGenCtx::initType(IRType *irType) {
     if (irType->llvmStruct == NULL) {
         LLVMStruct *s = new LLVMStruct(this, irType, irType->ftype->c_mangledName);
         irType->llvmStruct = s;
@@ -48,32 +45,11 @@ LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
         return s;
     }
     return (LLVMStruct*)irType->llvmStruct;
-    /*
-    //FTypeRef &ref = curPod->typeRefs[type];
-    std::string name = FCodeUtil::getTypeRefName(curPod, type, false);
-    std::map<std::string, LLVMStruct*>::iterator itr  = structMap.find(name);
-    if (itr != structMap.end()) {
-        return itr->second;
-    }
-    
-    FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, type);
-    LLVMStruct *sty = new LLVMStruct(this, ftype, name);
-    structMap[name] = sty;
-    
-    sty->init();
-    return sty;
-     */
 }
 
 llvm::Type *LLVMGenCtx::getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName) {
     IRType *irType = irModule->getTypeByName(curPod, podName, typeName);
-    if (irType->llvmStruct == NULL) {
-        LLVMStruct *s = new LLVMStruct(this, irType, irType->ftype->c_mangledName);
-        irType->llvmStruct = s;
-        s->init();
-        return s->structTy;
-    }
-    return ((LLVMStruct*)irType->llvmStruct)->structTy;
+    return initType(irType)->structTy;
 }
 
 llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {

@@ -39,9 +39,7 @@ public:
     llvm::Module *module;
     
     IRModule *irModule;
-    
-    std::unique_ptr<llvm::Module> runtimeModule;
-    
+        
     std::map<std::string, LLVMStruct*> structMap;
     
     llvm::Type *ptrType;
@@ -49,17 +47,17 @@ public:
     //llvm::Type *valueType;
     //llvm::Type *pvalueType;
     
-    LLVMGenCtx();
+    LLVMGenCtx(IRModule *ir);
     ~LLVMGenCtx();
     
     llvm::Type *toLlvmType(FPod *curPod, int16_t type);
     
     LLVMStruct *getStruct(FPod *curPod, int16_t type);
     
+    LLVMStruct *initType(IRType *irType);
+    
     int fieldIndex(FPod *curPod, FFieldRef *ref);
-    
-    llvm::Function *getRuntimeFunc(const std::string &name);
-    
+        
     llvm::Type *getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName);
 private:
 };

@@ -38,22 +38,28 @@ public:
     LLVMGenCtx *ctx;
     llvm::IRBuilder<> builder;
     
-    std::vector<llvm::GlobalVariable*> staticFields;
+    std::map<std::string, llvm::GlobalVariable*> staticFields;
     
     
     std::vector<llvm::GlobalVariable*> vtables;
     
     std::map<std::string, int> fieldIndex;
-    std::map<std::string, llvm::Function *> declMethods;
+    //std::map<std::string, llvm::Function *> declMethods;
     
     LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name);
     
 public:
     void init();
+    void genCode();
+    
+    llvm::GlobalVariable *getClassVar() { return vtables.at(0); }
+    
+    static llvm::GlobalValue::LinkageTypes toLinkageType(uint32_t flags);
+    
 public:
-    void genVTable();
+    void genClassInit();
 private:
-    void genVTableAt(llvm::Value *vtablePos, IRVTable *irVTable);
+    void genVTableAt(llvm::Value *vtable, int base, IRVTable *irVTable);
 };
 
 #endif /* LLVMStruct_hpp */

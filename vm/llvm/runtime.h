@@ -15,8 +15,8 @@
 extern "C" {
 #endif
 
-    struct sys_Obj { void *type; };
-    struct sys_Obj *sys_Str_makeUtf8(const char *utf8);
+    void std_throw(void *err);
+    void *std_alloc(void *type);
 
 #ifdef __cplusplus
 }

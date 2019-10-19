@@ -21,21 +21,27 @@ LLVMCodeGen::LLVMCodeGen(LLVMGenCtx *ctx, IRMethod *irMethod, std::string &name)
 }
 
 llvm::Function* LLVMCodeGen::getFunctionProto(IRMethod *irMethod) {
-    if (auto* function = module->getFunction(name)) return function;
+    return getFunctionProtoByDef(ctx, Builder, irMethod->method);
+}
+
+llvm::Function* LLVMCodeGen::getFunctionProtoByDef(LLVMGenCtx *ctx, llvm::IRBuilder<> &Builder, FMethod *method) {
+    const std::string &name = method->c_mangledName;
+    if (auto* function = ctx->module->getFunction(name)) return function;
     
+    FPod *pod = method->c_parent->c_pod;
     llvm::SmallVector<llvm::Type*, 16> paramTypes;
-    if (!irMethod->method->isStatic()) {
-        paramTypes.push_back(ctx->toLlvmType(irMethod->curPod, irMethod->method->c_parent->meta.self));
+    if (!method->isStatic()) {
+        paramTypes.push_back(ctx->toLlvmType(pod, method->c_parent->meta.self));
     }
     
-    for (int i=0; i < irMethod->method->paramCount; ++i) {
-        FMethodVar &v = irMethod->method->vars[i];
-        paramTypes.push_back(ctx->toLlvmType(irMethod->curPod, v.type));
+    for (int i=0; i < method->paramCount; ++i) {
+        FMethodVar &v = method->vars[i];
+        paramTypes.push_back(ctx->toLlvmType(pod, v.type));
     }
-    llvm::Type *returnType = ctx->toLlvmType(irMethod->curPod, irMethod->returnType);
+    llvm::Type *returnType = ctx->toLlvmType(pod, method->returnType);
     
     auto* llvmFunctionType = llvm::FunctionType::get(returnType, paramTypes, false);
-    auto* function = llvm::Function::Create(llvmFunctionType, llvm::Function::ExternalLinkage, name, module);
+    auto* function = llvm::Function::Create(llvmFunctionType, LLVMStruct::toLinkageType(method->flags), name, ctx->module);
     
     return function;
 }
@@ -409,7 +415,6 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
                 }
                 else {
                     Builder.CreateBr((llvm::BasicBlock*)(s->targetBlock->llvmBlock));
-                    //return;
                 }
             }
             break;
@@ -419,9 +424,11 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
                 llvm::Type *type = structT->structTy;
                 llvm::Value *sizeValue = llvm::ConstantExpr::getSizeOf(type);
                 
-                Constant* alloc = module->getOrInsertFunction("std_alloc", type->getPointerTo()
-                                                             , structT->vtables[0]->getType(), sizeValue->getType());
-                llvm::Value *res = Builder.CreateCall(alloc, { structT->vtables[0], sizeValue });
+                llvm::Value *classVar = structT->getClassVar();
+                llvm::Value *classVarV = Builder.CreateBitCast(classVar, ctx->ptrType);
+                Constant* alloc = module->getOrInsertFunction("std_alloc", ctx->ptrType, ctx->ptrType, sizeValue->getType());
+                llvm::Value *resV = Builder.CreateCall(alloc, { classVarV, sizeValue });
+                llvm::Value *res = Builder.CreateBitCast(resV, type->getPointerTo());
                 setExpr(s->obj, res);
             }
             break;
@@ -456,7 +463,10 @@ void LLVMCodeGen::genStmt(Stmt *stmt) {
             break;
         case StmtType::TypeCheck:
             if (TypeCheckStmt *s = dynamic_cast<TypeCheckStmt*>(stmt)) {
-                
+                llvm::Value *vtable = getVTable(getExpr(s->obj));
+                llvm::Value *type = ctx->getStruct(curPod, s->type)->getClassVar();
+                llvm::Value *res = Builder.CreateICmpEQ(vtable, type);
+                setExpr(s->result, res);
             }
     }
 }
