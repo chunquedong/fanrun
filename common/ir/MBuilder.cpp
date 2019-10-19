@@ -696,7 +696,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                TypeInfo type;type.makeInt();
+                TypeInfo type = TypeInfo::makeInt();
                 Var &var = block->newVarAs(type);;
                 stmt->result = var.asRef();
                 block->stmts.push_back(stmt);
@@ -717,7 +717,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                TypeInfo type;type.makeBool();
+                TypeInfo type = TypeInfo::makeBool();
                 Var &var = block->newVarAs(type);
                 stmt->result = var.asRef();
                 block->stmts.push_back(stmt);
@@ -731,7 +731,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->curPod = curPod;
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
-                TypeInfo type;type.makeBool();
+                TypeInfo type = TypeInfo::makeBool();
                 Var &var = block->newVarAs(type);
                 stmt->result = var.asRef();
                 block->stmts.push_back(stmt);
@@ -771,7 +771,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->type = opObj.i1;
                 stmt->obj = block->pop();
                 
-                TypeInfo type;type.makeBool();
+                TypeInfo type = TypeInfo::makeBool();
                 Var &var = block->newVarAs(type);
                 Expr value = var.asRef();
                 block->push(value);

@@ -1226,16 +1226,16 @@
 		3297A4C7234772AD005165A6 /* ir */ = {
 			isa = PBXGroup;
 			children = (
-				3297A4C8234772AD005165A6 /* FCodeUtil.hpp */,
 				3297A4C9234772AD005165A6 /* IRMethod.cpp */,
 				3297A4CA234772AD005165A6 /* IRMethod.h */,
+				3297A4D1234772AD005165A6 /* Stmt.hpp */,
 				3297A4CB234772AD005165A6 /* Stmt.cpp */,
 				3297A4CC234772AD005165A6 /* IRType.hpp */,
-				3297A4CD234772AD005165A6 /* MBuilder.cpp */,
 				3297A4CE234772AD005165A6 /* IRType.cpp */,
+				3297A4CD234772AD005165A6 /* MBuilder.cpp */,
 				3297A4CF234772AD005165A6 /* MBuilder.hpp */,
+				3297A4C8234772AD005165A6 /* FCodeUtil.hpp */,
 				3297A4D0234772AD005165A6 /* FCodeUtil.cpp */,
-				3297A4D1234772AD005165A6 /* Stmt.hpp */,
 			);
 			name = ir;
 			path = ../common/ir;

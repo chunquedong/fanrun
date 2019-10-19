@@ -31,6 +31,7 @@ class LLVMGenCtx;
 
 class LLVMStruct {
 public:
+    static int virtualTableHeader;
     IRType *irType;
     
     llvm::StructType *structTy;

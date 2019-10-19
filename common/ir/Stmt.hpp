@@ -15,24 +15,33 @@
 
 class IRMethod;
 class Block;
+struct Var;
 
 struct TypeInfo {
+    friend Var;
+    
     std::string pod;
     std::string name;
+    
     bool isNullable;
+    bool isBuildin;
     bool isValue;
+    
+    int32_t typeRef;
     
     std::string getName() const;
     
-    TypeInfo() : isNullable(false), isValue(false) {}
-    //TypeInfo(const std::string &pod, const std::string &name);
+private:
+    TypeInfo() : isNullable(false), isBuildin(false), isValue(false), typeRef(-1) {}
+public:
+    TypeInfo(const std::string &pod, const std::string &name, bool isValue, bool isBuildin, bool isNullable);
     TypeInfo(FPod *curPod, uint16_t typeRefId) { setFromTypeRef(curPod, typeRefId); }
     
-    void makeInt();
-    void makeBool();
+    static TypeInfo makeInt();
+    static TypeInfo makeBool();
     
     void setFromTypeRef(FPod *curPod, uint16_t typeRefId);
-    
+public:
     bool isThis();
     bool isVoid();
     

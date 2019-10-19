@@ -34,6 +34,7 @@
 class LLVMStruct;
 
 class LLVMGenCtx {
+    llvm::Type *objPtrType_;
 public:
     llvm::LLVMContext *context;
     llvm::Module *module;
@@ -44,6 +45,7 @@ public:
     
     llvm::Type *ptrType;
     llvm::Type *pptrType;
+    
     //llvm::Type *valueType;
     //llvm::Type *pvalueType;
     
@@ -51,14 +53,18 @@ public:
     ~LLVMGenCtx();
     
     llvm::Type *toLlvmType(FPod *curPod, int16_t type);
+    llvm::Type *getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName);
     
     LLVMStruct *getStruct(FPod *curPod, int16_t type);
     
     LLVMStruct *initType(IRType *irType);
     
     int fieldIndex(FPod *curPod, FFieldRef *ref);
-        
-    llvm::Type *getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName);
+    
+    llvm::Type *objPtrType(FPod *curPod);
+    
+private:
+    LLVMStruct *getStructByName(FPod *curPod, const std::string &podName, const std::string &typeName);
 private:
 };
 

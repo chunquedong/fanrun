@@ -11,7 +11,7 @@
 #include "LLVMCodeGen.hpp"
 #include "MBuilder.hpp"
 
-const int virtualTableHeader = 16;
+int LLVMStruct::virtualTableHeader = 16;
 
 LLVMStruct::LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name)
     : ctx(ctx), builder(*ctx->context), irType(irType) {
@@ -34,7 +34,7 @@ void LLVMStruct::init() {
     //init struct fileds
     std::vector<llvm::Type*> fieldTypes;
     //super class
-    if (irType->ftype->meta.base != 0xFFFF) {
+    if (irType->ftype->meta.base != 0xFFFF && irType->ftype->c_mangledName == "sys_Obj") {
         LLVMStruct *base = ctx->getStruct(irType->fpod, irType->ftype->meta.base);
         fieldTypes.push_back(base->structTy);
     }
@@ -54,6 +54,14 @@ void LLVMStruct::init() {
         
         fieldTypes.push_back(t);
         fieldIndex[name] = (int)fieldTypes.size()-1;
+    }
+    
+    if (ftype->meta.flags & FFlags::Mixin) {
+        fieldTypes.clear();
+        llvm::Type *obj = ctx->objPtrType(ftype->c_pod);
+        fieldTypes.push_back(obj);
+        //mixin vtable
+        fieldTypes.push_back(ctx->ptrType);
     }
     
     structTy->setBody(std::move(fieldTypes));

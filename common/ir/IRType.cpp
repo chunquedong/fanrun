@@ -10,7 +10,7 @@
 #include "FCodeUtil.hpp"
 
 
-IRVirtualMethod::IRVirtualMethod() : parent(nullptr), method(nullptr), offsetVTable(-1) {
+IRVirtualMethod::IRVirtualMethod() : parent(nullptr), method(nullptr) {
 
 }
 
@@ -64,6 +64,15 @@ IRType *IRModule::getTypeByName(FPod *curPod, const std::string &podName, const 
 
 /////////////////////////////////////////////////////////////////////
 
+int IRVTable::funcOffset(const std::string &name) {
+    std::map<std::string, int>::iterator found = position.find(name);
+    if (found == position.end()) {
+        printf("ERROR: method not found %s\n", name.c_str());
+        return -1;
+    }
+    return found->second;
+}
+
 IRType::IRType(FType *ftype, IRModule *module) : isVTableInited(false), ftype(ftype), module(module), llvmStruct(nullptr) {
     fpod = ftype->c_pod;
 }
@@ -111,13 +120,14 @@ void IRType::setVTable(IRVTable *vtable) {
         IRVirtualMethod &vm = vtable->functions[i];
         std::string name = vm.parent->fpod->names[vm.method->name];
         
+        vtable->position[name] = i;
+        
         std::map<std::string, IRVirtualMethod>::iterator itr = resolvedMethods.find(name);
         if (itr == resolvedMethods.end()) {
             printf("ERROR: notfound method: %s\n", name.c_str());
             continue;
         }
         //override method
-        itr->second.offsetVTable = i;
         vm = itr->second;
     }
 }

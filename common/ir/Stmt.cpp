@@ -14,6 +14,10 @@ extern "C" {
 #include "utf8.h"
 }
 
+TypeInfo::TypeInfo(const std::string &pod, const std::string &name, bool isValue, bool isBuildin, bool isNullable)
+: pod(pod), name(name), isValue(isValue), isBuildin(isBuildin), isNullable(isNullable){
+}
+
 std::string TypeInfo::getName() const {
     std::string typeName = pod + "_" + name;
     if (isNullable) {
@@ -45,17 +49,18 @@ void TypeInfo::setFromTypeRef(FPod *curPod, uint16_t typeRefId) {
     
     isNullable = FCodeUtil::isNullableTypeRef(curPod, typeRefId);
     isValue = FCodeUtil::isValueTypeRef(curPod, typeRefId);
+    isBuildin = FCodeUtil::isBuildinVal(pod+"_"+name);
+    this->typeRef = typeRefId;
 }
 
-void TypeInfo::makeInt() {
-    pod = "sys";
-    name = "Int";
-    isValue = true;
+TypeInfo TypeInfo::makeInt() {
+    TypeInfo ty("sys", "Int", true, true, false);
+    return ty;
 }
-void TypeInfo::makeBool() {
-    pod = "sys";
-    name = "Bool";
-    isValue = true;
+
+TypeInfo TypeInfo::makeBool() {
+    TypeInfo ty("sys", "Bool", true, true, false);
+    return ty;
 }
 
 bool TypeInfo::isThis() {
@@ -184,58 +189,70 @@ void ConstStmt::print(Printer& printer) {
 }
 
 TypeInfo ConstStmt::getType() {
-    TypeInfo res;
-    res.pod = "sys";
+    
+    std::string pod = "sys";
+    std::string name;
+    bool isValue = false;
+    bool isBuildIn = false;
     switch (opObj.opcode) {
         case FOp::LoadNull: {
-            res.name = "Obj";
+            name = "Obj";
             break;
         }
         case FOp::LoadFalse: {
-            res.name = "Bool";
-            res.isValue = true;
+            name = "Bool";
+            isValue = true;
+            isBuildIn = true;
             break;
         }
         case FOp::LoadTrue: {
-            res.name = "Bool";
-            res.isValue = true;
+            name = "Bool";
+            isValue = true;
+            isBuildIn = true;
             break;
         }
         case FOp::LoadInt: {
-            res.name = "Int";
-            res.isValue = true;
+            name = "Int";
+            isValue = true;
+            isBuildIn = true;
             break;
         }
         case FOp::LoadFloat: {
-            res.name = "Float";
-            res.isValue = true;
+            name = "Float";
+            isValue = true;
+            isBuildIn = true;
             break;
         }
         case FOp::LoadDecimal: {
-            res.name = "Decimal";
+            name = "Decimal";
+            isValue = true;
             break;
         }
         case FOp::LoadStr: {
-            res.name = "Str";
+            name = "Str";
             break;
         }
         case FOp::LoadDuration: {
-            res.name = "Duration";
+            name = "Duration";
+            isValue = true;
             break;
         }
         case FOp::LoadUri: {
-            res.name = "Uri";
+            name = "Uri";
+            isValue = true;
             break;
         }
         case FOp::LoadType: {
-            res.name = "Type";
+            name = "Type";
             break;
         }
         default: {
-            res.name = "Obj";
+            name = "Obj";
             break;
         }
     }
+    
+    TypeInfo res(pod, name, isValue, isBuildIn, false);
     return res;
 }
 

@@ -14,7 +14,8 @@
 
 using namespace llvm;
 
-LLVMGenCtx::LLVMGenCtx(IRModule *ir) {
+LLVMGenCtx::LLVMGenCtx(IRModule *ir) : objPtrType_(nullptr) {
+    irModule = ir;
     context = new llvm::LLVMContext();
     module = new llvm::Module("test", *context);
     ptrType = Type::getInt8PtrTy(*context);
@@ -22,14 +23,19 @@ LLVMGenCtx::LLVMGenCtx(IRModule *ir) {
     
     //llvm::SMDiagnostic err;
     //runtimeModule = parseIRFile("runtime.ll", err, *context);
-    
-    irModule = ir;
 }
 
 LLVMGenCtx::~LLVMGenCtx() {
     delete module;
     delete context;
     delete irModule;
+}
+
+llvm::Type *LLVMGenCtx::objPtrType(FPod *curPod) {
+    if (objPtrType_ == nullptr) {
+        objPtrType_ = getStructByName(curPod, "sys", "Obj")->structPtr;
+    }
+    return objPtrType_;
 }
 
 LLVMStruct *LLVMGenCtx::getStruct(FPod *curPod, int16_t type) {
@@ -47,9 +53,33 @@ LLVMStruct *LLVMGenCtx::initType(IRType *irType) {
     return (LLVMStruct*)irType->llvmStruct;
 }
 
-llvm::Type *LLVMGenCtx::getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName) {
+LLVMStruct *LLVMGenCtx::getStructByName(FPod *curPod, const std::string &podName, const std::string &typeName) {
     IRType *irType = irModule->getTypeByName(curPod, podName, typeName);
-    return initType(irType)->structTy;
+    return initType(irType);
+}
+
+llvm::Type *LLVMGenCtx::getLlvmType(FPod *curPod, const std::string &podName, const std::string &typeName) {
+    llvm::Type *buildValTy = nullptr;
+    if (podName == "sys") {
+        if (typeName == "Void") {
+            return Type::getVoidTy(*context);
+        }
+        else if (typeName == "Ptr") {
+            return ptrType;
+        }
+        if (typeName == "Int") {
+            buildValTy = Type::getInt64Ty(*context);
+        }
+        else if (typeName == "Float") {
+            buildValTy = Type::getDoubleTy(*context);
+        }
+        else if (typeName == "Bool") {
+            buildValTy = Type::getInt1Ty(*context);
+        }
+    }
+    
+    LLVMStruct *ty = getStructByName(curPod, podName, typeName);
+    return ty->structPtr;
 }
 
 llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
@@ -58,6 +88,7 @@ llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
     std::string &typeName = pod->names[typeRef.typeName];
     
     //primity type
+    llvm::Type *buildValTy = nullptr;
     if (podName == "sys") {
         if (typeRef.extName.size() == 0) {
             if (typeName == "Void") {
@@ -67,38 +98,48 @@ llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
                 return ptrType;
             }
             if (typeName == "Int") {
-                return Type::getInt64Ty(*context);
+                buildValTy = Type::getInt64Ty(*context);
             }
             else if (typeName == "Float") {
-                return Type::getDoubleTy(*context);
+                buildValTy = Type::getDoubleTy(*context);
             }
             else if (typeName == "Bool") {
-                return Type::getInt1Ty(*context);
+                buildValTy = Type::getInt1Ty(*context);
             }
         }
         else if (typeRef.extName.size() > 0 && typeRef.extName[0] != '?' && typeRef.extName[0] != '<') {
             if (typeName == "Int") {
                 if (typeRef.extName == "8") {
-                    return Type::getInt8Ty(*context);
+                    buildValTy = Type::getInt8Ty(*context);
                 }
                 else if (typeRef.extName == "16") {
-                    return Type::getInt16Ty(*context);
+                    buildValTy = Type::getInt16Ty(*context);
                 }
                 else if (typeRef.extName == "32") {
-                    return Type::getInt32Ty(*context);
+                    buildValTy = Type::getInt32Ty(*context);
                 }
                 else if (typeRef.extName == "64") {
-                    return Type::getInt64Ty(*context);
+                    buildValTy = Type::getInt64Ty(*context);
                 }
             }
             else if (typeName == "Float") {
                 if (typeRef.extName == "32") {
-                    return Type::getFloatTy(*context);
+                    buildValTy = Type::getFloatTy(*context);
                 }
                 else if (typeRef.extName == "64") {
-                    return Type::getDoubleTy(*context);
+                    buildValTy = Type::getDoubleTy(*context);
                 }
             }
+        }
+    }
+    
+    if (buildValTy) {
+        bool isNullable = FCodeUtil::isNullableTypeRef(pod, type);
+        if (isNullable) {
+            return buildValTy->getPointerTo();
+        }
+        else {
+            return buildValTy;
         }
     }
     
@@ -106,7 +147,12 @@ llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
     //std::string name = ftype->c_mangledName;
     
     LLVMStruct *sty = getStruct(pod, type);
-    return sty->structTy;
+    FType *ftype = FCodeUtil::getFTypeFromTypeRef(pod, type);
+    if (ftype->meta.flags & FFlags::Mixin) {
+        return sty->structTy;
+    }
+    
+    return sty->structPtr;
 }
 
 int LLVMGenCtx::fieldIndex(FPod *curPod, FFieldRef *ref) {

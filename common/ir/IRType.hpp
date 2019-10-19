@@ -19,7 +19,6 @@ class IRVirtualMethod {
 public:
     IRType *parent;
     FMethod *method;
-    int offsetVTable;
     
     IRVirtualMethod();
     
@@ -30,6 +29,7 @@ public:
 };
 
 class IRVTable {
+    friend IRType;
 public:
     IRType *type;
     IRType *owner;
@@ -37,6 +37,10 @@ public:
     IRVTable(IRType *owner, IRType *type);
     
     std::vector<IRVirtualMethod> functions;
+    
+    int funcOffset(const std::string &name);
+private:
+    std::map<std::string, int> position;
 };
 
 class IRModule {

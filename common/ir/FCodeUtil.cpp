@@ -93,8 +93,8 @@ namespace FCodeUtil {
     }
 
     bool isValueType(FType *type) {
-        return isBuildinValType(type);
-        //return (type->meta.flags & FFlags::Struct) != 0;
+        //return isBuildinValType(type);
+        return (type->meta.flags & FFlags::Struct) != 0;
     }
     
     bool isNullableTypeRef(FPod *pod, uint16_t tid) {
