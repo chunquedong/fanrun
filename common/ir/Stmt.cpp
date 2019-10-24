@@ -51,6 +51,11 @@ void TypeInfo::setFromTypeRef(FPod *curPod, uint16_t typeRefId) {
     isValue = FCodeUtil::isValueTypeRef(curPod, typeRefId);
     isBuildin = FCodeUtil::isBuildinVal(pod+"_"+name);
     this->typeRef = typeRefId;
+    
+    FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, typeRefId);
+    if (ftype->meta.flags & FFlags::Mixin) {
+        this->isMixin = true;
+    }
 }
 
 TypeInfo TypeInfo::makeInt() {

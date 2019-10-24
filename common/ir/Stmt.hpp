@@ -26,13 +26,14 @@ struct TypeInfo {
     bool isNullable;
     bool isBuildin;
     bool isValue;
+    bool isMixin;
     
     int32_t typeRef;
     
     std::string getName() const;
     
 private:
-    TypeInfo() : isNullable(false), isBuildin(false), isValue(false), typeRef(-1) {}
+    TypeInfo() : isNullable(false), isBuildin(false), isValue(false), typeRef(-1), isMixin(false) {}
 public:
     TypeInfo(const std::string &pod, const std::string &name, bool isValue, bool isBuildin, bool isNullable);
     TypeInfo(FPod *curPod, uint16_t typeRefId) { setFromTypeRef(curPod, typeRefId); }

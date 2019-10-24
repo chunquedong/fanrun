@@ -15,8 +15,12 @@
 extern "C" {
 #endif
 
-    void std_throw(void *err);
-    void *std_alloc(void *type);
+    void fr_throw(void *err);
+    void *fr_alloc(void *type);
+    
+    void *fr_getITable(void *vtable, void *interface);
+    _Bool fr_typeFits(void *typeSub, void *typeSuper);
+    
 
 #ifdef __cplusplus
 }

@@ -62,7 +62,8 @@ private:
     
     llvm::Value *getExpr(Expr &expr);
     void setExpr(Expr &expr, llvm::Value *v);
-    llvm::Value *getVTable(llvm::Value *v);
+    llvm::Value *getClassVTable(llvm::Value *v);
+    llvm::Value *getVTable(Expr &expr);
     
     void genCall(CallStmt *stmt);
     void genCompare(CompareStmt *stmt);
