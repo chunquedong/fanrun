@@ -123,8 +123,8 @@ llvm::Function *LLVMCodeGen::gen(Module *M) {
     curErrVar = builder.CreateAlloca(ctx->ptrType);
     curErrVar->setName("curErr");
     builder.CreateStore(llvm::ConstantPointerNull::get(ctx->ptrType), curErrVar);
-    errPosition = builder.CreateAlloca(ctx->intType);
-    errPosition->setName("errPosition");
+    errOccurAt = builder.CreateAlloca(ctx->intType);
+    errOccurAt->setName("errOccurAt");
     
     //init params
     for (int j=0; j<irMethod->methodVars->locals.size(); ++j) {
@@ -180,8 +180,8 @@ void LLVMCodeGen::genErrTable() {
         for (FTrap &trap : errTable->traps) {
             llvm::Value *start = llvm::ConstantInt::get(ctx->intType, trap.start, true);
             llvm::Value *end = llvm::ConstantInt::get(ctx->intType, trap.end, true);
-            llvm::Value *cond = builder.CreateAnd(builder.CreateICmpSLT(errPosition, start),
-                              builder.CreateICmpSGT(end, errPosition));
+            llvm::Value *cond = builder.CreateAnd(builder.CreateICmpSLT(errOccurAt, start),
+                              builder.CreateICmpSGT(end, errOccurAt));
             
             llvm::Value *errType = ctx->getStructByName(irMethod->curPod, "sys", "Err")->getClassVar();
             llvm::Value *errVal = builder.CreateLoad(curErrVar->getType()->getPointerElementType(), curErrVar);
@@ -224,17 +224,34 @@ void LLVMCodeGen::genCall(CallStmt *s, Block *block) {
     bool isNative;
     llvm::Function *callee = getFunctionProtoByRef(irMethod->curPod, s->methodRef, &isNative);
     
-    if (s->isVirtual || s->isMixin) {
-        llvm::Value *vtable = NULL;
-        LLVMStruct *clz = ctx->getStruct(irMethod->curPod, s->methodRef->parent);
-        
-        llvm::Value *instance = getExpr(s->params.at(0));
-        if (s->isMixin) {
-            vtable = getVTable(s->params.at(0));
+    llvm::Value *vtable = NULL;
+    bool isVirtual = s->isVirtual || s->isMixin;
+    if (!s->isStatic && isVirtual) {
+        FType *ftype = FCodeUtil::getFTypeFromTypeRef(irMethod->curPod, s->methodRef->parent);
+        //struct
+        if (ftype->meta.flags & FFlags::Struct) {
+            if (s->isMixin) {
+                Expr &expr = s->params.at(0);
+                Var &v = expr.block->locals[expr.index];
+                if (v.type.isValue) {
+                    vtable = ctx->getStructByName(irMethod->curPod, v.type.pod, v.type.name)->getClassVar();
+                }
+            }
         }
+        //normal
         else {
-            vtable = getClassVTable(instance);
+            llvm::Value *instance = getExpr(s->params.at(0));
+            if (s->isMixin) {
+                vtable = getVTable(s->params.at(0));
+            }
+            else {
+                vtable = getClassVTable(instance);
+            }
         }
+    }
+    
+    if (vtable) {
+        LLVMStruct *clz = ctx->getStruct(irMethod->curPod, s->methodRef->parent);
         int offset = clz->irType->vtables.at(0)->funcOffset(s->mthName);
         offset += LLVMStruct::virtualTableHeader;
         llvm::Value *mth = builder.CreateStructGEP(vtable, offset);
@@ -264,7 +281,7 @@ void LLVMCodeGen::genCall(CallStmt *s, Block *block) {
     builder.CreateCondBr(isNull, normalBlock, errBlock);
     
     builder.SetInsertPoint(errBlock);
-    builder.CreateStore(llvm::ConstantInt::get(ctx->intType, block->pos), errPosition);
+    builder.CreateStore(llvm::ConstantInt::get(ctx->intType, block->pos), errOccurAt);
     builder.CreateBr(errTableBlock);
     
     builder.SetInsertPoint(normalBlock);
@@ -306,30 +323,60 @@ void LLVMCodeGen::genCompare(CompareStmt *stmt) {
     llvm::Value *v1 = getExpr(stmt->param1);
     llvm::Value *v2 = getExpr(stmt->param2);
     llvm::Value *res = NULL;
-    switch (stmt->opObj.opcode) {
-        case FOp::CompareEQ: {
-            res = builder.CreateICmpEQ(v1, v2);
-        } break;
-        case FOp::CompareNE: {
-            res = builder.CreateICmpNE(v1, v2);
-        } break;
-        case FOp::Compare: {
-            res = builder.CreateSub(v1, v2);
-        } break;
-        case FOp::CompareLT: {
-            res = builder.CreateICmpSLT(v1, v2);
-        } break;
-        case FOp::CompareLE: {
-            res = builder.CreateICmpSLE(v1, v2);
-        } break;
-        case FOp::CompareGT: {
-            res = builder.CreateICmpSGT(v1, v2);
-        } break;
-        case FOp::CompareGE: {
-            res = builder.CreateICmpSGE(v1, v2);
-        } break;
-        default:
-            break;
+    
+    if (stmt->param1.getTypeName() == "sys_Float") {
+        switch (stmt->opObj.opcode) {
+            case FOp::CompareEQ: {
+                res = builder.CreateFCmpOEQ(v1, v2);
+            } break;
+            case FOp::CompareNE: {
+                res = builder.CreateFCmpONE(v1, v2);
+            } break;
+            case FOp::Compare: {
+                res = builder.CreateFSub(v1, v2);
+            } break;
+            case FOp::CompareLT: {
+                res = builder.CreateFCmpOLT(v1, v2);
+            } break;
+            case FOp::CompareLE: {
+                res = builder.CreateFCmpOLE(v1, v2);
+            } break;
+            case FOp::CompareGT: {
+                res = builder.CreateFCmpOGT(v1, v2);
+            } break;
+            case FOp::CompareGE: {
+                res = builder.CreateFCmpOGE(v1, v2);
+            } break;
+            default:
+                break;
+        }
+    }
+    else {
+        switch (stmt->opObj.opcode) {
+            case FOp::CompareEQ: {
+                res = builder.CreateICmpEQ(v1, v2);
+            } break;
+            case FOp::CompareNE: {
+                res = builder.CreateICmpNE(v1, v2);
+            } break;
+            case FOp::Compare: {
+                res = builder.CreateSub(v1, v2);
+            } break;
+            case FOp::CompareLT: {
+                res = builder.CreateICmpSLT(v1, v2);
+            } break;
+            case FOp::CompareLE: {
+                res = builder.CreateICmpSLE(v1, v2);
+            } break;
+            case FOp::CompareGT: {
+                res = builder.CreateICmpSGT(v1, v2);
+            } break;
+            case FOp::CompareGE: {
+                res = builder.CreateICmpSGE(v1, v2);
+            } break;
+            default:
+                break;
+        }
     }
     setExpr(stmt->result, res);
 }
@@ -531,7 +578,7 @@ void LLVMCodeGen::genStmt(Stmt *stmt, Block *block) {
             if (ThrowStmt *s = dynamic_cast<ThrowStmt*>(stmt)) {
                 llvm::Value *v = getExpr(s->var);
                 builder.CreateStore(v, curErrVar);
-                builder.CreateStore(llvm::ConstantInt::get(ctx->intType, block->pos), errPosition);
+                builder.CreateStore(llvm::ConstantInt::get(ctx->intType, block->pos), errOccurAt);
                 builder.CreateBr(errTableBlock);
 //                Constant* std_throw = module->getOrInsertFunction("fr_throw", Type::getVoidTy(*ctx->context), ctx->ptrType);
 //                builder.CreateCall(std_throw, { v });

@@ -50,7 +50,7 @@ class LLVMCodeGen {
     llvm::Value *preErrVar;
     llvm::Value *curErrVar;
     llvm::BasicBlock *errTableBlock;
-    llvm::Value *errPosition;
+    llvm::Value *errOccurAt;
     
 public:
     
