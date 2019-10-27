@@ -79,6 +79,8 @@ public:
     FPod *curPod;
     std::string name;
     
+    std::vector<FErrTable*> errTable;
+    
     IRMethod(FPod *curPod, FMethod *method);
     
     void print(Printer& printer, int pass);

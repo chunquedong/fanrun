@@ -28,6 +28,7 @@ namespace FCodeUtil {
         
     std::string getIdentifierName(FPod *pod, uint16_t nid);
     void escapeIdentifierName(std::string &name);
+    
 }
 
 #endif /* FCodeUtil_hpp */

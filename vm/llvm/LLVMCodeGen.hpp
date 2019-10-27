@@ -37,7 +37,7 @@ class LLVMGenCtx;
 class LLVMCodeGen {
     std::string name;
     IRMethod *irMethod;
-    llvm::IRBuilder<> Builder;
+    llvm::IRBuilder<> builder;
     
     LLVMGenCtx *ctx;
     llvm::Module *module;
@@ -46,28 +46,36 @@ class LLVMCodeGen {
     
     std::vector<llvm::Value*> locals;
     
+    llvm::Value *envVar;
+    llvm::Value *preErrVar;
+    llvm::Value *curErrVar;
+    llvm::BasicBlock *errTableBlock;
+    llvm::Value *errPosition;
+    
 public:
     
     LLVMCodeGen(LLVMGenCtx *ctx, IRMethod *irMethod, std::string &name);
     
     llvm::Function *gen(llvm::Module *M);
     
-    static llvm::Function* getFunctionProtoByDef(LLVMGenCtx *ctx, llvm::IRBuilder<> &Builder, FMethod *method);
+    static llvm::Function* getFunctionProtoByDef(LLVMGenCtx *ctx, llvm::IRBuilder<> &builder, FMethod *method, bool *isNative);
     
 private:
-    llvm::Function* getFunctionProto(IRMethod *irMethod);
-    llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool isStatic);
+    llvm::Function* getFunctionProto(IRMethod *irMethod, bool *isNative);
+    llvm::Function* getFunctionProtoByRef(FPod *curPod, FMethodRef *ref, bool *isNative);
     void genBlock(Block *block);
-    void genStmt(Stmt *stmt);
+    void genStmt(Stmt *stmt, Block *block);
     
     llvm::Value *getExpr(Expr &expr);
     void setExpr(Expr &expr, llvm::Value *v);
     llvm::Value *getClassVTable(llvm::Value *v);
     llvm::Value *getVTable(Expr &expr);
     
-    void genCall(CallStmt *stmt);
+    void genCall(CallStmt *stmt, Block *block);
     void genCompare(CompareStmt *stmt);
     void getConst(ConstStmt *stmt);
+    
+    void genErrTable();
     
 };
 

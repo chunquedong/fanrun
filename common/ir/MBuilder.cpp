@@ -169,6 +169,7 @@ bool MBuilder::buildMethod(FMethod *method) {
     rewriteLocals();
     //irMethod.locals.swap(this->locals);
     irMethod.blocks.swap(this->blocks);
+    irMethod.errTable.swap(this->attrs);
     irMethod.methodVars = methodVars;
     return true;
 }
@@ -319,6 +320,7 @@ void MBuilder::insertException() {
             }
             
             Block *cb = posToBlock[trap.handler];
+            trap.c_handler = cb;
             ExceptionStmt *handlerStmt = NULL;
             for (Stmt *s : cb->stmts) {
                 ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);

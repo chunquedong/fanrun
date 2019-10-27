@@ -43,8 +43,9 @@ public:
         
     std::map<std::string, LLVMStruct*> structMap;
     
-    llvm::Type *ptrType;
-    llvm::Type *pptrType;
+    llvm::PointerType *ptrType;
+    llvm::PointerType *pptrType;
+    llvm::Type *intType;
     
     //llvm::Type *valueType;
     //llvm::Type *pvalueType;
@@ -63,7 +64,6 @@ public:
     
     llvm::Type *objPtrType(FPod *curPod);
     
-private:
     LLVMStruct *getStructByName(FPod *curPod, const std::string &podName, const std::string &typeName);
 private:
 };

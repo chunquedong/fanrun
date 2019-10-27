@@ -21,6 +21,8 @@ LLVMGenCtx::LLVMGenCtx(IRModule *ir) : objPtrType_(nullptr) {
     ptrType = Type::getInt8PtrTy(*context);
     pptrType = ptrType->getPointerTo();
     
+    intType = llvm::Type::getInt32Ty(*context);
+    
     //llvm::SMDiagnostic err;
     //runtimeModule = parseIRFile("runtime.ll", err, *context);
 }

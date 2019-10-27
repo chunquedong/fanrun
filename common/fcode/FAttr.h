@@ -65,6 +65,7 @@ struct FTrap {
     uint16_t end;      // pc exlcusive
     uint16_t handler;  // pc to call on trap
     uint16_t type;     // Err type to catch (typeRefs.def)
+    void *c_handler;
 };
 
 class FErrTable : public FAttr {

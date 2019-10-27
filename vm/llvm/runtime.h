@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-    void fr_throw(void *err);
+    //void fr_throw(void *err);
     void *fr_alloc(void *type);
     
     void *fr_getITable(void *vtable, void *interface);

@@ -113,7 +113,8 @@ void LLVMStruct::genVTableAt(llvm::Value *vtable, int base, IRVTable *irVTable) 
             printf("ERROR: not found method: %s\n", name.c_str());
         }
          */
-        llvm::Function *func = LLVMCodeGen::getFunctionProtoByDef(ctx, builder, vm.method);
+        bool isNative;
+        llvm::Function *func = LLVMCodeGen::getFunctionProtoByDef(ctx, builder, vm.method, &isNative);
         llvm::Value *casted = builder.CreateBitCast(func, ctx->ptrType);
         llvm::Value *ptr = builder.CreateStructGEP(vtable, base+i);
         builder.CreateStore(casted, ptr);
