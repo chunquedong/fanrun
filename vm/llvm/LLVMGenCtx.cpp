@@ -150,9 +150,12 @@ llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
     
     LLVMStruct *sty = getStruct(pod, type);
     FType *ftype = FCodeUtil::getFTypeFromTypeRef(pod, type);
-    if (ftype->meta.flags & FFlags::Mixin) {
-        return sty->structTy;
-    }
+//    if (ftype->meta.flags & FFlags::Mixin) {
+//        return sty->structTy;
+//    }
+//    if (ftype->c_mangledName == "sys_Str") {
+//        printf("");
+//    }
     
     return sty->structPtr;
 }

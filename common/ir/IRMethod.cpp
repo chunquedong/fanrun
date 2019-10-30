@@ -121,6 +121,7 @@ IRMethod::IRMethod(FPod *curPod, FMethod *method) :
     selfType = method->c_parent->meta.self;
     paramCount = method->paramCount;
     name = curPod->names[method->name];
+    isVoid = FCodeUtil::isVoid(curPod, method->returnType);
 }
 
 void IRMethod::print(Printer& printer, int pass) {

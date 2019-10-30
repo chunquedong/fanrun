@@ -21,6 +21,7 @@ extern "C" {
     void *fr_getITable(void *vtable, void *interface);
     _Bool fr_typeFits(void *typeSub, void *typeSuper);
     
+    void *fr_toTypeObj(void *vtable);
 
 #ifdef __cplusplus
 }

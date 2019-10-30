@@ -19,6 +19,7 @@ namespace FCodeUtil {
     bool isValueTypeRef(FPod *curPod, uint16_t typeRefId);
     bool isValueType(FType *type);
     bool isNullableTypeRef(FPod *curPod, uint16_t typeRefId);
+    bool isVoid(FPod *curPod, uint16_t typeRefId);
     
     bool isBuildinValType(FType *type);
     bool isBuildinVal(const std::string &name);

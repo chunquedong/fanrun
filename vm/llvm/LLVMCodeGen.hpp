@@ -47,10 +47,10 @@ class LLVMCodeGen {
     std::vector<llvm::Value*> locals;
     
     llvm::Value *envVar;
-    llvm::Value *preErrVar;
-    llvm::Value *curErrVar;
+    llvm::Value *errVar;
     llvm::BasicBlock *errTableBlock;
     llvm::Value *errOccurAt;
+    llvm::Value *returnVar;
     
 public:
     
@@ -73,7 +73,9 @@ private:
     
     void genCall(CallStmt *stmt, Block *block);
     void genCompare(CompareStmt *stmt);
-    void getConst(ConstStmt *stmt);
+    void getConst(ConstStmt *stmt, Block *block);
+    void genCheckErr(llvm::Value *errVal, Block *block);
+    llvm::Value *constFromStr(const std::string &pod, const std::string &type, const std::string &str, Block *block);
     
     void genErrTable();
     

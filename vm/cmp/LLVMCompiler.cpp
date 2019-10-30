@@ -35,14 +35,35 @@ bool LLVMCompiler::complie(FPod *fpod) {
     }
     
     if (true) {
-      ctx.module->print(dbgs(), nullptr,
+        std::error_code error;
+        llvm::raw_fd_ostream file("out.ll", error, llvm::sys::fs::F_None);
+        if (error) {
+            printf("%s\n", error.message().c_str());
+            return false;
+        }
+                
+        ctx.module->print(file, nullptr,
                       /*ShouldPreserveUseListOrder=*/false, /*IsForDebug=*/true);
+        
+        file.flush();
     }
     
     llvm::verifyModule(*ctx.module, &llvm::errs());
     
     // Output the bitcode file to stdout
     //llvm::WriteBitcodeToFile(*ctx.module, outs());
+    
+    if (true) {
+        std::error_code error;
+        llvm::raw_fd_ostream file("out.bc", error, llvm::sys::fs::F_None);
+        if (error) {
+            printf("%s\n", error.message().c_str());
+            return false;
+        }
+        llvm::WriteBitcodeToFile(*ctx.module, file);
+        file.flush();
+    }
+    
     return true;
 }
 

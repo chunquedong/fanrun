@@ -109,6 +109,16 @@ namespace FCodeUtil {
         return false;
     }
     
+    bool isVoid(FPod *pod, uint16_t tid) {
+        FTypeRef &typeRef = pod->typeRefs[tid];
+        std::string &podName = pod->names[typeRef.podName];
+        std::string &typeName = pod->names[typeRef.typeName];
+        if (podName == "sys" && typeName == "Void") {
+            return true;
+        }
+        return false;
+    }
+    
     bool isValueTypeRef(FPod *pod, uint16_t tid) {
         if (isNullableTypeRef(pod, tid)) return false;
         FTypeRef &typeRef = pod->typeRefs[tid];

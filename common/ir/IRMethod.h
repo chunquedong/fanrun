@@ -78,6 +78,7 @@ public:
     
     FPod *curPod;
     std::string name;
+    bool isVoid;
     
     std::vector<FErrTable*> errTable;
     
