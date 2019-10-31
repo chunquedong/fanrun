@@ -246,7 +246,6 @@
 		3297A4A323477295005165A6 /* LLVMJIT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3297A49523477295005165A6 /* LLVMJIT.cpp */; };
 		3297A4A423477295005165A6 /* LLVMCodeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3297A49623477295005165A6 /* LLVMCodeGen.cpp */; };
 		3297A4A523477295005165A6 /* LLVMStruct.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3297A49723477295005165A6 /* LLVMStruct.cpp */; };
-		3297A4A623477295005165A6 /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3297A49823477295005165A6 /* runtime.c */; };
 		3297A4A723477295005165A6 /* LLVMTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3297A49F23477295005165A6 /* LLVMTest.cpp */; };
 		3297A4D2234772AD005165A6 /* escape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3297A4AA234772AD005165A6 /* escape.cpp */; };
 		3297A4D3234772AD005165A6 /* tinycthread.c in Sources */ = {isa = PBXBuildFile; fileRef = 3297A4AB234772AD005165A6 /* tinycthread.c */; };
@@ -545,9 +544,7 @@
 		3297A49523477295005165A6 /* LLVMJIT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMJIT.cpp; sourceTree = "<group>"; };
 		3297A49623477295005165A6 /* LLVMCodeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMCodeGen.cpp; sourceTree = "<group>"; };
 		3297A49723477295005165A6 /* LLVMStruct.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LLVMStruct.cpp; sourceTree = "<group>"; };
-		3297A49823477295005165A6 /* runtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = runtime.c; sourceTree = "<group>"; };
 		3297A49923477295005165A6 /* LLVMTest.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMTest.hpp; sourceTree = "<group>"; };
-		3297A49B23477295005165A6 /* runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
 		3297A49C23477295005165A6 /* LLVMGenCtx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMGenCtx.hpp; sourceTree = "<group>"; };
 		3297A49D23477295005165A6 /* LLVMCodeGen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMCodeGen.hpp; sourceTree = "<group>"; };
 		3297A49E23477295005165A6 /* LLVMJIT.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LLVMJIT.hpp; sourceTree = "<group>"; };
@@ -1169,8 +1166,6 @@
 				3297A49623477295005165A6 /* LLVMCodeGen.cpp */,
 				3297A4A023477295005165A6 /* LLVMStruct.hpp */,
 				3297A49723477295005165A6 /* LLVMStruct.cpp */,
-				3297A49B23477295005165A6 /* runtime.h */,
-				3297A49823477295005165A6 /* runtime.c */,
 				3297A49E23477295005165A6 /* LLVMJIT.hpp */,
 				3297A49523477295005165A6 /* LLVMJIT.cpp */,
 				3297A49923477295005165A6 /* LLVMTest.hpp */,
@@ -1381,7 +1376,6 @@
 			files = (
 				3297A4DE234772AD005165A6 /* PodLoader.cpp in Sources */,
 				3297A52A234775AC005165A6 /* zutil.c in Sources */,
-				3297A4A623477295005165A6 /* runtime.c in Sources */,
 				3297A52B234775AC005165A6 /* inftrees.c in Sources */,
 				3297A4DC234772AD005165A6 /* ZipFile.cpp in Sources */,
 				3297A520234775AC005165A6 /* ioapi_buf.c in Sources */,

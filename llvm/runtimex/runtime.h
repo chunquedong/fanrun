@@ -16,9 +16,10 @@ extern "C" {
 #endif
 
     //void fr_throw(void *err);
-    void *fr_alloc(void *type);
+    void *fr_alloc(void *env, void *type);
     
-    void *fr_getITable(void *vtable, void *interface);
+    void *fr_getVTable(void *instance);
+    void *fr_getITable(void *instance, void *interface);
     _Bool fr_typeFits(void *typeSub, void *typeSuper);
     
     void *fr_toTypeObj(void *vtable);

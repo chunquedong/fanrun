@@ -652,24 +652,31 @@ void LLVMCodeGen::setExpr(Expr &expr, llvm::Value *v) {
 }
 
 llvm::Value *LLVMCodeGen::getClassVTable(llvm::Value *v) {
-    llvm::Type *int64Ty = llvm::Type::getInt64Ty(*ctx->context);
-    llvm::Value *offset = llvm::ConstantInt::getSigned(int64Ty, -2);
-    llvm::Value *value = builder.CreateBitCast(v, ctx->pptrType);
-    llvm::Value *headerPP = builder.CreateGEP(value, offset);
-    llvm::Value *headerPtr = builder.CreateBitCast(headerPP, ctx->pptrType);
-    llvm::Value *header = builder.CreateLoad(headerPtr);
-    return header;
+//    llvm::Type *int64Ty = llvm::Type::getInt64Ty(*ctx->context);
+//    llvm::Value *offset = llvm::ConstantInt::getSigned(int64Ty, -2);
+//    llvm::Value *value = builder.CreateBitCast(v, ctx->pptrType);
+//    llvm::Value *headerPP = builder.CreateGEP(value, offset);
+//    llvm::Value *headerPtr = builder.CreateBitCast(headerPP, ctx->pptrType);
+//    llvm::Value *header = builder.CreateLoad(headerPtr);
+//    return header;
+    
+    llvm::Value *value = builder.CreateBitCast(v, ctx->ptrType);
+    Constant* getITable = module->getOrInsertFunction("fr_getVTable", ctx->ptrType, ctx->ptrType);
+    return builder.CreateCall(getITable, { value });
 }
 
 llvm::Value *LLVMCodeGen::getVTable(Expr &expr) {
     Var &v = expr.block->locals[expr.index];
     int pos = v.newIndex;
-    llvm::Value *vtable = getClassVTable(locals[pos]);
+    
     if (!v.type.isMixin) {
+        llvm::Value *vtable = getClassVTable(locals[pos]);
         return vtable;
     }
     FPod *curPod = irMethod->curPod;
     llvm::Value *type = ctx->getStruct(curPod, v.type.typeRef)->getClassVar();
     Constant* getITable = module->getOrInsertFunction("fr_getITable", ctx->ptrType, ctx->ptrType, ctx->ptrType);
-    return builder.CreateCall(getITable, { vtable,  type});
+    
+    llvm::Value *value = builder.CreateBitCast(locals[pos], ctx->ptrType);
+    return builder.CreateCall(getITable, { value,  type});
 }
