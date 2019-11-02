@@ -34,7 +34,7 @@ llvm::Function* LLVMCodeGen::getFunctionProtoByDef(LLVMGenCtx *ctx, llvm::IRBuil
     
     llvm::SmallVector<llvm::Type*, 16> paramTypes;
     //call c native
-    if (method->flags & FFlags::Native && method->code.isEmpty()) {
+    if ((method->flags & FFlags::Native) && method->code.isEmpty() && (method->flags & FFlags::Static)) {
         //pass
         *isNative = true;
     }
@@ -71,7 +71,13 @@ llvm::Function* LLVMCodeGen::getFunctionProtoByRef(FPod *curPod, FMethodRef *ref
     if ((ref->flags & FFlags::RefSetter) || (ref->flags & FFlags::RefOverload)) {
         mthName += std::to_string(ref->paramCount);
     }
-    FMethod *fmethod = ftype->c_methodMap[mthName];
+    
+    std::unordered_map<std::string, FMethod*>::iterator itr = ftype->c_methodMap.find(mthName);
+    if (itr == ftype->c_methodMap.end()) {
+        printf("ERROR: found not found: %s\n", mthName.c_str());
+        abort();
+    }
+    FMethod *fmethod = itr->second;
     
     return getFunctionProtoByDef(ctx, builder, fmethod, isNative);
 //

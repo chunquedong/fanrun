@@ -149,7 +149,7 @@ llvm::Type *LLVMGenCtx::toLlvmType(FPod *pod, int16_t type) {
     //std::string name = ftype->c_mangledName;
     
     LLVMStruct *sty = getStruct(pod, type);
-    FType *ftype = FCodeUtil::getFTypeFromTypeRef(pod, type);
+//    FType *ftype = FCodeUtil::getFTypeFromTypeRef(pod, type);
 //    if (ftype->meta.flags & FFlags::Mixin) {
 //        return sty->structTy;
 //    }

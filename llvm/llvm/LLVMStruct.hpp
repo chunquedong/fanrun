@@ -47,6 +47,8 @@ public:
     std::map<std::string, int> fieldIndex;
     //std::map<std::string, llvm::Function *> declMethods;
     
+    llvm::Function *initFunction;
+    
     LLVMStruct(LLVMGenCtx *ctx, IRType *irType, std::string &name);
     
 public:
@@ -60,7 +62,10 @@ public:
 public:
     void genClassInit();
 private:
+    void setArrayAt(llvm::Value *vtable, int pos, llvm::Value *val);
     void genVTableAt(llvm::Value *vtable, int base, IRVTable *irVTable);
+    
+    void genReflect(llvm::Value *env);
 };
 
 #endif /* LLVMStruct_hpp */

@@ -65,6 +65,7 @@ public:
     llvm::Type *objPtrType(FPod *curPod);
     
     LLVMStruct *getStructByName(FPod *curPod, const std::string &podName, const std::string &typeName);
+    
 private:
 };
 
