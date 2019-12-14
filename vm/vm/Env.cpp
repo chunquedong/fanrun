@@ -372,6 +372,9 @@ void Env::call(FMethod *method, int paramCount/*without self*/) {
     }
     else {
         bool isNative = (method->flags & FFlags::Native) || (method->c_parent->meta.flags & FFlags::Native);
+        if (!method->code.isEmpty()) {
+            isNative = false;
+        }
         if (isNative) {
             std::string &name = method->c_parent->c_pod->names[method->name];
             std::string &typeName = method->c_parent->c_name;

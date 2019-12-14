@@ -227,13 +227,48 @@ bool fr_isInstanceOf(fr_Env self, fr_Obj obj, fr_Type type) {
     return rc;
 }
 
-fr_Obj fr_toTypeObj(fr_Env self, fr_Type type) {
-    Env *e = (Env*)self;
-    //e->lock();
-    FObj *obj = e->podManager->getWrappedType(e, (FType *)type);
-    fr_Obj objRef = fr_toHandle(self, obj);
-    //e->unlock();
-    return objRef;
+//fr_Obj fr_toTypeObj(fr_Env self, fr_Type type) {
+//    Env *e = (Env*)self;
+//    //e->lock();
+//    FObj *obj = e->podManager->getWrappedType(e, (FType *)type);
+//    fr_Obj objRef = fr_toHandle(self, obj);
+//    //e->unlock();
+//    return objRef;
+//}
+
+////////////////////////////
+// Array
+////////////////////////////
+
+fr_Obj fr_arrayNew(fr_Env self, fr_Type type, size_t size) {
+    fr_Type arrayType = fr_findType(self, "sys", "Array");
+    size_t allocSize = sizeof(struct fr_Array)+(sizeof(fr_Value)*size);
+    struct fr_Array *a = (struct fr_Array*)fr_allocObj_internal(self, arrayType, (int)allocSize);
+    a->type = type;
+    a->size = size;
+    return fr_toHandle(self, (FObj*)a);
+}
+
+size_t fr_arrayLen(fr_Env self, fr_Obj array) {
+    struct fr_Array *a = (struct fr_Array*)fr_getPtr(self, array);
+    return a->size;
+}
+void fr_arrayGet(fr_Env self, fr_Obj array, size_t index, fr_Value *val) {
+    struct fr_Array *a = (struct fr_Array*)fr_getPtr(self, array);
+    if (index >= a->size) {
+        fr_throwNew(self, "sys", "IndexErr", "out index");
+        return;
+    }
+    val->h = fr_toHandle(self, a->data[index]);
+}
+void fr_arraySet(fr_Env self, fr_Obj array, size_t index, fr_Value *val) {
+    struct fr_Array *a = (struct fr_Array*)fr_getPtr(self, array);
+    if (index >= a->size) {
+        fr_throwNew(self, "sys", "IndexErr", "out index");
+        return;
+    }
+    
+    a->data[index] = fr_getPtr(self, val->h);
 }
 
 ////////////////////////////

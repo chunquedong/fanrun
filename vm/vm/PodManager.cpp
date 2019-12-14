@@ -272,7 +272,7 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
     type->c_allocStaticSize = staticSize;
     
     //get native alloc size
-    if (type->meta.flags & FFlags::Native) {
+    if (type->c_isExtern) {
         FPod *pod = type->c_pod;
         std::string name = pod->name +"_"+ type->c_name + "__allocSize__";
         int (*func)() = (int (*)())nativeFuncMap[name];
@@ -327,7 +327,7 @@ void PodManager::initTypeAllocSize(Env *env, FType *type) {
 
 bool PodManager::isNullableType(Env *env, FPod *curPod, uint16_t tid) {
     FTypeRef &typeRef = curPod->typeRefs[tid];
-    std::string &sig = typeRef.signature;
+    std::string &sig = typeRef.extName;
     if (sig.size() > 0 && sig[sig.size()-1] == '?') {
         return true;
     }
@@ -336,7 +336,7 @@ bool PodManager::isNullableType(Env *env, FPod *curPod, uint16_t tid) {
 
 bool PodManager::isPrimitiveType(Env *env, FPod *curPod, uint16_t tid) {
     FTypeRef &typeRef = curPod->typeRefs[tid];
-    std::string &sig = typeRef.signature;
+    std::string &sig = typeRef.extName;
     if (sig.size() > 0 && sig[sig.size()-1] == '?') {
         return false;
     }
@@ -354,6 +354,9 @@ bool PodManager::isPrimitiveType(Env *env, FPod *curPod, uint16_t tid) {
     else if (type == boolType) {
         return true;
     }
+    else if (type == ptrType) {
+        return true;
+    }
     else {
         return false;
     }
@@ -361,7 +364,7 @@ bool PodManager::isPrimitiveType(Env *env, FPod *curPod, uint16_t tid) {
 
 fr_ValueType PodManager::getValueType(Env *env, FPod *curPod, uint16_t tid) {
     FTypeRef &typeRef = curPod->typeRefs[tid];
-    std::string &sig = typeRef.signature;
+    std::string &sig = typeRef.extName;
     if (sig.size() > 0 && sig[sig.size()-1] == '?') {
         return fr_vtObj;
     }
@@ -378,6 +381,9 @@ fr_ValueType PodManager::getValueType(Env *env, FPod *curPod, uint16_t tid) {
     }
     else if (type == boolType) {
         return fr_vtBool;
+    }
+    else if (type == ptrType) {
+        return fr_vtPtr;
     }
     else {
         return fr_vtObj;
@@ -396,6 +402,9 @@ fr_ValueType PodManager::getValueTypeByType(Env *env, FType *type) {
     else if (type == boolType) {
         return fr_vtBool;
     }
+    else if (type == ptrType) {
+        return fr_vtPtr;
+    }
     else {
         return fr_vtObj;
     }
@@ -405,7 +414,7 @@ fr_ValueType PodManager::getExactValueType(FPod *curPod, uint16_t tid, bool &nul
     FTypeRef &typeRef = curPod->typeRefs[tid];
     std::string &podName = curPod->names[typeRef.podName];
     std::string &typeName = curPod->names[typeRef.typeName];
-    std::string &sig = typeRef.signature;
+    std::string &sig = typeRef.extName;
     
     if (isVoid) {
         *isVoid = false;
@@ -421,6 +430,9 @@ fr_ValueType PodManager::getExactValueType(FPod *curPod, uint16_t tid, bool &nul
         }
         else if (typeName == "Bool") {
             vtype = fr_vtBool;
+        }
+        else if (typeName == "Ptr") {
+            vtype = fr_vtPtr;
         }
         else if (typeName == "Void") {
             if (isVoid) {
@@ -451,6 +463,9 @@ FType *PodManager::getInstanceType(Env *env, fr_TagValue &val) {
             break;
         case fr_vtBool:
             type = boolType;
+            break;
+        case fr_vtPtr:
+            type = ptrType;
             break;
         case fr_vtObj:
             type = fr_getFType(env, val.any.o);
@@ -545,24 +560,26 @@ void PodManager::initSysType(Env *env) {
         intType = findType(env, "sys", "Int", false);
         floatType = findType(env, "sys", "Float", false);
         boolType = findType(env, "sys", "Bool", false);
+        ptrType = findType(env, "sys", "Ptr", false);
         voidType = findType(env, "sys", "Void", false);
-        typeType = findType(env, "sys", "Type", false);
+        //typeType = findType(env, "sys", "Type", false);
         npeType = findType(env, "sys", "NullErr", false);
         
         initTypeAllocSize(env, objType);
         initTypeAllocSize(env, intType);
         initTypeAllocSize(env, floatType);
         initTypeAllocSize(env, boolType);
+        initTypeAllocSize(env, ptrType);
         initTypeAllocSize(env, voidType);
-        initTypeAllocSize(env, typeType);
+        //initTypeAllocSize(env, typeType);
         initTypeAllocSize(env, npeType);
     }
 }
 
-FType *PodManager::getTypeType(Env *env) {
-    if (!intType) initSysType(env);
-    return typeType;
-}
+//FType *PodManager::getTypeType(Env *env) {
+//    if (!intType) initSysType(env);
+//    return typeType;
+//}
 FType *PodManager::getNpeType(Env *env) {
     if (!intType) initSysType(env);
     return npeType;
@@ -581,6 +598,9 @@ FType *PodManager::getSysType(Env *env, fr_ValueType vt) {
         case fr_vtBool:
             type = boolType;
             break;
+        case fr_vtPtr:
+            type = ptrType;
+            break;
         case fr_vtObj:
         default:
             type = objType;
@@ -589,13 +609,13 @@ FType *PodManager::getSysType(Env *env, fr_ValueType vt) {
     return type;
 }
 
-FObj * PodManager::getWrappedType(Env *env, FType *type) {
-    return objFactory.getWrappedType(env, type);
-}
-
-FType *PodManager::getFType(Env *env, FObj *otype) {
-    return objFactory.getFType(env, otype);
-}
+//FObj * PodManager::getWrappedType(Env *env, FType *type) {
+//    return objFactory.getWrappedType(env, type);
+//}
+//
+//FType *PodManager::getFType(Env *env, FObj *otype) {
+//    return objFactory.getFType(env, otype);
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 

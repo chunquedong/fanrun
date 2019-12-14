@@ -87,6 +87,7 @@ public:
     
     FTypeMeta meta;
     FPod *c_pod;
+    bool c_isExtern;
     
     //cache
     std::string c_name;

@@ -72,6 +72,12 @@ enum class FOp {
     CallSuper       =  56, // (method) call super method
     LoadFieldLiteral = 57, //  (FOpArg.FieldRef),   //  57
     LoadMethodLiteral = 58, // (FOpArg.MethodRef)   //  58
+    AddressOfVar      = 59, // (FOpArg.Register),   //  59
+    AddressOfInstance = 60, // (FOpArg.FieldRef),   //  60
+    AddressOfStatic   = 61, // (FOpArg.FieldRef),   //  61
+    SizeOf            = 62, // (FOpArg.TypeRef),    //  62
+    LoadFuncHandle    = 63, // (FOpArg.MethodRef),  //  63  load func handle and put func obj on stack
+    CallFunc          = 64, // (FOpArg.MethodRef)   //  64
 };
 
 extern const char* OpNames[];

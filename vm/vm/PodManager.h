@@ -25,10 +25,11 @@ class PodManager {
 private:
     FType *intType;
     FType *floatType;
+    FType *ptrType;
     FType *boolType;
     FType *objType;
     FType *voidType;
-    FType *typeType;
+    //FType *typeType;
     FType *npeType;
 public:
     ObjFactory objFactory;
@@ -66,11 +67,11 @@ public:
     FType *findType(Env *env, const std::string &pod, const std::string &type, bool initType = true);
     bool fitType(Env *env, FType *type, FPod *curPod, uint16_t tid);
     bool fitTypeByType(Env *env, FType *typeA, FType *typeB);
-    FObj * getWrappedType(Env *env, FType *type);
-    FType *getFType(Env *env, FObj *otype);
+//    FObj * getWrappedType(Env *env, FType *type);
+//    FType *getFType(Env *env, FObj *otype);
 public:
     FType *getSysType(Env *env, fr_ValueType vt);
-    FType *getTypeType(Env *env);
+    //FType *getTypeType(Env *env);
     FType *getNpeType(Env *env);
     bool isVoidType(Env *env, FType *type);
     bool isNullableType(Env *env, FPod *curPod, uint16_t tid);

@@ -221,6 +221,7 @@ fr_Obj sys_Int_toChar_f(fr_Env env, fr_Int self) {
 fr_Obj sys_Int_toCode_f(fr_Env env, fr_Int self, fr_Int base) {
     return 0;
 }
+fr_Float sys_Int_toFloat_f(fr_Env env, fr_Int self) { return self; }
 
 void sys_Int_make_f(fr_Env env, fr_Int self) {
     return;

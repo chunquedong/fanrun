@@ -284,12 +284,12 @@ bool Interpreter::exeStep() {
         }
         case FOp::LoadType: {
             FType *type = context->podManager->getType(context, frame()->curPod, i1);
-            FObj * wtype = context->podManager->getWrappedType(context, type);
+//          FObj * wtype = context->podManager->getWrappedType(context, type);
             //operandStack.pushObj(wtype);
             
             fr_TagValue entry;
-            entry.any.o = wtype;
-            entry.type = fr_vtObj;
+            entry.any.p = type;
+            entry.type = fr_vtOther;
             context->push(&entry);
             break;
         }

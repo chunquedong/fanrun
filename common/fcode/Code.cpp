@@ -70,6 +70,12 @@ FOpArg OpArgList[] =
     FOpArg::MethodRef,   //  56 CallSuper
     FOpArg::FieldRef,    //  57 LoadFieldLiteral
     FOpArg::MethodRef,   //  58 LoadMethodLiteral
+    FOpArg::Register,     // AddressOfVar  59
+    FOpArg::FieldRef,     // AddressOfInstance  60
+    FOpArg::FieldRef,     // AddressOfStatic    61
+    FOpArg::TypeRef,      // SizeOf             62
+    FOpArg::MethodRef,    // LoadFuncHandle     63  load func handle and put func obj on stack
+    FOpArg::MethodRef,    // CallFunc           64
 };
 
 const char* OpNames[] =
@@ -133,6 +139,12 @@ const char* OpNames[] =
     "CallSuper",          //  56
     "LoadFieldLiteral",   //  57
     "LoadMethodLiteral",  //  58
+    "AddressOfVar",       //  59
+    "AddressOfInstance",  //  60
+    "AddressOfStatic",    //  61
+    "SizeOf",             //  62
+    "LoadFuncHandle",     //  63  load func handle and put func obj on stack
+    "CallFunc",           //  64
 };
 
 

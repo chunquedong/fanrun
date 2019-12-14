@@ -11,18 +11,25 @@
 //#include "StackFrame.h"
 
 extern  "C"  {
-#if 0
-    void sys_register(fr_Fvm vm) {}
-    FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) { return 0; }
-    char *sys_Str_getUtf8(fr_Env env__, FObj * self__) { return 0; }
-    FObj * sys_Type_fromFType(fr_Env env__, FType * ftype) { return 0; }
-    FType * sys_Type_toFType(fr_Env env__, FObj*) { return 0; }
-#else
-    FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr);// { return 0; }
-    char *sys_Str_getUtf8(fr_Env env__, FObj * self__);// { return 0; }
-    FObj * sys_Type_fromFType(fr_Env env__, FType * ftype);// { return 0; }
-    FType * sys_Type_toFType(fr_Env env__, FObj*);
+#if 1
+    //void sys_register(fr_Fvm vm) {}
 #endif
+
+  FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) {
+      fr_Value args;
+      fr_Value ret;
+      args.p = (void*)cstr;
+      fr_callMethodS(env__, "sys", "Str", "fromCStr1", 1, &args, &ret);
+      return ret.o;
+  }
+  char *sys_Str_getUtf8(fr_Env env__, FObj * self__) {
+      fr_Value args;
+      fr_Value ret;
+      args.o = self__;
+      fr_callMethodS(env__, "sys", "Str", "toUtf8", 1, &args, &ret);
+      struct fr_Array *a = (struct fr_Array*)ret.o;
+      return (char*)a->data;
+  }
 }
 
 ObjFactory::ObjFactory()
@@ -215,15 +222,15 @@ const char *ObjFactory::getStrUtf8(Env *env, FObj *obj) {
     return sys_Str_getUtf8(env, obj);
 }
 
-FObj *ObjFactory::getWrappedType(Env *env, FType *type) {
-    if (!type->c_wrappedType) {
-        FObj *obj = sys_Type_fromFType(env, type);
-        fr_Obj objRef = env->newGlobalRef(obj);
-        type->c_wrappedType = (void*)objRef;
-    }
-    return fr_getPtr(env, (fr_Obj)type->c_wrappedType);
-}
-
-FType *ObjFactory::getFType(Env *env, FObj *otype) {
-    return sys_Type_toFType(env, otype);
-}
+//FObj *ObjFactory::getWrappedType(Env *env, FType *type) {
+//    if (!type->c_wrappedType) {
+//        FObj *obj = sys_Type_fromFType(env, type);
+//        fr_Obj objRef = env->newGlobalRef(obj);
+//        type->c_wrappedType = (void*)objRef;
+//    }
+//    return fr_getPtr(env, (fr_Obj)type->c_wrappedType);
+//}
+//
+//FType *ObjFactory::getFType(Env *env, FObj *otype) {
+//    return sys_Type_toFType(env, otype);
+//}

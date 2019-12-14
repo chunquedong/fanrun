@@ -33,9 +33,9 @@ public:
     
     FObj * newString(Env *env, const char *utf8);
     
-    FObj * getWrappedType(Env *env, FType *type);
-    
-    FType * getFType(Env *env, FObj *otype);
+//    FObj * getWrappedType(Env *env, FType *type);
+//
+//    FType * getFType(Env *env, FObj *otype);
     
     const char *getStrUtf8(Env *env, FObj *obj);
 };

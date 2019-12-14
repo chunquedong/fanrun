@@ -29,13 +29,12 @@ FObj *makeArgArray(Env *env, int start, int argc, const char * argv[]) {
     val.any.i = 2;
     env->push(&val);
     
-    val.type = fr_vtObj;
-    FType *strType = env->podManager->findType(env, "sys", "Str");
-    val.any.o = env->podManager->getWrappedType(env, strType);
-    env->push(&val);
+//    val.type = fr_vtObj;
+//    FType *strType = env->podManager->findType(env, "sys", "Str");
+//    val.any.o = env->podManager->getWrappedType(env, strType);
+//    env->push(&val);
     
-    
-    env->newObj(listType, listMake, 2);
+    env->newObj(listType, listMake, 1);
     
     FMethod *listAdd = env->podManager->findMethodInType(env, listType, "add", -1);
     fr_TagValue param;
@@ -52,7 +51,7 @@ FObj *makeArgArray(Env *env, int start, int argc, const char * argv[]) {
     return val.any.o;
 }
 
-//-p/Users/yangjiandong/workspace/code/fanCore/devEnv/ -d baseTest::BoxingTest#main
+//-p/Users/yangjiandong/workspace/code/fanx/env/ -d baseTest::BoxingTest.main
 int main(int argc, const char * argv[]) {
     char buf[256] = {0};
     const char *libPath = NULL;
@@ -116,7 +115,7 @@ int main(int argc, const char * argv[]) {
         *type = 0;
         type = type + 2;
     }
-    char *method = strstr(type, "#");
+    char *method = strstr(type, ".");
     if (method == NULL) {
         method = (char*)"main";
     } else {

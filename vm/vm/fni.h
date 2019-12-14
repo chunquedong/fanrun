@@ -25,6 +25,7 @@ typedef enum fr_ValueType_ {
     fr_vtFloat,
     fr_vtBool,
     fr_vtHandle,
+    fr_vtPtr,
 } fr_ValueType;
 
 /**
@@ -39,6 +40,7 @@ typedef struct GcObj_ FObj;
 typedef int64_t fr_Int;
 typedef double fr_Float;
 typedef bool fr_Bool;
+typedef void * fr_Ptr;
 
 /**
  * user client handle type
@@ -63,6 +65,7 @@ typedef union fr_Value_ {
     FObj *o;
     fr_Obj h;
     fr_Bool b;
+    void *p;
 } fr_Value;
 
 /**
@@ -160,7 +163,16 @@ fr_Type fr_getInstanceType(fr_Env self, fr_Value *obj, fr_ValueType vtype);
 fr_Type fr_getObjType(fr_Env self, fr_Obj obj);
 bool fr_isInstanceOf(fr_Env self, fr_Obj obj, fr_Type type);
 
-fr_Obj fr_toTypeObj(fr_Env self, fr_Type type);
+//fr_Obj fr_toTypeObj(fr_Env self, fr_Type type);
+
+////////////////////////////
+// Array
+////////////////////////////
+
+fr_Obj fr_arrayNew(fr_Env self, fr_Type type, size_t size);
+size_t fr_arrayLen(fr_Env self, fr_Obj array);
+void fr_arrayGet(fr_Env self, fr_Obj array, size_t index, fr_Value *val);
+void fr_arraySet(fr_Env self, fr_Obj array, size_t index, fr_Value *val);
 
 ////////////////////////////
 // Method

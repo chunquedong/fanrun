@@ -242,3 +242,5 @@ void sys_Float_static__init_f(fr_Env env) {
     return;
 }
 fr_Obj sys_Float_toLocale_f(fr_Env env, fr_Float selfj, fr_Obj pattern){ return 0; }
+
+fr_Int sys_Float_toInt_f(fr_Env env, fr_Float self) { return (fr_Int)self; }

@@ -30,6 +30,11 @@ static void getValueTypeName(fr_ValueType vtype, std::string &name, std::string 
             tagName = "b";
             typeName = "fr_vtBool";
             break;
+        case fr_vtPtr:
+            name = "fr_Ptr";
+            tagName = "p";
+            typeName = "fr_vtPtr";
+            break;
         default:
             name = "fr_Obj";
             tagName = "h";
@@ -137,7 +142,7 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
     //--------------------------------
     // gen struct
     if (printType == PrintType::pStruct
-        && (type->meta.flags & FFlags::Native)!=0) {
+        && (type->c_isExtern)) {
         std::string typeName = preName;
         escape(typeName);
         escapeKeyword(typeName);
@@ -161,7 +166,7 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
     
     //--------------------------------
     // gen allocSize
-    if ((type->meta.flags & FFlags::Native)!=0) {
+    if ((type->c_isExtern)) {
         std::string typeName = preName;
         escape(typeName);
         escapeKeyword(typeName);
@@ -187,8 +192,7 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
     }
     
     bool optimize = false;
-    if ((preName == "sys_Func_") || preName == "sys_ByteArray_"
-        || preName == "sys_ObjArray_") {
+    if ((preName == "sys_Func_")) {
         optimize = true;
     }
     
@@ -198,6 +202,12 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
         
         if ((type->meta.flags & FFlags::Native)==0
             && (method->flags & FFlags::Native)==0) {
+            continue;
+        }
+        if (!method->code.isEmpty()) {
+            continue;
+        }
+        if (method->flags & FFlags::Abstract) {
             continue;
         }
         
@@ -331,6 +341,8 @@ void NativeGen::genNativePod(std::string &path, FPod *pod, Printer *printer, Pri
         std::string &podName = pod->names[typeRef.podName];
         std::string &typeName = pod->names[typeRef.typeName];
         std::string preName = podName + "_" + typeName + "_";
+        
+        if (typeName == "Libc") continue;
         
         if (printType != PrintType::pImpeStub) {
             genNativeType(pod, type, preName, printer, printType);

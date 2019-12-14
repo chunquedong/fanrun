@@ -49,11 +49,11 @@ fr_Bool sys_Obj_isImmutable_f(fr_Env env, fr_Obj self) {
 fr_Obj sys_Obj_toImmutable_f(fr_Env env, fr_Obj self) {
     return 0;
 }
-fr_Obj sys_Obj_typeof_f(fr_Env env, fr_Obj self) {
-    fr_Type ftype = fr_getObjType(env, self);
-    fr_Obj obj = fr_toTypeObj(env, ftype);
-    return obj;
-}
+//fr_Obj sys_Obj_typeof_f(fr_Env env, fr_Obj self) {
+//    fr_Type ftype = fr_getObjType(env, self);
+//    fr_Obj obj = fr_toTypeObj(env, ftype);
+//    return obj;
+//}
 void sys_Obj_finalize_f(fr_Env env, fr_Obj self) {
     return;
 }
