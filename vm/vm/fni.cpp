@@ -240,35 +240,35 @@ bool fr_isInstanceOf(fr_Env self, fr_Obj obj, fr_Type type) {
 // Array
 ////////////////////////////
 
-fr_Obj fr_arrayNew(fr_Env self, fr_Type type, size_t size) {
-    fr_Type arrayType = fr_findType(self, "sys", "Array");
-    size_t allocSize = sizeof(struct fr_Array)+(sizeof(fr_Value)*size);
-    struct fr_Array *a = (struct fr_Array*)fr_allocObj_internal(self, arrayType, (int)allocSize);
-    a->type = type;
-    a->size = size;
+fr_Obj fr_arrayNew(fr_Env self, fr_Type type, size_t elemSize, size_t size) {
+    Env *env = (Env*)self;
+    fr_Array *a = env->arrayNew(fr_toFType(self, type), elemSize, size);
     return fr_toHandle(self, (FObj*)a);
 }
 
 size_t fr_arrayLen(fr_Env self, fr_Obj array) {
-    struct fr_Array *a = (struct fr_Array*)fr_getPtr(self, array);
+    fr_Array *a = (fr_Array*)fr_getPtr(self, array);
     return a->size;
 }
 void fr_arrayGet(fr_Env self, fr_Obj array, size_t index, fr_Value *val) {
-    struct fr_Array *a = (struct fr_Array*)fr_getPtr(self, array);
-    if (index >= a->size) {
-        fr_throwNew(self, "sys", "IndexErr", "out index");
-        return;
+    fr_Array *a = (fr_Array*)fr_getPtr(self, array);
+    Env *e = (Env*)self;
+    e->arrayGet(a, index, val);
+    
+    fr_ValueType vt = (fr_ValueType)a->valueType;
+    if (vt == fr_vtObj) {
+        val->h = fr_toHandle(self, val->o);
     }
-    val->h = fr_toHandle(self, a->data[index]);
 }
 void fr_arraySet(fr_Env self, fr_Obj array, size_t index, fr_Value *val) {
-    struct fr_Array *a = (struct fr_Array*)fr_getPtr(self, array);
-    if (index >= a->size) {
-        fr_throwNew(self, "sys", "IndexErr", "out index");
-        return;
-    }
+    fr_Array *a = (fr_Array*)fr_getPtr(self, array);
+    Env *e = (Env*)self;
     
-    a->data[index] = fr_getPtr(self, val->h);
+    fr_ValueType vt = (fr_ValueType)a->valueType;
+    if (vt == fr_vtObj) {
+        val->o = fr_getPtr(self, val->h);
+    }
+    e->arraySet(a, index, val);
 }
 
 ////////////////////////////

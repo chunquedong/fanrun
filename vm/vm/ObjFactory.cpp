@@ -16,18 +16,53 @@ extern  "C"  {
 #endif
 
   FObj * sys_Str_fromUtf8_(fr_Env env__, const char *cstr) {
-      fr_Value args;
-      fr_Value ret;
-      args.p = (void*)cstr;
-      fr_callMethodS(env__, "sys", "Str", "fromCStr1", 1, &args, &ret);
-      return ret.o;
+//      fr_Value args[2];
+//      fr_Value ret;
+//      args[0].p = (void*)cstr;
+//      args[1].i = strlen(cstr);
+//      fr_callMethodS(env__, "sys", "Str", "fromCStr", 2, args, &ret);
+//      return fr_getPtr(env__, ret.h);
+      
+      Env *e = (Env*)env__;
+      static FMethod *m = NULL;
+      if (!m) {
+          m = e->findMethod("sys", "Str", "fromCStr");
+      }
+      fr_TagValue args[2];
+      args[0].type = fr_vtPtr;
+      args[0].any.p = (void*)cstr;
+      args[1].type = fr_vtInt;
+      args[1].any.i = strlen(cstr);
+      e->push(&args[0]);
+      e->push(&args[1]);
+      e->call(m, 2);
+      
+      fr_TagValue ret;
+      e->pop(&ret);
+      return ret.any.o;
   }
   char *sys_Str_getUtf8(fr_Env env__, FObj * self__) {
-      fr_Value args;
-      fr_Value ret;
-      args.o = self__;
-      fr_callMethodS(env__, "sys", "Str", "toUtf8", 1, &args, &ret);
-      struct fr_Array *a = (struct fr_Array*)ret.o;
+//      fr_Value args;
+//      fr_Value ret;
+//      args.o = self__;
+//      fr_callMethodS(env__, "sys", "Str", "toUtf8", 1, &args, &ret);
+//      fr_Array *a = (fr_Array*)fr_getPtr(env__, ret.h);
+//      return (char*)a->data;
+      
+      Env *e = (Env*)env__;
+      static FMethod *m = NULL;
+      if (!m) {
+          m = e->findMethod("sys", "Str", "toUtf8");
+      }
+      fr_TagValue args[2];
+      args[0].type = fr_vtObj;
+      args[0].any.o = self__;
+      e->push(&args[0]);
+      e->call(m, 0);
+      
+      fr_TagValue ret;
+      e->pop(&ret);
+      fr_Array *a = (fr_Array*)ret.any.o;
       return (char*)a->data;
   }
 }

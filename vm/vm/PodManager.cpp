@@ -554,6 +554,54 @@ FType *PodManager::findType(Env *env, const std::string &podName, const std::str
     return type;
 }
 
+FType *PodManager::findElemType(Env *env, const std::string &extName, size_t *elemSize, fr_ValueType *valueType) {
+    FType *elemType = NULL;
+    if (extName == "sys::Int8") {
+        elemType = intType;
+        *elemSize = 1;
+        *valueType = fr_vtInt;
+    }
+    else if (extName == "sys::Int16") {
+        elemType = intType;
+        *elemSize = 2;
+        *valueType = fr_vtInt;
+    }
+    else if (extName == "sys::Int32") {
+        elemType = intType;
+        *elemSize = 4;
+        *valueType = fr_vtInt;
+    }
+    else if (extName == "sys::Int64" || extName == "sys::Int") {
+        elemType = intType;
+        *elemSize = 8;
+        *valueType = fr_vtInt;
+    }
+    else if (extName == "sys::Float32") {
+        elemType = floatType;
+        *elemSize = 4;
+        *valueType = fr_vtFloat;
+    }
+    else if (extName == "sys::Float64" || extName == "sys::Float") {
+        elemType = floatType;
+        *elemSize = 4;
+        *valueType = fr_vtFloat;
+    }
+    else if (extName == "sys::Bool") {
+        elemType = boolType;
+        *elemSize = 1;
+        *valueType = fr_vtBool;
+    }
+    else {
+        size_t pos = extName.find("::");
+        std::string pod = extName.substr(0, pos);
+        std::string type = extName.substr(pos+2);
+        elemType = findType(env, pod, type);
+        *valueType = fr_vtObj;
+        *elemSize = sizeof(void*);
+    }
+    return elemType;
+}
+
 void PodManager::initSysType(Env *env) {
     if (intType == nullptr) {
         objType = findType(env, "sys", "Obj", false);

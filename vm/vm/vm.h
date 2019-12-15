@@ -34,12 +34,14 @@ struct FType *fr_getFType(fr_Env self, FObj *obj);
 struct FType *fr_toFType(fr_Env self, fr_Type otype);
 const char *fr_getTypeName(fr_Env self, FObj *obj);
 
-struct fr_Array {
+typedef struct fr_Array_ {
     fr_ObjHeader super;
-    void *type;
+    struct FType *elemType;
+    int32_t valueType;
+    int32_t elemSize;
     fr_Int size;
     FObj* data[1];
-};
+} fr_Array;
 
 CF_END
 

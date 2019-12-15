@@ -308,6 +308,9 @@ void Env::call(FMethod *method, int paramCount/*without self*/) {
     //assert(curFrame->operandStack.size() >= paramCount);
     
     if (trace) {
+//        if (method->c_mangledName == "sys_Obj_echo") {
+//            printf("");
+//        }
         printf("before call:");
         printOperandStack();
         printf("\n");
@@ -610,3 +613,85 @@ void Env::clearError() {
     error = NULL;
 }
 
+fr_Array* Env::arrayNew(FType *elemType, size_t elemSize, size_t size) {
+    fr_Type arrayType = findType("sys", "Array");
+    
+    size_t allocSize = sizeof(fr_Array)+(elemSize*(size+1));
+    fr_Array *a = (fr_Array*)allocObj(arrayType, 2, (int)allocSize);
+    a->elemType = elemType;
+    a->elemSize = (int32_t)elemSize;
+    a->valueType = podManager->getValueTypeByType(this, elemType);
+    
+    a->size = size;
+    return a;
+}
+
+void Env::arrayGet(fr_Array *array, size_t index, fr_Value *val) {
+    if (index >= array->size) {
+        throwNew("sys", "IndexErr", "out index", 2);
+        return;
+    }
+    //val->h = fr_toHandle(self, a->data[index]);
+    
+    size_t elemSize = array->elemSize;
+    if (array->valueType == fr_vtInt) {
+        switch (elemSize) {
+            case 1: {
+                int8_t *t = (int8_t*)array->data;
+                val->i = t[index];
+                break;
+            }
+            case 2: {
+                int16_t *t = (int16_t*)array->data;
+                val->i = t[index];
+                //resVal.type = fr_vtInt;
+                break;
+            }
+            case 4: {
+                int32_t *t = (int32_t*)array->data;
+                val->i = *t;
+                //resVal.type = fr_vtInt;
+                break;
+            }
+            case 8: {
+                int64_t *t = (int64_t*)array->data;
+                val->i = *t;
+                //resVal.type = fr_vtInt;
+                break;
+            }
+        }
+    }
+}
+void Env::arraySet(fr_Array *array, size_t index, fr_Value *val) {
+    if (index >= array->size) {
+        throwNew("sys", "IndexErr", "out index", 2);
+        return;
+    }
+    //a->data[index] = fr_getPtr(self, val->h);
+    
+    size_t elemSize = array->elemSize;
+    if (array->valueType == fr_vtInt) {
+        switch (elemSize) {
+            case 1: {
+                int8_t *t = (int8_t*)array->data;
+                t[index] = val->i;
+                break;
+            }
+            case 2: {
+                int16_t *t = (int16_t*)array->data;
+                t[index] = val->i;
+                break;
+            }
+            case 4: {
+                int32_t *t = (int32_t*)array->data;
+                t[index] = (int32_t)val->i;
+                break;
+            }
+            case 8: {
+                int64_t *t = (int64_t*)array->data;
+                t[index] = val->i;
+                break;
+            }
+        }
+    }
+}

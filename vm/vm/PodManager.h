@@ -69,6 +69,7 @@ public:
     bool fitTypeByType(Env *env, FType *typeA, FType *typeB);
 //    FObj * getWrappedType(Env *env, FType *type);
 //    FType *getFType(Env *env, FObj *otype);
+    FType *findElemType(Env *env, const std::string &qname, size_t *elemSize, fr_ValueType *valueType);
 public:
     FType *getSysType(Env *env, fr_ValueType vt);
     //FType *getTypeType(Env *env);

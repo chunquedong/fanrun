@@ -776,7 +776,24 @@ void Interpreter::callNew(int16_t mid) {
     FMethod *method = nullptr;
     FMethodRef &methodRef = frame()->curPod->methodRefs[mid];
     int paramCount = methodRef.paramCount;
+    
     method = context->podManager->getMethod(context, frame()->curPod, methodRef);
+    
+    
+    if (method->c_parent->c_mangledName == "sys_Array") {
+        FTypeRef &typeRef = frame()->curPod->typeRefs[methodRef.parent];
+        std::string extName = typeRef.extName.substr(1, typeRef.extName.size()-2);
+        
+        FType *elemType = NULL;
+        size_t elemSize = sizeof(void*);
+        fr_ValueType valueType;
+        elemType = context->podManager->findElemType(context, extName, &elemSize, &valueType);
+        
+        fr_Array *a = context->arrayNew(elemType, elemSize, popInt());
+        pushObj((FObj*)a);
+        return;
+    }
+    
     FObj * obj = context->allocObj(method->c_parent, 1);
     
     fr_TagValue self;
@@ -805,5 +822,131 @@ void Interpreter::callMethod(int16_t mid, bool isVirtual) {
     } else {
         method = context->podManager->getMethod(context, frame()->curPod, methodRef);
     }
+    
+    
+    if (method->c_parent->c_mangledName == "sys_Array") {
+        
+        if (method->c_mangledName == "sys_Array_get") {
+            size_t index = popInt();
+            fr_TagValue entry;
+            context->pop(&entry);
+            fr_Array *array = (fr_Array*)entry.any.o;
+            fr_TagValue retVal;
+            context->arrayGet(array, index, &retVal.any);
+            retVal.type = (fr_ValueType)array->valueType;
+            context->push(&retVal);
+            return;
+        }
+        else if (method->c_mangledName == "sys_Array_set") {
+            fr_TagValue val;
+            context->pop(&val);
+            size_t index = popInt();
+            fr_TagValue entry;
+            context->pop(&entry);
+            fr_Array *array = (fr_Array*)entry.any.o;
+            context->arraySet(array, index, &val.any);
+            return;
+        }
+        else if (method->c_mangledName == "sys_Array_size") {
+            fr_TagValue entry;
+            context->pop(&entry);
+            fr_Array *array = (fr_Array*)entry.any.o;
+            fr_TagValue retVal;
+            retVal.type = fr_vtInt;
+            retVal.any.i = array->size;
+            context->push(&retVal);
+            return;
+        }
+    }
+    else if (method->c_parent->c_mangledName == "sys_Ptr") {
+        if (method->c_mangledName == "sys_Ptr_get") {
+            FTypeRef &typeRef = frame()->curPod->typeRefs[methodRef.parent];
+            std::string extName = typeRef.extName.substr(1, typeRef.extName.size()-2);
+            
+            FType *elemType = NULL;
+            size_t elemSize = sizeof(void*);
+            fr_ValueType valueType;
+            elemType = context->podManager->findElemType(context, extName, &elemSize, &valueType);
+            
+            size_t index = popInt();
+            fr_TagValue entry;
+            context->pop(&entry);
+            
+            fr_TagValue resVal;
+            if (valueType == fr_vtInt) {
+                switch (elemSize) {
+                    case 1: {
+                        int8_t *t = (int8_t*)entry.any.p;
+                        resVal.any.i = t[index];
+                        resVal.type = fr_vtInt;
+                        break;
+                    }
+                    case 2: {
+                        int16_t *t = (int16_t*)entry.any.p;
+                        resVal.any.i = t[index];
+                        resVal.type = fr_vtInt;
+                        break;
+                    }
+                    case 4: {
+                        int32_t *t = (int32_t*)entry.any.p;
+                        resVal.any.i = *t;
+                        resVal.type = fr_vtInt;
+                        break;
+                    }
+                    case 8: {
+                        int64_t *t = (int64_t*)entry.any.p;
+                        resVal.any.i = *t;
+                        resVal.type = fr_vtInt;
+                        break;
+                    }
+                }
+            }
+            context->push(&resVal);
+            return;
+        }
+        else if (method->c_mangledName == "sys_Ptr_set") {
+            FTypeRef &typeRef = frame()->curPod->typeRefs[methodRef.parent];
+            std::string extName = typeRef.extName.substr(1, typeRef.extName.size()-2);
+            
+            FType *elemType = NULL;
+            size_t elemSize = sizeof(void*);
+            fr_ValueType valueType;
+            elemType = context->podManager->findElemType(context, extName, &elemSize, &valueType);
+            
+            fr_TagValue val;
+            context->pop(&val);
+            
+            size_t index = popInt();
+            fr_TagValue entry;
+            context->pop(&entry);
+            
+            if (valueType == fr_vtInt) {
+                switch (elemSize) {
+                    case 1: {
+                        int8_t *t = (int8_t*)entry.any.p;
+                        t[index] = val.any.i;
+                        break;
+                    }
+                    case 2: {
+                        int16_t *t = (int16_t*)entry.any.p;
+                        t[index] = val.any.i;
+                        break;
+                    }
+                    case 4: {
+                        int32_t *t = (int32_t*)entry.any.p;
+                        t[index] = (int32_t)val.any.i;
+                        break;
+                    }
+                    case 8: {
+                        int64_t *t = (int64_t*)entry.any.p;
+                        t[index] = val.any.i;
+                        break;
+                    }
+                }
+            }
+            return;
+        }
+    }
+    
     context->call(method, paramCount);
 }

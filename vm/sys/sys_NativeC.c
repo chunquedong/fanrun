@@ -12,13 +12,13 @@ fr_Obj sys_NativeC_typeName_f(fr_Env env, fr_Obj self) {
     return fr_newStrUtf8(env, name);
 }
 void sys_NativeC_print_f(fr_Env env, fr_Obj utf8) {
-    struct sys_Array_ *a;
-    a = (struct sys_Array_ *)fr_getPtr(env, utf8);
+    fr_Array *a;
+    a = (fr_Array *)fr_getPtr(env, utf8);
     puts((const char*)a->data);
 }
 void sys_NativeC_printErr_f(fr_Env env, fr_Obj utf8) {
-    struct sys_Array_ *a;
-    a = (struct sys_Array_ *)fr_getPtr(env, utf8);
+    fr_Array *a;
+    a = (fr_Array *)fr_getPtr(env, utf8);
     fprintf( stderr, "%s\n", (const char*)a->data);
 }
 fr_Obj sys_NativeC_stackTrace_f(fr_Env env) {

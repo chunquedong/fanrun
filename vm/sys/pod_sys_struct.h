@@ -26,10 +26,7 @@ struct sys_Int_{
 };
 
 struct sys_Array_{
-    struct sys_Obj_ super;
-    void *type;
-    fr_Int size;
-    FObj* data[0];
+    fr_Array data;
 };
 
 struct sys_Func_{
