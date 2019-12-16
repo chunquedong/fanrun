@@ -8,14 +8,23 @@
 #include "PodLoader.h"
 #include "PodGen.hpp"
 
+// /Users/yangjiandong/workspace/code/fanx/env/ baseTest /Users/yangjiandong/workspace/code/fanrun/gen/temp/
 int main(int argc, const char * argv[]) {
-    
-    std::string libPath = "/Users/yangjiandong/workspace/code/fanCore/devEnv";
-    std::string pod = "baseTest";
-    std::string outPath = "/Users/yangjiandong/workspace/code/fanrun/gen/temp/";
+    std::string libPath;
+    std::string pod;
+    std::string outPath;
+    if (argc == 4) {
+        libPath = argv[1];
+        pod = argv[2];
+        outPath = argv[3];
+    }
+    else {
+        printf("Usage: <envPath> <podName> <outputPath>");
+        return -1;
+    }
   
     PodLoader podMgr;
-    libPath += "/lib/fan/";
+    libPath += "lib/fan/";
     podMgr.load(libPath, pod);
     
     PodGen gen(&podMgr, "sys");

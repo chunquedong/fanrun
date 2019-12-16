@@ -78,7 +78,7 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
             TypeInfo &defVarTypeName = blocks[0]->locals[irMethod.paramCount].type;
             storeStmt->src = asType(b, b->pop(), defVarTypeName);
             storeStmt->dst.index = irMethod.paramCount;
-            storeStmt->dst.block = blocks[0];
+            storeStmt->dst.block = methodVars;
             b->stmts.push_back(storeStmt);
             
             //-----------------------------------
@@ -103,7 +103,7 @@ bool MBuilder::buildDefParam(FMethod *method, int paramNum, bool isVal) {
             for (int i=0; i<irMethod.paramCount+1; ++i) {
                 Expr expr;
                 expr.index = i;
-                expr.block = blocks[0];
+                expr.block = methodVars;
                 stmt->params.push_back(expr);
             }
             
@@ -533,7 +533,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::LoadVar: {
                 Expr var;
                 var.index = opObj.i1;
-                var.block = blocks[0];
+                var.block = methodVars;
                 block->push(var);
                 break;
             }
@@ -541,7 +541,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 StoreStmt *stmt = new StoreStmt();
                 stmt->curPod = curPod;
                 stmt->dst.index = opObj.i1;
-                stmt->dst.block = blocks[0];
+                stmt->dst.block = methodVars;
                 
                 stmt->src = asType(block, block->pop(), stmt->dst.getType());
                 block->stmts.push_back(stmt);

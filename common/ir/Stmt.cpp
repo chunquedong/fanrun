@@ -170,12 +170,12 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
 }
 
 std::string &Expr::getName() {
-    Var &var = block->locals[index];
+    Var &var = block->locals.at(index);
     return var.name;
 }
 
 TypeInfo &Expr::getType() {
-    Var &var = block->locals[index];
+    Var &var = block->locals.at(index);
     return var.type;
 }
 

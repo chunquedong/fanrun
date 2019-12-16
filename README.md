@@ -2,15 +2,12 @@
 
 # fanrun
 
-gen
----
+### gen
 A translator from fcode to C
 
-vm
----
+### vm
 The interpreter/JIT VM
 
-llvm
----
+### llvm
 LLVM compiler
 
