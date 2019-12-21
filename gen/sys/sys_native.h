@@ -16,88 +16,42 @@ extern  "C" {
 #endif
     
 struct sys_Obj_struct {
-    struct GcObj_ header;
 };
 
 struct sys_Int_struct {
-    struct sys_Obj_struct super__;
     int64_t _val;
 };
 struct sys_Float_struct {
-    struct sys_Obj_struct super__;
     double _val;
 };
 struct sys_Bool_struct {
-    struct sys_Obj_struct super__;
     bool _val;
 };
 
-
-struct sys_Err_struct {
-    struct sys_Obj_struct super__;
-    sys_Str msg;
-    sys_Err_null cause;
-    sys_Str traceToStr;
+struct sys_Array_struct {
+    fr_Type elemType;
+    int32_t valueType;
+    int32_t elemSize;
+    int64_t size;
+    fr_Obj data[1];
 };
 
-struct sys_Num_struct {
-    struct sys_Obj_struct super__;
-};
-
-struct sys_Str_struct {
-    struct sys_Obj_struct super__;
-    const wchar_t *data;
-    size_t size;
-    
-    size_t hashCode;
-    const char *utf8;
-};
-
-struct sys_StrBuf_struct {
-    struct sys_Obj_struct super__;
-    sys_Int capacity;
-    wchar_t *data;
-    sys_Int size;
-};
-
-struct sys_ByteArray_struct {
-    struct sys_Obj_struct super__;
-    sys_Int size;
-    char *data;
-};
-/*
-struct sys_IntArray_struct {
-    struct sys_Obj_struct super__;
-    sys_Int size;
-    sys_Int *data;
-};
-
-struct sys_FloatArray_struct {
-    sys_Int size;
-    sys_Float *data;
-};
-*/
-struct sys_ObjArray_struct {
-    struct sys_Obj_struct super__;
-    sys_Int size;
-    fr_Obj *data;
-};
-/*
-struct sys_BoolArray_struct {
-};
-*/
 struct sys_Func_struct {
-    struct sys_Obj_struct super__;
+};
+    
+struct sys_Ptr_struct {
+    void *_val;
 };
 
-struct sys_Type_struct {
-    struct sys_Obj_struct super__;
-    fr_Type rawClass;
-};
-
-struct sys_Void_struct {
-    struct sys_Obj_struct super__;
-};
+fr_Err sys_Func_call8(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e, sys_Obj_null f, sys_Obj_null g, sys_Obj_null h);
+fr_Err sys_Func_call7(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e, sys_Obj_null f, sys_Obj_null g);
+fr_Err sys_Func_call6(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e, sys_Obj_null f);
+fr_Err sys_Func_call5(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d, sys_Obj_null e);
+fr_Err sys_Func_call4(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c, sys_Obj_null d);
+fr_Err sys_Func_call3(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b, sys_Obj_null c);
+fr_Err sys_Func_call2(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a, sys_Obj_null b);
+fr_Err sys_Func_call1(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sys_Obj_null a);
+fr_Err sys_Func_call0(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self);
 
 #ifdef  __cplusplus
 } //end "C"

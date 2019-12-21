@@ -31,6 +31,7 @@ void TypeInfo::setFromTypeRef(FPod *curPod, uint16_t typeRefId) {
     FTypeRef &typeRef = curPod->typeRefs[typeRefId];
     pod = curPod->names[typeRef.podName];
     name = curPod->names[typeRef.typeName];
+    extName = typeRef.extName;
     
     std::string::size_type pos = name.find("^");
     if (pos != std::string::npos) {
@@ -116,7 +117,7 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
         }
         case FOp::LoadStr: {
             std::string str = curPod->constantas.strings[opObj.i1];
-            size_t len = utf8len(str.c_str(), str.size());
+            size_t len = str.size();//utf8len(str.c_str(), str.size());
             long pos = 0;
             while (pos < str.length()) {
                 if (str[pos] == '"') {
@@ -127,7 +128,7 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             }
 
             printer.println("(sys_Str)(%s_ConstPoolStrs[%d]);", curPod->name.c_str(), opObj.i1);
-            printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStr(__env, L\"%s\", %d, false);"
+            printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStrUtf8(__env, \"%s\", %d);"
                            , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
             printer.printf("%s = (sys_Str)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
             break;
@@ -140,7 +141,7 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
         }
         case FOp::LoadUri: {
             std::string str = curPod->constantas.strings[opObj.i1];
-            size_t len = utf8len(str.c_str(), str.size());
+            size_t len = str.size();//utf8len(str.c_str(), str.size());
             long pos = 0;
             while (pos < str.length()) {
                 if (str[pos] == '"') {
@@ -151,7 +152,7 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             }
             
             printer.println("(std_Uri)(%s_ConstPoolUris[%d]);", curPod->name.c_str(), opObj.i1);
-            printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d, false));"
+            printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d));"
                            , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
             printer.printf("%s = (std_Uri)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
             break;
@@ -169,9 +170,13 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
     }
 }
 
-std::string &Expr::getName() {
+std::string Expr::getName(bool deRef) {
     Var &var = block->locals.at(index);
-    return var.name;
+    std::string vname = var.name;
+    if (deRef && var.isArg && var.type.isValue && !var.type.isBuildin && !var.type.isNullable) {
+        vname = "(*" +vname+ ")";
+    }
+    return vname;
 }
 
 TypeInfo &Expr::getType() {
@@ -266,43 +271,123 @@ void StoreStmt::print(Printer& printer) {
 }
 
 void CallStmt::print(Printer& printer) {
-    if (!isVoid) {
-        printer.printf("%s = (%s)", retValue.getName().c_str(), retValue.getTypeName().c_str());
+    if (!isStatic && !params.at(0).isValueType()) {
+        printer.printf("FR_CHECK_NULL(%s);", params.at(0).getName().c_str());
     }
     
-    bool isValueType = false;
-    if (!isStatic && params.at(0).isValueType()) {
-        isValueType = true;
-        printer.printf("%s_%s_val(__env", typeName.c_str(), mthName.c_str());
+    if (typeName == "sys_Array") {
+        if (mthName == "get") {
+            printer.printf("%s = ((%s*)(%s->data))[%s];", retValue.getName().c_str(), extName.c_str(),
+                           params[0].getName().c_str(), params[1].getName().c_str());
+            return;
+        }
+        else if (mthName == "set") {
+            printer.printf("((%s*)(%s->data))[%s] = %s;", extName.c_str(),
+                           params[0].getName().c_str(), params[1].getName().c_str(), params[2].getName().c_str());
+            return;
+        }
+        else if (mthName == "make") {
+            //printer.printf("");
+        }
     }
-    else if (isVirtual) {
-        printer.printf("FR_VCALL(%s, %s", typeName.c_str(), mthName.c_str());
+    else if (typeName == "sys_Ptr") {
+        if (mthName == "get") {
+            printer.printf("%s = ((%s*)(%s))[%s];", retValue.getName().c_str(), extName.c_str(),
+                           params[0].getName().c_str(), params[1].getName().c_str());
+            return;
+        }
+        else if (mthName == "set") {
+            printer.printf("((%s*)(%s))[%s] = %s;", extName.c_str(),
+                           params[0].getName().c_str(), params[1].getName().c_str(), params[2].getName().c_str());
+            return;
+        }
+        else if (mthName == "make") {
+            //printer.printf("");
+        }
     }
-    else if (isMixin) {
-        printer.printf("FR_ICALL(%s, %s", typeName.c_str(), mthName.c_str());
-    }
-    else if (isStatic) {
-        printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
+    
+    bool isFirstArg = false;
+    bool isExternC = false;
+    if (isStatic && typeName == "sys_Libc") {
+        isFirstArg = true;
+        isExternC = true;
+        if (!isVoid) printer.printf("%s = ", retValue.getName().c_str());
+        printer.printf("%s(", mthName.c_str());
     }
     else {
-        printer.printf("%s_%s(__env", typeName.c_str(), mthName.c_str());
+        std::string voidFlag;
+        if (isVoid) {
+            voidFlag = "_VOID";
+        }
+
+        bool isValueType = false;
+        if (!isStatic && params.at(0).isValueType()) {
+            isValueType = true;
+            printer.printf("FR%s_CALL(%s, %s_val", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+        }
+        else if (isVirtual) {
+            printer.printf("FR%s_VCALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+        }
+        else if (isMixin) {
+            printer.printf("FR%s_ICALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+        }
+        else if (isStatic) {
+            printer.printf("FR%s_SCALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+        }
+        else {
+            printer.printf("FR%s_CALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+        }
+        
+        if (!isVoid) {
+            printer.printf(",(%s*)(&%s)", retValue.getTypeName().c_str(), retValue.getName().c_str());
+        }
     }
     
     for (int i=0; i<params.size(); ++i) {
+        if (!isFirstArg || i>0) printer.printf(", ");
+        TypeInfo &typeInfo = params[i].getType();
+        if (typeInfo.isValue && !typeInfo.isBuildin && !typeInfo.isNullable) {
+            printer.printf("(%s_pass)&%s"
+                           , typeInfo.getName().c_str(), params[i].getName(true).c_str());
+            continue;
+        }
         if (!isStatic && i == 0) {
-            printer.printf(", (%s)%s"
-                           , typeName.c_str(), params[i].getName().c_str());
-        } else {
-            printer.printf(", %s", params[i].getName().c_str());
+            printer.printf("(%s)%s"
+                           , typeName.c_str(), params[i].getName(true).c_str());
+        }
+        else if (isExternC && params[i].getTypeName() == "sys_Ptr") {
+            std::string extName = params[i].getType().extName;
+            extName = extName.substr(1, extName.size()-2);
+            if (extName[extName.size()-1] == '?') {
+                extName.resize(extName.size()-1);
+            }
+            int pos = (int)extName.find("::");
+            if (pos>0) {
+                extName = extName.replace(pos, 2, "_");
+            }
+            if (extName == "sys_Int8") {
+                extName = "char";
+            }
+            printer.printf("(%s*)%s", extName.c_str(), params[i].getName(true).c_str());
+        }
+        else {
+            printer.printf("%s", params[i].getName(true).c_str());
         }
     }
     printer.printf(");");
 }
 
 void FieldStmt::print(Printer& printer) {
-    std::string typeName = FCodeUtil::getTypeRefName(curPod, fieldRef->parent, false);
+    std::string parentName = FCodeUtil::getTypeRefName(curPod, fieldRef->parent, false);
     std::string name = FCodeUtil::getIdentifierName(curPod, fieldRef->name);
-    bool isValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->parent);
+    bool parentValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->parent);
+    bool isValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->type);
+    std::string typeName = FCodeUtil::getTypeRefName(curPod, fieldRef->type, false);
+    bool isBuildinType = FCodeUtil::isBuildinVal(typeName);
+    
+    if (!isStatic && !parentValueType) {
+        printer.printf("FR_CHECK_NULL(%s);", instance.getName().c_str());
+    }
     if (isLoad) {
         //lazy init class
         if (isStatic) {
@@ -311,31 +396,60 @@ void FieldStmt::print(Printer& printer) {
             FType *ftype = curPod->c_typeMap[purName];
             auto itr = ftype->c_methodMap.find("static$init");
             if (itr != ftype->c_methodMap.end()) {
-                printer.println("FR_STATIC_INIT(%s);", typeName.c_str());
+                printer.println("FR_STATIC_INIT(%s);", parentName.c_str());
             }
         }
         
-        printer.printf("%s = ", value.getName().c_str());
-        if (isStatic) {
-            printer.printf("%s_%s", typeName.c_str(), name.c_str());
-        }
-        else if (isValueType) {
-            printer.printf("%s.%s", instance.getName().c_str(), name.c_str());
+        if (isValueType && !isBuildinType) {
+            if (isStatic) {
+                printer.printf("memcpy(&%s, &(%s_%s), sizeof(%s))", value.getName().c_str(), parentName.c_str(), name.c_str(), typeName.c_str());
+            }
+            else if (parentValueType) {
+                printer.printf("memcpy(&%s, &(%s.%s), sizeof(%s))", value.getName().c_str(), instance.getName(true).c_str(), name.c_str(), typeName.c_str());
+            }
+            else {
+                printer.printf("memcpy(&%s, &(%s->%s), sizeof(%s))", value.getName().c_str(), instance.getName(true).c_str(), name.c_str(), typeName.c_str());
+            }
         }
         else {
-            printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
+            printer.printf("%s = ", value.getName().c_str());
+            if (isStatic) {
+                printer.printf("%s_%s", parentName.c_str(), name.c_str());
+            }
+            else if (parentValueType) {
+                printer.printf("%s.%s", instance.getName(true).c_str(), name.c_str());
+            }
+            else {
+                printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
+            }
         }
     } else {
-        if (isStatic) {
-            printer.printf("%s_%s", typeName.c_str(), name.c_str());
+        if (name == "r__0") {
+            printf("");
         }
-        else if (isValueType) {
-            printer.printf("%s.%s", instance.getName().c_str(), name.c_str());
+        if (isValueType && !isBuildinType) {
+            if (isStatic) {
+                printer.printf("memcpy(&(%s_%s), &%s, sizeof(%s))", parentName.c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
+            }
+            else if (parentValueType) {
+                printer.printf("memcpy(&(%s.%s), &%s, sizeof(%s))", instance.getName(true).c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
+            }
+            else {
+                printer.printf("memcpy(&(%s->%s), &%s, sizeof(%s))", instance.getName(true).c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
+            }
         }
         else {
-            printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
+            if (isStatic) {
+                printer.printf("%s_%s", parentName.c_str(), name.c_str());
+            }
+            else if (parentValueType) {
+                printer.printf("%s.%s", instance.getName(true).c_str(), name.c_str());
+            }
+            else {
+                printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
+            }
+            printer.printf("= %s", value.getName().c_str());
         }
-        printer.printf("= %s", value.getName().c_str());
     }
     
     printer.printf(";");
@@ -479,7 +593,7 @@ void CompareStmt::print(Printer& printer) {
     }
     else {
         if (!isVal1) {
-            printer.printf("if (%s == NULL) fr_throwNPE(__env);", param1.getName().c_str());
+            printer.printf("if (%s == NULL) FR_THROW_NPE();", param1.getName().c_str());
             printer.printf("if (!FR_TYPE_IS(%s, %s) )"
                            , param1.getName().c_str(), param2.getTypeName().c_str());
             if (opObj.opcode == FOp::Compare) {
@@ -499,7 +613,7 @@ void CompareStmt::print(Printer& printer) {
             }
         }
         else if (!isVal2) {
-            printer.printf("if (%s == NULL) fr_throwNPE(__env);", param2.getName().c_str());
+            printer.printf("if (%s == NULL) FR_THROW_NPE();", param2.getName().c_str());
             printer.printf("if (!FR_TYPE_IS(%s, %s) )"
                            , param2.getName().c_str(), param1.getTypeName().c_str());
             if (opObj.opcode == FOp::Compare) {
@@ -524,55 +638,60 @@ void CompareStmt::print(Printer& printer) {
     if (cmpType == -1) {
         switch (opObj.opcode) {
             case FOp::Compare: {
-                printer.printf("%s = FR_VCALL(sys_Obj, compare1, (sys_Obj)%s, (sys_Obj)%s);"
+                printer.printf("FR_VCALL(sys_Obj, compare, &%s, (sys_Obj)%s, (sys_Obj)%s);"
                                 , result.getName().c_str()
                                 , param1.getName().c_str(), param2.getName().c_str());
                 break;
             }
             case FOp::CompareEQ: {
-                printer.printf("%s = FR_VCALL(sys_Obj, equals1, (sys_Obj)%s, (sys_Obj)%s);"
+                printer.printf("FR_VCALL(sys_Obj, equals, &%s, (sys_Obj)%s, (sys_Obj)%s);"
                                , result.getName().c_str()
                                , param1.getName().c_str(), param2.getName().c_str());
                 break;
             }
             case FOp::CompareNE: {
-                printer.printf("%s = !FR_VCALL(sys_Obj, equals1, (sys_Obj)%s, (sys_Obj)%s);"
+                printer.printf("FR_VCALL(sys_Obj, equals, &%s, (sys_Obj)%s, (sys_Obj)%s); %s = !%s;"
                                , result.getName().c_str()
-                               , param1.getName().c_str(), param2.getName().c_str());
+                               , param1.getName().c_str(), param2.getName().c_str()
+                               , result.getName().c_str(), result.getName().c_str());
                 break;
             }
             case FOp::CompareLT: {
-                printer.printf("%s = FR_VCALL(sys_Obj, compare1, (sys_Obj)%s, (sys_Obj)%s) < 0;"
-                               , result.getName().c_str()
-                               , param1.getName().c_str(), param2.getName().c_str());
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res < 0; }"
+                               //, result.getName().c_str()
+                               , param1.getName().c_str(), param2.getName().c_str()
+                               , result.getName().c_str());
                 break;
             }
             case FOp::CompareLE: {
-                printer.printf("%s = FR_VCALL(sys_Obj, compare1, (sys_Obj)%s, (sys_Obj)%s) <= 0;"
-                               , result.getName().c_str()
-                               , param1.getName().c_str(), param2.getName().c_str());
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res <= 0; }"
+                               //, result.getName().c_str()
+                               , param1.getName().c_str(), param2.getName().c_str()
+                               , result.getName().c_str());
                 break;
             }
             case FOp::CompareGE: {
-                printer.printf("%s = FR_VCALL(sys_Obj, compare1, (sys_Obj)%s, (sys_Obj)%s) >= 0;"
-                               , result.getName().c_str()
-                               , param1.getName().c_str(), param2.getName().c_str());
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res >= 0; }"
+                               //, result.getName().c_str()
+                               , param1.getName().c_str(), param2.getName().c_str()
+                               , result.getName().c_str());
                 break;
             }
             case FOp::CompareGT: {
-                printer.printf("%s = FR_VCALL(sys_Obj, compare1, (sys_Obj)%s, (sys_Obj)%s) > 0;"
-                               , result.getName().c_str()
-                               , param1.getName().c_str(), param2.getName().c_str());
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res > 0; }"
+                               //, result.getName().c_str()
+                               , param1.getName().c_str(), param2.getName().c_str()
+                               , result.getName().c_str());
                 break;
             }
             case FOp::CompareSame: {
-                printer.printf("%s = FR_VCALL(sys_Obj, compare1, (sys_Obj)%s, (sys_Obj)%s) == 0;"
+                printer.printf("%s = (sys_Obj)%s == (sys_Obj)%s;"
                                , result.getName().c_str()
                                , param1.getName().c_str(), param2.getName().c_str());
                 break;
             }
             case FOp::CompareNotSame: {
-                printer.printf("%s = (sys_Obj)%s == (sys_Obj)%s;"
+                printer.printf("%s = (sys_Obj)%s != (sys_Obj)%s;"
                                , result.getName().c_str()
                                , param1.getName().c_str(), param2.getName().c_str());
                 break;
@@ -585,9 +704,9 @@ void CompareStmt::print(Printer& printer) {
 
 void ReturnStmt::print(Printer& printer) {
     if (isVoid) {
-        printer.printf("return;");
+        printer.printf("return NULL;");
     } else {
-        printer.printf("return %s;", retValue.getName().c_str());
+        printer.printf("*__ret = %s; return NULL;", retValue.getName().c_str());
     }
 }
 
@@ -676,7 +795,7 @@ void CoerceStmt::print(Printer& printer) {
     
     if (!isVal1 && !isVal2) {
         if (isNull1 && !isNull2) {
-            printer.printf("%s = FR_NOT_NULL(%s, %s);", to.getName().c_str()
+            printer.printf("FR_NOT_NULL(%s, %s, %s);", to.getName().c_str()
                            , from.getName().c_str(), typeName2.c_str());
             return;
         }
@@ -687,7 +806,7 @@ void CoerceStmt::print(Printer& printer) {
                            , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
         } else {
             printer.printf("%s = FR_UNBOXING(%s, %s);"
-                       , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
+                       , to.getName().c_str(), from.getName(true).c_str(), typeName2.c_str());
         }
         return;
     }
@@ -706,7 +825,7 @@ void CoerceStmt::print(Printer& printer) {
         }
         else {
             printer.printf("FR_BOXING(%s, %s, %s, %s);"
-                           , to.getName().c_str(), from.getName().c_str()
+                           , to.getName().c_str(), from.getName(true).c_str()
                            , typeName1.c_str(), typeName2.c_str());
         }
         return;
@@ -720,7 +839,7 @@ void CoerceStmt::print(Printer& printer) {
         std::string toTypeName = FCodeUtil::getTypeRefName(curPod, toType, false);
         
         if (checked) {
-            printer.printf("%s = FR_CAST(%s, %s, %s);", to.getName().c_str()
+            printer.printf("FR_CAST(%s, %s, %s, %s);", to.getName().c_str()
                        , from.getName().c_str() , toTypeName.c_str(), typeName2.c_str());
         } else {
             printer.printf("%s = FR_TYPE_AS(%s, %s);", to.getName().c_str()

@@ -48,6 +48,7 @@
 		327A0D8922194B17001A6EF0 /* inffast.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0D7322194B17001A6EF0 /* inffast.c */; };
 		327A0D8A22194B17001A6EF0 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0D7422194B17001A6EF0 /* adler32.c */; };
 		3291F9941F6D5F4F00F12438 /* MethodGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9921F6D5F4F00F12438 /* MethodGen.cpp */; };
+		329A856423AE2205004A82CE /* IRType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 329A856223AE2204004A82CE /* IRType.cpp */; };
 		32CE89F11F6560200029A071 /* TypeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32CE89EF1F6560200029A071 /* TypeGen.cpp */; };
 /* End PBXBuildFile section */
 
@@ -154,6 +155,8 @@
 		327A0D7522194B17001A6EF0 /* zconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zconf.h; sourceTree = "<group>"; };
 		3291F9921F6D5F4F00F12438 /* MethodGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MethodGen.cpp; sourceTree = "<group>"; };
 		3291F9931F6D5F4F00F12438 /* MethodGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MethodGen.h; sourceTree = "<group>"; };
+		329A856223AE2204004A82CE /* IRType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IRType.cpp; sourceTree = "<group>"; };
+		329A856323AE2205004A82CE /* IRType.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = IRType.hpp; sourceTree = "<group>"; };
 		32CE89EF1F6560200029A071 /* TypeGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TypeGen.cpp; sourceTree = "<group>"; };
 		32CE89F01F6560200029A071 /* TypeGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypeGen.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -230,6 +233,8 @@
 		327A0D1C22194ACC001A6EF0 /* ir */ = {
 			isa = PBXGroup;
 			children = (
+				329A856223AE2204004A82CE /* IRType.cpp */,
+				329A856323AE2205004A82CE /* IRType.hpp */,
 				327A0D1D22194ACC001A6EF0 /* FCodeUtil.hpp */,
 				327A0D1E22194ACC001A6EF0 /* IRMethod.cpp */,
 				327A0D1F22194ACC001A6EF0 /* IRMethod.h */,
@@ -375,6 +380,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 3278446F1F49149E00481704;
@@ -410,6 +416,7 @@
 				327A0D8222194B17001A6EF0 /* deflate.c in Sources */,
 				327A0D3F22194ACC001A6EF0 /* LinkedList.c in Sources */,
 				327A0D8722194B17001A6EF0 /* uncompr.c in Sources */,
+				329A856423AE2205004A82CE /* IRType.cpp in Sources */,
 				327A0D3922194ACC001A6EF0 /* Stmt.cpp in Sources */,
 				327A0D3E22194ACC001A6EF0 /* utf8.c in Sources */,
 				327A0D3A22194ACC001A6EF0 /* MBuilder.cpp in Sources */,

@@ -10,13 +10,15 @@
 
 
 PodGen::PodGen(PodLoader *podMgr, const std::string& podName) : podMgr(podMgr), podName(podName) {
+    module = new IRModule();
+    
     pod = podMgr->findPod(podName);
     
     allTypes.clear();
     allTypes.reserve(pod->types.size());
     for (int i=0; i<pod->types.size(); ++i) {
         FType *type = &pod->types[i];
-        TypeGen gtype(this, type);
+        TypeGen gtype(this, type, module->defType(type));
         gtype.c_sortFlag = 0;
         
         //if (gtype.name != "testlib_Main") continue;
@@ -31,6 +33,11 @@ PodGen::PodGen(PodLoader *podMgr, const std::string& podName) : podMgr(podMgr), 
     topoSortType();
 }
 
+PodGen::~PodGen() {
+    delete module;
+    module = NULL;
+}
+
 void PodGen::gen(std::string &path) {
     std::string headerFile = path + podName + ".h";
     Printer headerPrinter(headerFile.c_str());
@@ -39,6 +46,10 @@ void PodGen::gen(std::string &path) {
     std::string impleFile = path + podName + ".cpp";
     Printer implePrinter(impleFile.c_str());
     genImple(&implePrinter);
+    
+    std::string regisFile = path + podName + "_prototype.h";
+    Printer prototypePrinter(regisFile.c_str());
+    genNativePrototype(&prototypePrinter);
     
     /*
     std::string regisFile = path + podName + "_register.c";
@@ -132,6 +143,14 @@ void PodGen::genHeader(Printer *printer) {
     printer->println("#endif //_%s_h_", podName.c_str());
 }
 
+void PodGen::genNativePrototype(Printer *printer) {
+    for (int i=0; i<sortedTypes.size(); ++i) {
+        TypeGen *gtype = sortedTypes[i];
+        gtype->genNativePrototype(printer);
+        printer->newLine();
+    }
+}
+
 void PodGen::genImple(Printer *printer) {
     
     printer->println("#include \"%s.h\"", podName.c_str());
@@ -219,8 +238,16 @@ void PodGen::genStub(Printer *printer) {
     }
 }
 */
-std::string PodGen::getTypeRefName(uint16_t tid) {
-    return FCodeUtil::getTypeRefName(pod, tid, true);
+std::string PodGen::getTypeRefName(uint16_t tid, bool forPass) {
+    std::string t = FCodeUtil::getTypeRefName(pod, tid, true);
+    if (forPass) {
+        if (FCodeUtil::isValueTypeRef(pod, tid) && !FCodeUtil::isBuildinVal(t)) {
+            if (t.find("_null") != t.size()-5) {
+                t += "_pass";
+            }
+        }
+    }
+    return t;
 }
 
 

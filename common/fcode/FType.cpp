@@ -87,7 +87,6 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
     this->c_name = pod->names[typeRef.typeName];
     std::string typeName = pod->name + "_" + this->c_name;
     escape(typeName);
-    escapeKeyword(typeName);
     this->c_mangledName = typeName;
     
     typeRef.c_type = this;
@@ -123,17 +122,18 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
             
             std::string name = pod->names[method.name];
             if (method.flags & FFlags::Setter) {
-                name += "$";
+                //name += "$";
                 name += std::to_string(method.paramCount);
             }
             else if (method.flags & FFlags::Overload) {
-                name += "$";
+                //name += "$";
                 name += std::to_string(method.paramCount);
             }
             
             method.c_mangledName = typeName +"_"+ name;
             escape(method.c_mangledName);
-            escapeKeyword(method.c_mangledName);
+            method.c_mangledSimpleName = name;
+            escape(method.c_mangledSimpleName);
             
             c_methodMap[name] = &method;
         }

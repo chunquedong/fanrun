@@ -1,10 +1,4 @@
-//
-//  sys_Err.c
-//  run
-//
-//  Created by yangjiandong on 2017/12/17.
-//  Copyright © 2017年 yangjiandong. All rights reserved.
-//
+
 
 #include "sys.h"
 
@@ -12,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 char *getTraceString() {
     void *array[100];
@@ -61,23 +56,26 @@ char *getTraceString() {
     return str;
 }
 
-//void sys_Err_make0(fr_Env __env, sys_Err_ref __self){ return; }
-//void sys_Err_make1(fr_Env __env, sys_Err_ref __self, sys_Str msg){ return; }
-void sys_Err_make2(fr_Env __env, sys_Err_ref __self, sys_Str msg, sys_Err_null cause){
-    __self->msg = msg;
-    __self->cause = cause;
-    
-    char *data = getTraceString();
-    sys_Str str = (sys_Str)fr_newStrUtf8(__env, data);
-    free(data);
-    __self->traceToStr = str;
+
+fr_Err sys_NativeC_toId(fr_Env __env, sys_Int *__ret, sys_Obj self){
+    *__ret = (int64_t)self;
+    return 0;
+}
+fr_Err sys_NativeC_typeName(fr_Env __env, sys_Str *__ret, sys_Obj self){return 0; }
+
+fr_Err sys_NativeC_print(fr_Env __env, sys_Array utf8){
+    puts((const char*)utf8->data);
+    return 0;
+}
+fr_Err sys_NativeC_printErr(fr_Env __env, sys_Array utf8){
+    fprintf(stderr, "%s\n", (const char*)utf8->data);
+    return 0;
 }
 
-sys_Str sys_Err_msg0(fr_Env __env, sys_Err_ref __self) { return __self->msg; }
-sys_Err_null sys_Err_cause0(fr_Env __env, sys_Err_ref __self) { return __self->cause; }
-sys_Err sys_Err_trace0(fr_Env __env, sys_Err_ref __self) {
-    printf("%s", fr_getStrUtf8(__env, __self->traceToStr, NULL));
-    return __self;
+fr_Err sys_NativeC_stackTrace(fr_Env __env, sys_Str *__ret){
+    char *data = getTraceString();
+    sys_Str str = (sys_Str)fr_newStrUtf8(__env, data, -1);
+    free(data);
+    *__ret = str;
+    return 0;
 }
-sys_Str sys_Err_traceToStr0(fr_Env __env, sys_Err_ref __self) { return __self->traceToStr; }
-sys_Str sys_Err_toStr0(fr_Env __env, sys_Err_ref __self) { return __self->msg; }

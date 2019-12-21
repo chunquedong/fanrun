@@ -13,8 +13,10 @@
 #include "Printer.h"
 #include "TypeGen.h"
 #include <unordered_map>
+#include "IRType.hpp"
 
 class PodGen {
+    IRModule *module;
 public:
     PodLoader *podMgr;
     FPod *pod;
@@ -28,9 +30,11 @@ public:
     
 public:
     PodGen(PodLoader *podMgr, const std::string& podName);
+    ~PodGen();
     void gen(std::string &path);
 private:
     void genHeader(Printer *printer);
+    void genNativePrototype(Printer *printer);
     void genImple(Printer *printer);
     void horizontalLine(Printer *printer, const char *name);
     void genConstPool(Printer *printer);
@@ -38,7 +42,7 @@ private:
     //void genStub(Printer *printer);
     void genStaticInit(Printer *printer);
 public:
-    std::string getTypeRefName(uint16_t tid);
+    std::string getTypeRefName(uint16_t tid, bool forPass = false);
     TypeGen* findType(std::string &name);
 private:
     void topoSortType();

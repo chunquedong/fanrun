@@ -77,7 +77,11 @@ namespace FCodeUtil {
     }
     
     bool isBuildinVal(const std::string &name) {
-        if (name == "sys_Int" || name == "sys_Bool" || name == "sys_Float") {
+        if (name == "sys_Int" || name == "sys_Bool" || name == "sys_Float" || name == "sys_Ptr") {
+            return true;
+        }
+        if (name == "sys_Int8" || name == "sys_Int16" || name == "sys_Int32" || name == "sys_Int64" ||
+            name == "sys_Float32" || name == "sys_Float64") {
             return true;
         }
         return false;
@@ -85,7 +89,7 @@ namespace FCodeUtil {
     
     bool isBuildinValType(FType *type) {
         if (type->c_pod->name == "sys") {
-            if (type->c_name == "Int" || type->c_name == "Bool" || type->c_name == "Float") {
+            if (type->c_name == "Int" || type->c_name == "Bool" || type->c_name == "Float" || type->c_name == "Ptr") {
                 return true;
             }
         }
@@ -162,13 +166,11 @@ namespace FCodeUtil {
     std::string getIdentifierName(FPod *pod, uint16_t nid) {
         std::string name = pod->names[nid];
         escape(name);
-        escapeKeyword(name);
         return name;
     }
     
     void escapeIdentifierName(std::string &name) {
         escape(name);
-        escapeKeyword(name);
     }
     
 }//ns

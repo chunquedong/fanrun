@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "PodLoader.h"
 #include "Printer.h"
+#include "IRType.hpp"
 
 class PodGen;
 class MethodGen;
@@ -21,17 +22,19 @@ public:
     PodGen *podGen;
     FType *type;
     int c_sortFlag;
+    IRType *irType;
 public:
     std::string name;
     bool isValueType;
 public:
-    TypeGen(PodGen *podGen, FType *type);
+    TypeGen(PodGen *podGen, FType *type, IRType *irType);
     
     void genTypeDeclare(Printer *printer);
     void genStruct(Printer *printer);
     void genVTable(Printer *printer);
     void genTypeInit(Printer *printer);
     void genMethodDeclare(Printer *printer);
+    void genNativePrototype(Printer *printer);
     void genInline(Printer *printer);
     void genImple(Printer *printer);
     void genStaticField(Printer *printer, bool isExtern);

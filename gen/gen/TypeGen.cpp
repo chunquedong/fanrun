@@ -13,8 +13,8 @@
 #include "FCodeUtil.hpp"
 #include <stdlib.h>
 
-TypeGen::TypeGen(PodGen *podGen, FType *type)
-: podGen(podGen), type(type) {
+TypeGen::TypeGen(PodGen *podGen, FType *type, IRType *irType)
+: podGen(podGen), type(type), irType(irType) {
     name = podGen->getTypeRefName(type->meta.self);
     isValueType = FCodeUtil::isValueType(type);
 }
@@ -26,18 +26,21 @@ void TypeGen::genTypeDeclare(Printer *printer) {
     if (isValueType) {
         if (!FCodeUtil::isBuildinValType(type)) {
             printer->println("typedef struct %s_struct %s_val;", name.c_str(), name.c_str());
+            printer->println("typedef %s_ref %s_pass;", name.c_str(), name.c_str());
+        }
+        else {
+            printer->println("typedef %s_val %s_pass;", name.c_str(), name.c_str());
         }
         printer->println("typedef %s_val %s;", name.c_str(), name.c_str());
     } else {
         printer->println("typedef %s_ref %s;", name.c_str(), name.c_str());
+        printer->println("typedef %s_ref %s_pass;", name.c_str(), name.c_str());
     }
 }
 
 void TypeGen::genStruct(Printer *printer) {
-    
-    if (FCodeUtil::isBuildinValType(type)) return;
-    
-    if ((type->meta.flags & FFlags::Native) != 0) {
+//    if (FCodeUtil::isBuildinValType(type)) return;
+    if (type->c_isExtern) {
         printer->println("//native struct %s_struct", name.c_str());
         return;
     }
@@ -47,7 +50,7 @@ void TypeGen::genStruct(Printer *printer) {
     printer->println("struct %s_struct {", name.c_str());
     
     printer->indent();
-    if (name == "sys_Obj") {
+    if (name == "sys_Obj" || baseName == "sys_Obj") {
         //printer->println("fr_Obj super__;");
     } else {
         printer->println("struct %s_struct super__;", baseName.c_str());
@@ -182,13 +185,13 @@ void TypeGen::genTypeMetadata(Printer *printer) {
     
     printer->println("((fr_Type)vtable)->methodCount = %d;", type->methods.size());
     
-    if (baseName == "sys_Func") {
-        auto itr = type->c_methodMap.find("doCall");
-        if (itr != type->c_methodMap.end()) {
-            int funcArity = itr->second->paramCount;
-            printer->println("((fr_Type)vtable)->funcArity = %d;", funcArity);
-        }
-    }
+//    if (baseName == "sys_Func") {
+//        auto itr = type->c_methodMap.find("doCall");
+//        if (itr != type->c_methodMap.end()) {
+//            int funcArity = itr->second->paramCount;
+//            printer->println("((fr_Type)vtable)->funcArity = %d;", funcArity);
+//        }
+//    }
     
     printer->println("fr_registerClass(__env, \"%s\", \"%s\", (fr_Type)%s_class__);"
                      , podGen->podName.c_str(), rawTypeName.c_str(), name.c_str());
@@ -233,12 +236,12 @@ void TypeGen::genVTableInit(Printer *printer) {
             continue;
         }
         MethodGen gmethod(this, method);
-        int j = method->paramCount;
+        //int j = method->paramCount;
         if ((method->flags & FFlags::Abstract) != 0) {
-            printer->println("vtable->%s%d = NULL;", gmethod.name.c_str(),j);
+            printer->println("vtable->%s = NULL;", gmethod.name.c_str());
         } else {
-            printer->println("vtable->%s%d = %s_%s%d;", gmethod.name.c_str(),
-                             j, name.c_str(), gmethod.name.c_str(), j);
+            printer->println("vtable->%s = %s_%s;", gmethod.name.c_str(),
+                             name.c_str(), gmethod.name.c_str());
         }
     }
     
@@ -250,9 +253,9 @@ void TypeGen::genVTableInit(Printer *printer) {
                 continue;
             }
             std::string rawMethodName = podGen->pod->names[method->name];
-            if (name == "sys_Type" && rawMethodName == "make") {
-                continue;
-            }
+//            if (name == "sys_Type" && rawMethodName == "make") {
+//                continue;
+//            }
             
             MethodGen gmethod(this, method);
             genOverrideVTable(type, rawMethodName, printer, gmethod, "vtable->");
@@ -319,16 +322,16 @@ void TypeGen::genOverrideVTable(FType *type, std::string &rawMethodName
         if ((found->second->flags & FFlags::Private)) {
             return;
         }
-        int j = gmethod.method->paramCount;
+        //int j = gmethod.method->paramCount;
         //FMethod *parentMethod = found->second;
         if (gmethod.method->flags & FFlags::Abstract) {
-            printer->println("*((int**)(&(%ssuper__.%s%d))) = NULL;", from.c_str()
-                             , gmethod.name.c_str(), j);
+            printer->println("*((int**)(&(%ssuper__.%s))) = NULL;", from.c_str()
+                             , gmethod.name.c_str());
         }
         else {
-            printer->println("*((int**)(&(%ssuper__.%s%d))) = (int*)%s_%s%d;", from.c_str()
-                             , gmethod.name.c_str(), j
-                             , name.c_str(), gmethod.name.c_str(), j);
+            printer->println("*((int**)(&(%ssuper__.%s))) = (int*)%s_%s;", from.c_str()
+                             , gmethod.name.c_str()
+                             , name.c_str(), gmethod.name.c_str());
         }
     }
     //if (podName == "sys" && typeName == "Obj") return;
@@ -357,6 +360,46 @@ void TypeGen::genMethodDeclare(Printer *printer) {
         }
         
         //printer->newLine();
+    }
+}
+
+void TypeGen::genNativePrototype(Printer *printer) {
+    if (type->c_isExtern) {
+        for (int i=0; i<type->fields.size(); ++i) {
+            FField *field = &type->fields[i];
+            if ((field->flags & FFlags::Static) == 0) {
+                continue;
+            }
+            auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
+            auto typeName = podGen->getTypeRefName(field->type);
+            printer->println("%s %s_%s = 0;", typeName.c_str(), this->name.c_str(), name.c_str());
+        }
+        printer->newLine();
+    }
+    
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod *method = &type->methods[i];
+        
+        if ((method->flags & FFlags::Native) == 0 && !method->c_parent->c_isExtern) {
+            continue;
+        }
+        if ((method->flags & FFlags::Abstract) != 0) {
+            continue;
+        }
+        std::string &methodName = podGen->pod->names[method->name];
+        if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
+            continue;
+        }
+        
+        MethodGen gmethod(this, method);
+        
+        bool isStatic = (method->flags & FFlags::Static);
+        if (!isStatic && isValueType) {
+            gmethod.genNativePrototype(printer, false, true);
+        }
+        else {
+            gmethod.genNativePrototype(printer, false, false);
+        }
     }
 }
 
@@ -404,7 +447,10 @@ void TypeGen::genField(Printer *printer) {
 }
 
 void TypeGen::genStaticField(Printer *printer, bool isExtern) {
-    if ((type->meta.flags & FFlags::Native) != 0) {
+//    if ((type->meta.flags & FFlags::Native) != 0) {
+//        isExtern = true;
+//    }
+    if (type->c_isExtern) {
         isExtern = true;
     }
     

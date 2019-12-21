@@ -50,6 +50,7 @@ jmp_buf *fr_popJmpBuf(fr_Env self);
 jmp_buf *fr_topJmpBuf(fr_Env self);
 #endif
 
+typedef fr_Obj fr_Err;
 fr_Obj fr_getErr(fr_Env self);
 void fr_setErr(fr_Env self, fr_Obj err);
 void fr_clearErr(fr_Env self);
@@ -74,21 +75,36 @@ void fr_yieldGc(fr_Env self);
 ////////////////////////////
 // Util
 ////////////////////////////
-fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy);
-fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes);
+//fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy);
+fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes, ssize_t size);
 //NullTerminated
-fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy);
+//fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy);
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj str, bool *isCopy);
     
-fr_Obj fr_toTypeObj(fr_Env env, fr_Type);
-void fr_throwNPE(fr_Env __env);
+//fr_Obj fr_toTypeObj(fr_Env env, fr_Type);
+fr_Err fr_makeNPE(fr_Env __env);
 
 ////////////////////////////
 // Buildin type
 ////////////////////////////
 typedef int64_t sys_Int_val;
+typedef int8_t  sys_Int8_val;
+typedef int16_t sys_Int16_val;
+typedef int32_t sys_Int32_val;
+typedef int64_t sys_Int64_val;
+typedef int8_t  sys_Int8;
+typedef int16_t sys_Int16;
+typedef int32_t sys_Int32;
+typedef int64_t sys_Int64;
+    
 typedef double sys_Float_val;
+typedef double sys_Float64_val;
+typedef float sys_Float32_val;
+typedef double sys_Float64;
+typedef float sys_Float32;
+
 typedef bool sys_Bool_val;
+typedef void * sys_Ptr_val;
 
 fr_Obj fr_box_int(fr_Env, sys_Int_val val);
 fr_Obj fr_box_float(fr_Env, sys_Float_val val);
@@ -101,22 +117,33 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_TYPE(type) (sys_Type)fr_toTypeObj(__env, type##_class__)
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
-#define FR_CAST(obj, type, toType) (FR_TYPE_IS(obj, type)?(toType)obj:(fr_throwNPE(__env),(toType)0) )
+#define FR_CAST(ret, obj, type, toType) {if (FR_TYPE_IS(obj, type)) ret = (toType)obj; else FR_THROW_NPE() }
 
 #define FR_ALLOC(type) ((type##_ref)fr_alloc(__env, type##_class__))
 #define FR_INIT_VAL(val, type) (memset(&val, 0, sizeof(struct type##_struct)))
 
-#define FR_TRY try
-#define FR_CATCH catch(...)
-#define FR_THROW(err) {fr_setErr(__env, err); throw 1;}
+#define FR_TRY /*try*/
+#define FR_CATCH /*catch(...)*/
+#define FR_THROW(err) {return err;}
+#define FR_THROW_NPE() { return fr_makeNPE(__env); }
+#define FR_CHECK_NULL(obj) do{ if (!obj) FR_THROW_NPE() }while(false)
 #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
 #define FR_ALLOC_THROW(errType) FR_THROW(FR_ALLOC(errType))
 
 #define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
 #define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__) )
 
-#define FR_VCALL(type, method, self, ...)  _FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
-#define FR_ICALL(type, method, self, ...) _FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
+#define _FR_CHECK_ERR(expr) { fr_Err __err = expr; if (__err) return __err; }
+#define FR_VOID_VCALL(type, method, self, ...) _FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
+#define FR_VOID_ICALL(type, method, self, ...) _FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
+#define FR_VOID_CALL(type, method, self, ...)  _FR_CHECK_ERR(type##_##method(__env, self, ## __VA_ARGS__))
+#define FR_VOID_SCALL(type, method, ...)  _FR_CHECK_ERR(type##_##method(__env, ## __VA_ARGS__))
+
+#define FR_VCALL(type, method, ret, self, ...) _FR_VTABLE(type, self)->method(__env, ret, self, ## __VA_ARGS__)
+#define FR_ICALL(type, method, ret, self, ...) _FR_IVTABLE(type, self)->method(__env, ret, self, ## __VA_ARGS__)
+#define FR_CALL(type, method, ret, self, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, self, ## __VA_ARGS__))
+#define FR_SCALL(type, method, ret, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, ## __VA_ARGS__))
+
 
 #define FR_BOXING(tagert, value, fromType, toType) {\
     fromType##_ref tmp__ = FR_ALLOC(fromType);\
@@ -134,12 +161,12 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 
 #define FR_UNBOXING(obj, toType) (*((toType##_null)obj))
 #define FR_UNBOXING_VAL(obj, toType) (((toType##_null)obj)->_val)
-#define FR_NOT_NULL(obj, toType) ( (obj?(toType)obj:(fr_throwNPE(__env),(toType)0)) )
+#define FR_NOT_NULL(ret, obj, toType) {if (obj) ret = (toType)obj; else FR_THROW_NPE()}
     
 #define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
 #define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);
     
-#define FR_STATIC_INIT(type) {if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init0(__env);}}
+#define FR_STATIC_INIT(type) {if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init(__env);}}
 
 #ifdef  __cplusplus
 }

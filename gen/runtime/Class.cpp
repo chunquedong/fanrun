@@ -36,7 +36,7 @@ void fr_VTable_init(fr_Env env, fr_Type type) {
 
 fr_Type fr_getClass(fr_Env env, fr_Obj obj) {
     if (!obj) {
-        fr_throwNPE(env);
+        return NULL;
     }
     GcObj *g = fr_toGcObj(obj);
     //return obj->super.header;

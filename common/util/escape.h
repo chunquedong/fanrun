@@ -12,6 +12,6 @@
 #include <string>
 
 void escape(std::string &str);
-void escapeKeyword(std::string &astr);
+
 
 #endif /* escape_h */

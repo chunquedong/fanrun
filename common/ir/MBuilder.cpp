@@ -154,6 +154,7 @@ bool MBuilder::buildMethod(FMethod *method) {
         Var &var = newVar(irMethod.selfType);
         //var.typeRef = method->c_parent->meta.self;
         var.name = "__self";
+        var.isArg = true;
         irMethod.paramCount++;
     }
     
@@ -162,6 +163,9 @@ bool MBuilder::buildMethod(FMethod *method) {
         Var &var = newVar(fvar->type);
         //var.methodVar = fvar;
         //var.typeRef = fvar->type;
+        if (i < method->paramCount) {
+            var.isArg = true;
+        }
         var.name = curPod->names[fvar->name];
     }
     
@@ -376,8 +380,24 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     stmt->methodRef = methodRef;
     
     stmt->typeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
+    FTypeRef parentRef = curPod->typeRefs[methodRef->parent];
+    if (stmt->typeName == "sys_Array" || stmt->typeName == "sys_Ptr") {
+        if (parentRef.extName.size() > 0) {
+            std::string extName = parentRef.extName.substr(1, parentRef.extName.size()-2);
+            if (extName[extName.size()-1] == '?') {
+                extName.resize(extName.size()-1);
+            }
+            int pos = (int)extName.find("::");
+            if (pos>0) {
+                stmt->extName = extName.replace(pos, 2, "_");
+            }
+        }
+    }
+    
     stmt->mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
-    stmt->mthName += std::to_string(methodRef->paramCount);
+    if (methodRef->flags & (FFlags::RefOverload | FFlags::RefSetter)) {
+        stmt->mthName += std::to_string(methodRef->paramCount);
+    }
     
     for (int i=methodRef->paramCount-1; i>=0; --i) {
         TypeInfo fvarType(curPod, methodRef->params.at(i));
@@ -392,7 +412,25 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     TypeInfo retType(curPod, methodRef->retType);
     stmt->isVoid = retType.isVoid();
     if (!stmt->isVoid) {
-        if (retType.isThis()) {
+        bool isThis = retType.isThis();
+        if (!isThis) {
+            FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, methodRef->parent);
+            std::string name = curPod->names[methodRef->name];
+            if (methodRef->flags & FFlags::RefSetter) {
+                //name += "$";
+                name += std::to_string(methodRef->paramCount);
+            }
+            else if (methodRef->flags & FFlags::RefOverload) {
+                //name += "$";
+                name += std::to_string(methodRef->paramCount);
+            }
+            FMethod *fmethod = ftype->c_methodMap[name];
+            if (fmethod) {
+                std::string returnType = FCodeUtil::getTypeRefName(ftype->c_pod, fmethod->returnType, false);
+                isThis = returnType == "sys_This";
+            }
+        }
+        if (isThis) {
             retType.setFromTypeRef(curPod, methodRef->parent);
         }
         Var &var = block->newVarAs(retType);

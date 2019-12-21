@@ -61,6 +61,7 @@ struct FMethod : public FSlot {
     void (*c_jit)(void *env);
     uint16_t c_jitLocalCount;
     std::string c_mangledName;
+    std::string c_mangledSimpleName;
 };
 
 struct FTypeMeta {

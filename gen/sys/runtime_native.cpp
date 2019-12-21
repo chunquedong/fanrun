@@ -8,6 +8,7 @@
 
 #include "sys.h"
 #include "runtime.h"
+#include "sys_native.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,80 +18,78 @@
 //////////////////////////////////////////////////////////
 extern "C" {
 sys_Int strHash(sys_Str str);
-size_t utf8encode(const wchar_t *us, char *des, size_t n, int *illegal);
-size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal);
+//size_t utf8encode(const wchar_t *us, char *des, size_t n, int *illegal);
+//size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal);
+    fr_Err sys_Str_fromCStr(fr_Env __env, sys_Str *__ret, sys_Ptr utf8, sys_Int byteLen);
 }
-fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes) {
+fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes, ssize_t size) {
     size_t len;
-    size_t size;
-    len = strlen(bytes);
-    size = len + 1;
+    sys_Str str;
     
-    sys_Str str = FR_ALLOC(sys_Str);
+    if (size == -1) len = strlen(bytes);
+    else len = size;
     
-    wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*size);
-    //mbstowcs();
-    //str->size = mbstowcs(cstr, str->data, len);
-    str->size = utf8decode(bytes, data, size, NULL);
-    str->data = data;
-    str->hashCode = strHash(str);
-    str->utf8 = bytes;
+    sys_Str_fromCStr(__env, &str, (sys_Ptr)bytes, len);
     return str;
 }
-fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy) {
-    sys_Str str = FR_ALLOC(sys_Str);
-    if (copy) {
-        wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*(size+1));
-        wcsncpy(data, data, size);
-        str->data = data;
-    }
-    else {
-        str->data = data;
-    }
-    str->size = size;
-    str->hashCode = strHash(str);
-    str->utf8 = NULL;
-    return str;
-}
-fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy) {
-    size_t size = wcslen(data);
-    return fr_newStr(__env, data, size, copy);
-}
+//fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy) {
+//    sys_Str str = FR_ALLOC(sys_Str);
+//    if (copy) {
+//        wchar_t *data = (wchar_t*)malloc(sizeof(wchar_t)*(size+1));
+//        wcsncpy(data, data, size);
+//        str->data = data;
+//    }
+//    else {
+//        str->data = data;
+//    }
+//    str->size = size;
+//    str->hashCode = strHash(str);
+//    str->utf8 = NULL;
+//    return str;
+//}
+//fr_Obj fr_newStrNT(fr_Env __env, const wchar_t *data, bool copy) {
+//    size_t size = wcslen(data);
+//    return fr_newStr(__env, data, size, copy);
+//}
 const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
-    size_t size;
-    size_t realSize;
-    sys_Str str = (sys_Str)obj;
-    if (str->utf8) return str->utf8;
-    size = str->size * 4 + 1;
-    char *utf8 = (char*)malloc(size);
-    realSize = utf8encode(str->data, utf8, size, NULL);
-    utf8[realSize] = 0;
-    str->utf8 = utf8;
+//    size_t size;
+//    size_t realSize;
+//    sys_Str str = (sys_Str)obj;
+//    if (str->utf8) return str->utf8;
+//    size = str->size * 4 + 1;
+//    char *utf8 = (char*)malloc(size);
+//    realSize = utf8encode(str->data, utf8, size, NULL);
+//    utf8[realSize] = 0;
+//    str->utf8 = utf8;
     
+    sys_Str str = (sys_Str)obj;
+    sys_Array array;
+    sys_Str_toUtf8(env__, &array, str);
+    const char *data = (const char*)array->data;
     if (isCopy) *isCopy = false;
-    return str->utf8;
+    return data;
 }
 
 ////////////////////////////////////////////////////////////////
 
-fr_Obj fr_toTypeObj(fr_Env __env, fr_Type clz) {
-    if (!clz->typeObj) {
-        sys_Type type = FR_ALLOC(sys_Type);
-        type->rawClass = clz;
-        clz->typeObj = type;
-    }
-    return clz->typeObj;
-}
-
-fr_Type fr_fromSysType(fr_Env __env, fr_Obj clz) {
-    return ((sys_Type)clz)->rawClass;
-}
+//fr_Obj fr_toTypeObj(fr_Env __env, fr_Type clz) {
+//    if (!clz->typeObj) {
+//        sys_Type type = FR_ALLOC(sys_Type);
+//        type->rawClass = clz;
+//        clz->typeObj = type;
+//    }
+//    return clz->typeObj;
+//}
+//
+//fr_Type fr_fromSysType(fr_Env __env, fr_Obj clz) {
+//    return ((sys_Type)clz)->rawClass;
+//}
 
 ////////////////////////////////////////////////////////////////
-void fr_throwNPE(fr_Env __env) {
+fr_Err fr_makeNPE(fr_Env __env) {
     sys_NullErr npe = FR_ALLOC(sys_NullErr);
     sys_NullErr_make0(__env, npe);
-    FR_THROW(npe);
+    return npe;
 }
 ////////////////////////////////////////////////////////////////
 #include <unordered_map>

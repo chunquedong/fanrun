@@ -22,6 +22,7 @@ struct TypeInfo {
     
     std::string pod;
     std::string name;
+    std::string extName;
     
     bool isNullable;
     bool isBuildin;
@@ -65,7 +66,7 @@ struct Expr {
     
     Expr() : block(nullptr), index(-1) {}
     
-    std::string &getName();
+    std::string getName(bool deRef = false);
     TypeInfo &getType();
     std::string getTypeName();
     bool isValueType();
@@ -89,8 +90,10 @@ struct Var {
     //type of var
     TypeInfo type;
     
+    bool isArg;
+    
     Var() : index(-1), newIndex(-1), block(nullptr),
-    isExport(false) {
+    isExport(false), isArg(false) {
     }
     
     Expr asRef();
@@ -149,6 +152,7 @@ public:
     
     std::string typeName;
     std::string mthName;
+    std::string extName;
     
     std::vector<Expr> params;
     Expr retValue;

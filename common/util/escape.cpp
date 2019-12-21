@@ -45,9 +45,14 @@ cstr keyword[] = {
     "volatile",
     //"while",
     "typeof",
+    
+    "not",
+    "and",
+    "or",
+    "xor",
 };
 
-const int keywordCount = 23;
+const int keywordCount = 27;
 
 void escapeKeyword(std::string &astr) {
     for (int i=0; i<keywordCount; ++i) {
@@ -58,7 +63,7 @@ void escapeKeyword(std::string &astr) {
     }
 }
 
-void escape(std::string &str) {
+void escapeName(std::string &str) {
     long pos = 0;
     
     while (pos < str.length()) {
@@ -68,4 +73,9 @@ void escape(std::string &str) {
         }
         ++pos;
     }
+}
+
+void escape(std::string &str) {
+    escapeName(str);
+    escapeKeyword(str);
 }
