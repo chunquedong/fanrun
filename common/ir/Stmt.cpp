@@ -272,7 +272,12 @@ void StoreStmt::print(Printer& printer) {
 
 void CallStmt::print(Printer& printer) {
     if (!isStatic && !params.at(0).isValueType()) {
-        printer.printf("FR_CHECK_NULL(%s);", params.at(0).getName().c_str());
+        if (typeName == "sys_Array" && mthName == "make") {
+            //pass
+        }
+        else {
+            printer.printf("FR_CHECK_NULL(%s);", params.at(0).getName().c_str());
+        }
     }
     
     if (typeName == "sys_Array") {
@@ -287,7 +292,38 @@ void CallStmt::print(Printer& printer) {
             return;
         }
         else if (mthName == "make") {
-            //printer.printf("");
+            int extType = -1;
+            std::string elemType;
+            if (extName == "sys_Int8") {
+                elemType = "sys_Int";
+                extType = 8;
+            }
+            else if (extName == "sys_Int16") {
+                elemType = "sys_Int";
+                extType = 16;
+            }
+            else if (extName == "sys_Int32") {
+                elemType = "sys_Int";
+                extType = 32;
+            }
+            else if (extName == "sys_Int" || extName == "sys_Int64") {
+                elemType = "sys_Int";
+                extType = 64;
+            }
+            else if (extName == "sys_Float" || extName == "sys_Float64") {
+                elemType = "sys_Float";
+                extType = 64;
+            }
+            else if (extName == "sys_Float32") {
+                elemType = "sys_Float";
+                extType = 32;
+            }
+            else {
+                elemType = extName;
+            }
+            printer.printf("%s = (sys_Array)fr_arrayNew(__env, %s_class__, %d, %s);", params[0].getName().c_str(),
+                           elemType.c_str(), extType, params[1].getName().c_str());
+            return;
         }
     }
     else if (typeName == "sys_Ptr") {
@@ -498,7 +534,10 @@ void JumpStmt::print(Printer& printer) {
 
 void AllocStmt::print(Printer& printer) {
     std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
-    if (FCodeUtil::isValueTypeRef(curPod, type)) {
+    if (typeName == "sys_Array") {
+        //move to CallStmt
+    }
+    else if (FCodeUtil::isValueTypeRef(curPod, type)) {
         printer.printf("FR_INIT_VAL(%s, %s);", obj.getName().c_str(), typeName.c_str());
     } else {
         printer.printf("%s = FR_ALLOC(%s);", obj.getName().c_str(), typeName.c_str());

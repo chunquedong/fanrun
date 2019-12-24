@@ -17,10 +17,45 @@
 
 //////////////////////////////////////////////////////////
 extern "C" {
-sys_Int strHash(sys_Str str);
+fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int extType, size_t len) {
+    int elemSize = sizeof(fr_Obj);
+    fr_ValueType vtype = fr_vtObj;
+    if (elemType == sys_Int_class__) {
+        vtype = fr_vtInt;
+        if (extType == -1) {
+            elemSize = 8;
+        }
+        else if (extType == 8 || extType == 16 || extType == 32 || extType == 64) {
+            elemSize = extType/8;
+        }
+    }
+    else if (elemType == sys_Float_class__) {
+        vtype = fr_vtFloat;
+        if (extType == -1) {
+            elemSize = sizeof(double);
+        }
+        else if (extType == 32 || extType == 64) {
+            elemSize = extType/8;
+        }
+    }
+    else if (elemType == sys_Bool_class__) {
+        vtype = fr_vtBool;
+        elemSize = sizeof(bool);
+    }
+    
+    size_t allocSize = sizeof(struct sys_Array_struct) + (elemSize * len);
+    sys_Array_ref array = (sys_Array_ref)fr_alloc(self, sys_Array_class__, allocSize);
+    array->elemType = elemType;
+    array->elemSize = elemSize;
+    array->valueType = vtype;
+    array->size = len;
+    return array;
+}
+
+//sys_Int strHash(sys_Str str);
 //size_t utf8encode(const wchar_t *us, char *des, size_t n, int *illegal);
 //size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal);
-    fr_Err sys_Str_fromCStr(fr_Env __env, sys_Str *__ret, sys_Ptr utf8, sys_Int byteLen);
+fr_Err sys_Str_fromCStr(fr_Env __env, sys_Str *__ret, sys_Ptr utf8, sys_Int byteLen);
 }
 fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes, ssize_t size) {
     size_t len;

@@ -38,17 +38,15 @@ typedef void *fr_Fvm;
 
 fr_Env fr_getEnv(fr_Fvm vm);
 void fr_releaseEnv(fr_Fvm vm, fr_Env env);
-    
-int fr_getFuncArity(fr_Env, fr_Type clz);
 
 ////////////////////////////
 // Exception
 ////////////////////////////
-#ifdef LONG_JMP_EXCEPTION
-jmp_buf *fr_pushJmpBuf(fr_Env self);
-jmp_buf *fr_popJmpBuf(fr_Env self);
-jmp_buf *fr_topJmpBuf(fr_Env self);
-#endif
+//#ifdef LONG_JMP_EXCEPTION
+//jmp_buf *fr_pushJmpBuf(fr_Env self);
+//jmp_buf *fr_popJmpBuf(fr_Env self);
+//jmp_buf *fr_topJmpBuf(fr_Env self);
+//#endif
 
 typedef fr_Obj fr_Err;
 fr_Obj fr_getErr(fr_Env self);
@@ -63,18 +61,31 @@ fr_Obj fr_addGlobalRef(fr_Env self, fr_Obj obj);
 void fr_deleteGlobalRef(fr_Env self, fr_Obj obj);
 void fr_addStaticRef(fr_Env self, fr_Obj *obj);
     
-fr_Obj fr_alloc(fr_Env self, fr_Type vtable);
+fr_Obj fr_alloc(fr_Env self, fr_Type vtable, ssize_t size);
 void fr_gc(fr_Env self);
 //GcObj *fr_toGcObj(fr_Obj obj);
 //fr_Obj fr_fromGcObj(GcObj *g);
-#define fr_toGcObj(obj) ((GcObj*)(obj))
-#define fr_fromGcObj(g) ((fr_Obj)(g))
+#define fr_toGcObj(obj) (((GcObj*)(obj))-1)
+#define fr_fromGcObj(g) ((fr_Obj)(((GcObj*)(g))+1))
 void fr_checkPoint(fr_Env self);
 void fr_yieldGc(fr_Env self);
 
 ////////////////////////////
 // Util
 ////////////////////////////
+
+typedef enum fr_ValueType_ {
+    fr_vtOther, //unsed
+    fr_vtObj,
+    fr_vtInt,
+    fr_vtFloat,
+    fr_vtBool,
+    fr_vtHandle,
+    fr_vtPtr,
+} fr_ValueType;
+
+fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int extType, size_t len);
+
 //fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy);
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes, ssize_t size);
 //NullTerminated
@@ -105,6 +116,14 @@ typedef float sys_Float32;
 
 typedef bool sys_Bool_val;
 typedef void * sys_Ptr_val;
+    
+//typedef struct fr_Array_ {
+//    fr_Type elemType;
+//    int32_t valueType;
+//    int32_t elemSize;
+//    int64_t size;
+//    fr_Obj data[1];
+//} fr_Array;
 
 fr_Obj fr_box_int(fr_Env, sys_Int_val val);
 fr_Obj fr_box_float(fr_Env, sys_Float_val val);
@@ -114,12 +133,12 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 // Other
 ////////////////////////////
 
-#define FR_TYPE(type) (sys_Type)fr_toTypeObj(__env, type##_class__)
+//#define FR_TYPE(type) (sys_Type)fr_toTypeObj(__env, type##_class__)
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
-#define FR_CAST(ret, obj, type, toType) {if (FR_TYPE_IS(obj, type)) ret = (toType)obj; else FR_THROW_NPE() }
+#define FR_CAST(ret, obj, type, toType) do{if (FR_TYPE_IS(obj, type)) ret = (toType)obj; else FR_THROW_NPE() }while(0)
 
-#define FR_ALLOC(type) ((type##_ref)fr_alloc(__env, type##_class__))
+#define FR_ALLOC(type) ((type##_ref)fr_alloc(__env, type##_class__, -1))
 #define FR_INIT_VAL(val, type) (memset(&val, 0, sizeof(struct type##_struct)))
 
 #define FR_TRY /*try*/
@@ -161,12 +180,12 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 
 #define FR_UNBOXING(obj, toType) (*((toType##_null)obj))
 #define FR_UNBOXING_VAL(obj, toType) (((toType##_null)obj)->_val)
-#define FR_NOT_NULL(ret, obj, toType) {if (obj) ret = (toType)obj; else FR_THROW_NPE()}
+#define FR_NOT_NULL(ret, obj, toType) do{if (obj) ret = (toType)obj; else FR_THROW_NPE()}while(0)
     
 #define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
 #define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);
     
-#define FR_STATIC_INIT(type) {if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init(__env);}}
+#define FR_STATIC_INIT(type) do{if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init(__env);}}while(0)
 
 #ifdef  __cplusplus
 }
