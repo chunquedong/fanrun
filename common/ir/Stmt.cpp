@@ -276,7 +276,7 @@ void CallStmt::print(Printer& printer) {
             //pass
         }
         else {
-            printer.printf("FR_CHECK_NULL(%s);", params.at(0).getName().c_str());
+            printer.printf("FR_CHECK_NULL(%d, %s);", this->pos, params.at(0).getName().c_str());
         }
     }
     
@@ -359,19 +359,19 @@ void CallStmt::print(Printer& printer) {
         bool isValueType = false;
         if (!isStatic && params.at(0).isValueType()) {
             isValueType = true;
-            printer.printf("FR%s_CALL(%s, %s_val", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+            printer.printf("FR%s_CALL(%d, %s, %s_val", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
         }
         else if (isVirtual) {
-            printer.printf("FR%s_VCALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+            printer.printf("FR%s_VCALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
         }
         else if (isMixin) {
-            printer.printf("FR%s_ICALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+            printer.printf("FR%s_ICALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
         }
         else if (isStatic) {
-            printer.printf("FR%s_SCALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+            printer.printf("FR%s_SCALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
         }
         else {
-            printer.printf("FR%s_CALL(%s, %s", voidFlag.c_str(), typeName.c_str(), mthName.c_str());
+            printer.printf("FR%s_CALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
         }
         
         if (!isVoid) {
@@ -422,7 +422,7 @@ void FieldStmt::print(Printer& printer) {
     bool isBuildinType = FCodeUtil::isBuildinVal(typeName);
     
     if (!isStatic && !parentValueType) {
-        printer.printf("FR_CHECK_NULL(%s);", instance.getName().c_str());
+        printer.printf("FR_CHECK_NULL(%d, %s);", this->pos, instance.getName().c_str());
     }
     if (isLoad) {
         //lazy init class
@@ -632,7 +632,7 @@ void CompareStmt::print(Printer& printer) {
     }
     else {
         if (!isVal1) {
-            printer.printf("if (%s == NULL) FR_THROW_NPE();", param1.getName().c_str());
+            printer.printf("if (%s == NULL) FR_THROW_NPE(%d);", param1.getName().c_str(), this->pos);
             printer.printf("if (!FR_TYPE_IS(%s, %s) )"
                            , param1.getName().c_str(), param2.getTypeName().c_str());
             if (opObj.opcode == FOp::Compare) {
@@ -677,48 +677,55 @@ void CompareStmt::print(Printer& printer) {
     if (cmpType == -1) {
         switch (opObj.opcode) {
             case FOp::Compare: {
-                printer.printf("FR_VCALL(sys_Obj, compare, &%s, (sys_Obj)%s, (sys_Obj)%s);"
+                printer.printf("FR_VCALL(%d, sys_Obj, compare, &%s, (sys_Obj)%s, (sys_Obj)%s);"
+                                , this->pos
                                 , result.getName().c_str()
                                 , param1.getName().c_str(), param2.getName().c_str());
                 break;
             }
             case FOp::CompareEQ: {
-                printer.printf("FR_VCALL(sys_Obj, equals, &%s, (sys_Obj)%s, (sys_Obj)%s);"
+                printer.printf("FR_VCALL(%d, sys_Obj, equals, &%s, (sys_Obj)%s, (sys_Obj)%s);"
+                               , this->pos
                                , result.getName().c_str()
                                , param1.getName().c_str(), param2.getName().c_str());
                 break;
             }
             case FOp::CompareNE: {
-                printer.printf("FR_VCALL(sys_Obj, equals, &%s, (sys_Obj)%s, (sys_Obj)%s); %s = !%s;"
+                printer.printf("FR_VCALL(%d, sys_Obj, equals, &%s, (sys_Obj)%s, (sys_Obj)%s); %s = !%s;"
+                               , this->pos
                                , result.getName().c_str()
                                , param1.getName().c_str(), param2.getName().c_str()
                                , result.getName().c_str(), result.getName().c_str());
                 break;
             }
             case FOp::CompareLT: {
-                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res < 0; }"
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(%d, sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res < 0; }"
                                //, result.getName().c_str()
+                               , this->pos
                                , param1.getName().c_str(), param2.getName().c_str()
                                , result.getName().c_str());
                 break;
             }
             case FOp::CompareLE: {
-                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res <= 0; }"
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(%d, sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res <= 0; }"
                                //, result.getName().c_str()
+                               , this->pos
                                , param1.getName().c_str(), param2.getName().c_str()
                                , result.getName().c_str());
                 break;
             }
             case FOp::CompareGE: {
-                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res >= 0; }"
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(%d, sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res >= 0; }"
                                //, result.getName().c_str()
+                               , this->pos
                                , param1.getName().c_str(), param2.getName().c_str()
                                , result.getName().c_str());
                 break;
             }
             case FOp::CompareGT: {
-                printer.printf("{ sys_Int __cmp_res; FR_VCALL(sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res > 0; }"
+                printer.printf("{ sys_Int __cmp_res; FR_VCALL(%d, sys_Obj, compare, &__cmp_res, (sys_Obj)%s, (sys_Obj)%s); %s = __cmp_res > 0; }"
                                //, result.getName().c_str()
+                               , this->pos
                                , param1.getName().c_str(), param2.getName().c_str()
                                , result.getName().c_str());
                 break;
@@ -750,7 +757,7 @@ void ReturnStmt::print(Printer& printer) {
 }
 
 void ThrowStmt::print(Printer& printer) {
-    printer.printf("FR_THROW(%s);", var.getName().c_str());
+    printer.printf("FR_THROW(%d, %s);", this->pos, var.getName().c_str());
 }
 
 void ExceptionStmt::print(Printer& printer) {
@@ -764,22 +771,29 @@ void ExceptionStmt::print(Printer& printer) {
             for (int i=0; i<handlerStmt.size(); ++i) {
                 ExceptionStmt *itr = handlerStmt[i];
                 if (itr->etype == CatchStart) {
-                    if (itr->catchType > 0) {
-                        std::string typeName = FCodeUtil::getTypeRefName(curPod, itr->catchType, false);
-                        printer.printf("if (FR_ERR_TYPE(%s)) { "
-                                       "%s = (%s)fr_getErr(__env); "
-                                       "fr_clearErr(__env); goto l__%d;}"
-                                ,typeName.c_str(), itr->catchVar.getName().c_str()
-                                , typeName.c_str(), handler);
-                    } else {
-                        printer.println("fr_clearErr(__env); goto l__%d;", handler);
+//                    if (itr->catchType > 0) {
+//                        std::string typeName = FCodeUtil::getTypeRefName(curPod, itr->catchType, false);
+//                        printer.printf("if (FR_ERR_TYPE(%s)) { "
+//                                       "%s = (%s)fr_getErr(__env); "
+//                                       "fr_clearErr(__env); goto l__%d;}"
+//                                ,typeName.c_str(), itr->catchVar.getName().c_str()
+//                                , typeName.c_str(), handler);
+//                    } else {
+//                        printer.println("fr_clearErr(__env); goto l__%d;", handler);
+//                    }
+                    if (itr->catchType != -1) {
+                        printer.printf("%s == __err;", itr->catchVar.getName().c_str());
+                    }
+                    else {
+                        printer.printf("__err = NULL;");
                     }
                 }
                 else if (itr->etype == FinallyStart) {
-                    printer.println("goto l__%d;//goto finally", handler);
+                    //printer.println("goto l__%d;//goto finally", handler);
                 }
             }
             printer.unindent();
+            printer.newLine();
             printer.println("}//ce");
         }
             break;
@@ -813,7 +827,7 @@ void ExceptionStmt::print(Printer& printer) {
         case FinallyEnd:
             printer.println("//finally end");
             
-            printer.println("if (fr_getErr(__env)) { FR_THROW(fr_getErr(__env)); }");
+            //printer.println("if (fr_getErr(__env)) { FR_THROW(fr_getErr(__env)); }");
             
             break;
         default:
@@ -834,7 +848,7 @@ void CoerceStmt::print(Printer& printer) {
     
     if (!isVal1 && !isVal2) {
         if (isNull1 && !isNull2) {
-            printer.printf("FR_NOT_NULL(%s, %s, %s);", to.getName().c_str()
+            printer.printf("FR_NOT_NULL(%d, %s, %s, %s);", this->pos, to.getName().c_str()
                            , from.getName().c_str(), typeName2.c_str());
             return;
         }
@@ -878,7 +892,7 @@ void CoerceStmt::print(Printer& printer) {
         std::string toTypeName = FCodeUtil::getTypeRefName(curPod, toType, false);
         
         if (checked) {
-            printer.printf("FR_CAST(%s, %s, %s, %s);", to.getName().c_str()
+            printer.printf("FR_CAST(%d, %s, %s, %s, %s);", this->pos, to.getName().c_str()
                        , from.getName().c_str() , toTypeName.c_str(), typeName2.c_str());
         } else {
             printer.printf("%s = FR_TYPE_AS(%s, %s);", to.getName().c_str()

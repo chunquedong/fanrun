@@ -11,7 +11,7 @@
 
 MBuilder::MBuilder(Code &code, IRMethod &irMethod) :
         curPod(irMethod.curPod), code(code)
-        , irMethod(irMethod) {
+        , irMethod(irMethod), errTable(NULL) {
     Block *b = new Block();
     b->curPod = curPod;
     methodVars = b;
@@ -144,7 +144,10 @@ bool MBuilder::buildMethod(FMethod *method) {
     for (FAttr *itr : method->attrs) {
         FErrTable *et = dynamic_cast<FErrTable*>(itr);
         if (et != nullptr) {
-            this->attrs.push_back(et);
+            if (this->errTable) {
+                printf("ERROR: errTable already exist\n");
+            }
+            this->errTable = et;
         }
     }
     
@@ -173,7 +176,7 @@ bool MBuilder::buildMethod(FMethod *method) {
     rewriteLocals();
     //irMethod.locals.swap(this->locals);
     irMethod.blocks.swap(this->blocks);
-    irMethod.errTable.swap(this->attrs);
+    irMethod.errTable = (this->errTable);
     irMethod.methodVars = methodVars;
     return true;
 }
@@ -234,8 +237,8 @@ void MBuilder::initJumpTarget() {
     }
     
     //find block in error table
-    for (FErrTable *et : attrs) {
-        for (FTrap &trap : et->traps) {
+    if (errTable) {
+        for (FTrap &trap : errTable->traps) {
             FOpObj *opObj = posToOp[trap.start];
             opObj->blockBegin = true;
             FOpObj *eObj = posToOp[trap.end];
@@ -300,45 +303,44 @@ void MBuilder::insertException() {
     ExceptionStmt *tryStart = nullptr;
     ExceptionStmt *tryEnd = nullptr;
     
-    for (FErrTable *et : attrs) {
-        for (FTrap &trap : et->traps) {
-            if (trap.start != start || trap.end != end) {
-                tryStart = new ExceptionStmt();
-                tryStart->curPod = curPod;
-                tryStart->etype = ExceptionStmt::TryStart;
-                
-                Block *b = posToBlock[trap.start];
-                b->stmts.insert(b->stmts.begin(), tryStart);
-                
-                start = trap.start;
-                end = trap.end;
-                
-                tryEnd = new ExceptionStmt();
-                tryEnd->curPod = curPod;
-                tryEnd->etype = ExceptionStmt::TryEnd;
-                tryEnd->catchType = trap.type;
-                tryEnd->handler = trap.handler;
-                Block *eb = posToBlock[trap.end];
-                eb = this->blocks.at(eb->index-1);
-                eb->stmts.push_back(tryEnd);
-            }
+    if (!errTable) return;
+    for (FTrap &trap : errTable->traps) {
+        if (trap.start != start || trap.end != end) {
+            tryStart = new ExceptionStmt();
+            tryStart->curPod = curPod;
+            tryStart->etype = ExceptionStmt::TryStart;
             
-            Block *cb = posToBlock[trap.handler];
-            trap.c_handler = cb;
-            ExceptionStmt *handlerStmt = NULL;
-            for (Stmt *s : cb->stmts) {
-                ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);
-                if (!catchStart) continue;
-                if (catchStart->pos == trap.handler) {
-                    handlerStmt = (catchStart);
-                    break;
-                }
-            }
-            if (handlerStmt == NULL) {
-                printf("ERROR: not found catch handlerStmt\n");
-            }
-            tryEnd->handlerStmt.push_back(handlerStmt);
+            Block *b = posToBlock[trap.start];
+            b->stmts.insert(b->stmts.begin(), tryStart);
+            
+            start = trap.start;
+            end = trap.end;
+            
+            tryEnd = new ExceptionStmt();
+            tryEnd->curPod = curPod;
+            tryEnd->etype = ExceptionStmt::TryEnd;
+            tryEnd->catchType = trap.type;
+            tryEnd->handler = trap.handler;
+            Block *eb = posToBlock[trap.end];
+            eb = this->blocks.at(eb->index-1);
+            eb->addStmt(tryEnd);
         }
+        
+        Block *cb = posToBlock[trap.handler];
+        trap.c_handler = cb;
+        ExceptionStmt *handlerStmt = NULL;
+        for (Stmt *s : cb->stmts) {
+            ExceptionStmt *catchStart = dynamic_cast<ExceptionStmt*>(s);
+            if (!catchStart) continue;
+            if (catchStart->pos == trap.handler) {
+                handlerStmt = (catchStart);
+                break;
+            }
+        }
+        if (handlerStmt == NULL) {
+            printf("ERROR: not found catch handlerStmt\n");
+        }
+        tryEnd->handlerStmt.push_back(handlerStmt);
     }
 }
 
@@ -375,6 +377,8 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     stmt->isVirtual = isVirtual;
     stmt->isMixin = isMixin;
     stmt->curPod = curPod;
+    stmt->pos = opObj.pos;
+    stmt->block = block;
     //stmt->methodRefId = opObj.i1;
     FMethodRef *methodRef = &curPod->methodRefs[opObj.i1];
     stmt->methodRef = methodRef;
@@ -401,12 +405,12 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     
     for (int i=methodRef->paramCount-1; i>=0; --i) {
         TypeInfo fvarType(curPod, methodRef->params.at(i));
-        stmt->params.insert(stmt->params.begin(), asType(block, block->pop(), fvarType));
+        stmt->params.insert(stmt->params.begin(), asType(block, block->pop(), fvarType, opObj.pos));
     }
     
     if (!isStatic) {
         TypeInfo selfType(curPod, methodRef->parent);
-        stmt->params.insert(stmt->params.begin(), asType(block, block->pop(), selfType));
+        stmt->params.insert(stmt->params.begin(), asType(block, block->pop(), selfType, opObj.pos));
     }
     
     TypeInfo retType(curPod, methodRef->retType);
@@ -437,18 +441,20 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
         stmt->retValue = var.asRef();
         block->push(stmt->retValue);
     }
-    block->stmts.push_back(stmt);
+    block->addStmt(stmt);
 }
 
-Expr MBuilder::asType(Block *block, Expr expr, TypeInfo &expectedType) {
+Expr MBuilder::asType(Block *block, Expr expr, TypeInfo &expectedType, int pos) {
     if (expr.getType() == expectedType) return expr;
     CoerceStmt *stmt = new CoerceStmt();
+    stmt->pos = pos;
+    stmt->block = block;
     stmt->from = expr;
     
     Var &var = block->newVarAs(expectedType);
     stmt->to = var.asRef();
     
-    block->stmts.push_back(stmt);
+    block->addStmt(stmt);
     return var.asRef();
 }
 
@@ -560,11 +566,13 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::LoadType:{
                 ConstStmt *stmt = new ConstStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->opObj = opObj;
                 Var &var = block->newVarAs(stmt->getType());
                 stmt->dst = var.asRef();
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 block->push(stmt->dst);
                 break;
             }
@@ -578,16 +586,20 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::StoreVar: {
                 StoreStmt *stmt = new StoreStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->dst.index = opObj.i1;
                 stmt->dst.block = methodVars;
                 
-                stmt->src = asType(block, block->pop(), stmt->dst.getType());
-                block->stmts.push_back(stmt);
+                stmt->src = asType(block, block->pop(), stmt->dst.getType(), opObj.pos);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::LoadInstance: {
                 FieldStmt *stmt = new FieldStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->isLoad = true;
                 stmt->isStatic = false;
                 stmt->instance = block->pop();
@@ -598,27 +610,31 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->value = var.asRef();
                 block->push(stmt->value);
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::StoreInstance: {
                 FieldStmt *stmt = new FieldStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->isLoad = false;
                 stmt->isStatic = false;
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
                 TypeInfo type(curPod, stmt->fieldRef->type);
-                stmt->value = asType(block, block->pop(), type);
+                stmt->value = asType(block, block->pop(), type, opObj.pos);
                 stmt->instance = block->pop();
           
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::LoadStatic:
             case FOp::LoadMixinStatic: {
                 FieldStmt *stmt = new FieldStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->isLoad = true;
                 stmt->isStatic = true;
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
@@ -628,21 +644,23 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->value = var.asRef();
                 block->push(stmt->value);
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::StoreStatic:
             case FOp::StoreMixinStatic:{
                 FieldStmt *stmt = new FieldStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->isLoad = false;
                 stmt->isStatic = true;
                 stmt->fieldRef = &curPod->fieldRefs[opObj.i1];
                 
                 TypeInfo type(curPod, stmt->fieldRef->type);
-                stmt->value = asType(block, block->pop(), type);
+                stmt->value = asType(block, block->pop(), type, opObj.pos);
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             // route method calls to FMethodRef
@@ -653,9 +671,11 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
                 AllocStmt *stmt = new AllocStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->type = typeId;
                 stmt->obj = value;
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 
                 //block->push(value);//put on stack top
                 FMethodRef *methodRef = &curPod->methodRefs[opObj.i1];
@@ -695,18 +715,22 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::Jump: {
                 JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->jmpType = JumpStmt::allJmp;
                 //stmt->opObj = opObj;
                 stmt->selfPos = opObj.pos;
                 stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::JumpTrue:{
                 JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->jmpType = JumpStmt::trueJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
@@ -714,12 +738,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::JumpFalse:{
                 JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->jmpType = JumpStmt::falseJmp;
                 stmt->expr = block->pop();
                 //stmt->opObj = opObj;
@@ -727,19 +753,21 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::Compare: {
                 CompareStmt *stmt = new CompareStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
                 TypeInfo type = TypeInfo::makeInt();
                 Var &var = block->newVarAs(type);;
                 stmt->result = var.asRef();
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 
                 block->push(stmt->result);
                 break;
@@ -754,13 +782,15 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::CompareNotSame: {
                 CompareStmt *stmt = new CompareStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->param2 = block->pop();
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
                 TypeInfo type = TypeInfo::makeBool();
                 Var &var = block->newVarAs(type);
                 stmt->result = var.asRef();
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 
                 block->push(stmt->result);
                 break;
@@ -769,12 +799,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::CompareNotNull:{
                 CompareStmt *stmt = new CompareStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->param1 = block->pop();
                 stmt->opObj = opObj;
                 TypeInfo type = TypeInfo::makeBool();
                 Var &var = block->newVarAs(type);
                 stmt->result = var.asRef();
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 
                 block->push(stmt->result);
                 break;
@@ -782,16 +814,18 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::Return: {
                 ReturnStmt *stmt = new ReturnStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 TypeInfo type(curPod, irMethod.returnType);
                 stmt->isVoid = type.isVoid();
                 if (!stmt->isVoid) {
                     if (type.isThis()) {
                         type.setFromTypeRef(curPod, irMethod.selfType);
                     }
-                    stmt->retValue = asType(block, block->pop(), type);
+                    stmt->retValue = asType(block, block->pop(), type, opObj.pos);
                 }
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::Pop: {
@@ -807,6 +841,8 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::Is: {
                 TypeCheckStmt *stmt = new TypeCheckStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 //stmt->isOrAs = false;
                 stmt->type = opObj.i1;
                 stmt->obj = block->pop();
@@ -817,12 +853,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 block->push(value);
                 stmt->result = value;
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::As: {
                 CoerceStmt *stmt = new CoerceStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->from = block->pop();
                 stmt->toType = opObj.i1;
                 Var &var = block->newVar(opObj.i1);
@@ -833,12 +871,14 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->safe = false;
                 stmt->checked = false;
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::Coerce: {
                 CoerceStmt *stmt = new CoerceStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->from = block->pop();
                 stmt->fromType = opObj.i1;
                 stmt->toType = opObj.i2;
@@ -849,7 +889,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 stmt->to = value;
                 stmt->safe = false;
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::Switch: {
@@ -859,42 +899,50 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
             case FOp::Throw: {
                 ThrowStmt *stmt = new ThrowStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->var = block->pop();
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::Leave: {
                 JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->jmpType = JumpStmt::leaveJmp;
                 //stmt->opObj = opObj;
                 stmt->selfPos =
                 stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::_JumpFinally:{
                 JumpStmt *stmt = new JumpStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->jmpType = JumpStmt::finallyJmp;
                 //stmt->opObj = opObj;
                 stmt->selfPos = opObj.pos;
                 stmt->targetPos = opObj.i1;
                 stmt->targetBlock = posToBlock[opObj.i1];
                 
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
                 break;
             }
             case FOp::CatchAllStart: {
                 ExceptionStmt *estmt = new ExceptionStmt();
                 estmt->curPod = curPod;
+                estmt->pos = opObj.pos;
+                estmt->block = block;
                 estmt->etype = ExceptionStmt::CatchStart;
                 estmt->catchType = -1;
                 estmt->pos = opObj.pos;
-                block->stmts.push_back(estmt);
+                block->addStmt(estmt);
             }
                 break;
                 
@@ -907,18 +955,22 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 
                 ExceptionStmt *estmt = new ExceptionStmt();
                 estmt->curPod = curPod;
+                estmt->pos = opObj.pos;
+                estmt->block = block;
                 estmt->etype = ExceptionStmt::CatchStart;
                 estmt->catchVar = value;
                 estmt->catchType = opObj.i1;
                 estmt->pos = opObj.pos;
-                block->stmts.push_back(estmt);
+                block->addStmt(estmt);
             }
                 break;
             case FOp::_CatchEnd: {
                 ExceptionStmt *stmt = new ExceptionStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->etype = ExceptionStmt::CatchEnd;
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
             }
                 break;
                 
@@ -926,16 +978,20 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
                 ExceptionStmt *stmt = new ExceptionStmt();
                 stmt->curPod = curPod;
                 stmt->pos = opObj.pos;
+                stmt->block = block;
+                stmt->pos = opObj.pos;
                 stmt->etype = ExceptionStmt::FinallyStart;
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
             }
                 break;
                 
             case FOp::FinallyEnd: {
                 ExceptionStmt *stmt = new ExceptionStmt();
                 stmt->curPod = curPod;
+                stmt->pos = opObj.pos;
+                stmt->block = block;
                 stmt->etype = ExceptionStmt::FinallyEnd;
-                block->stmts.push_back(stmt);
+                block->addStmt(stmt);
             }
                 break;
             case FOp::LoadFieldLiteral: {

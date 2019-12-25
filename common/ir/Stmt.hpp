@@ -107,8 +107,10 @@ class Stmt {
 public:
     FPod *curPod;
     IRMethod *method;
+    Block *block;
+    int pos;
     virtual void print(Printer& printer) = 0;
-    Stmt() : curPod(nullptr), method(nullptr) {}
+    Stmt() : curPod(nullptr), method(nullptr), pos(-1) {}
     virtual StmtType stmtType() = 0;
 };
 

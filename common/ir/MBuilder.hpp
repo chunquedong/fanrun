@@ -25,7 +25,7 @@ class MBuilder {
     
     IRMethod &irMethod;
     Code &code;
-    std::vector<FErrTable*> attrs;
+    FErrTable *errTable;
     
 public:
     MBuilder(Code &code, IRMethod &irMethod);
@@ -49,7 +49,7 @@ private:
     
     void rewriteLocals();
     
-    Expr asType(Block *block, Expr expr, TypeInfo &expectedType);
+    Expr asType(Block *block, Expr expr, TypeInfo &expectedType, int pos);
     
     void call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
               , bool isMixin, bool isAlloc = false);

@@ -116,7 +116,7 @@ void Block::print(IRMethod *method, Printer& printer, int pass) {
 
 IRMethod::IRMethod(FPod *curPod, FMethod *method) :
     curPod(curPod),
-    method(method) {
+    method(method), errTable(NULL) {
     returnType = method->returnType;
     selfType = method->c_parent->meta.self;
     paramCount = method->paramCount;
@@ -125,32 +125,32 @@ IRMethod::IRMethod(FPod *curPod, FMethod *method) :
 }
 
 void IRMethod::print(Printer& printer, int pass) {
+    printer.println("fr_Err __err; int __errOccurAt;");
+    for(int i=paramCount; i<methodVars->locals.size(); ++i) {
+        Var &v = methodVars->locals[i];
+        printer.printf("%s %s; ", v.type.getName().c_str(), v.name.c_str());
+    }
+    printer.newLine();
     
-    if (pass == 0) {
-        printer.printf("%s(", name.c_str());
-        for(int i=0; i<paramCount; ++i) {
-            Var &v = methodVars->locals[i];
-            if (i != 0) printer.printf(", ");
-            printer.printf("%s %s", v.type.getName().c_str(), v.name.c_str());
-        }
-        printer.println(")");
+    for (int i=0; i<blocks.size(); ++i) {
+        Block *b = blocks[i];
+        b->print(this, printer, 0);
     }
-    else if (pass == 1) {
-        
-        for(int i=paramCount; i<methodVars->locals.size(); ++i) {
-            Var &v = methodVars->locals[i];
-            printer.printf("%s %s; ", v.type.getName().c_str(), v.name.c_str());
-        }
-        printer.newLine();
-        
-        for (int i=0; i<blocks.size(); ++i) {
-            Block *b = blocks[i];
-            b->print(this, printer, 0);
-        }
-        for (int i=0; i<blocks.size(); ++i) {
-            Block *b = blocks[i];
-            b->print(this, printer, 1);
+    for (int i=0; i<blocks.size(); ++i) {
+        Block *b = blocks[i];
+        b->print(this, printer, 1);
+    }
+    
+    printer._print("__errTable:\n");
+    printer.println("if (!__err) abort();");
+    if (errTable) {
+        for (FTrap &trap : errTable->traps) {
+            std::string type = FCodeUtil::getTypeRefName(curPod, trap.type, false);
+            Block *handler = (Block*)trap.c_handler;
+            printer.println("if (%d < __errOccurAt && __errOccurAt > %d && FR_TYPE_IS(__err, %s)) { goto l__%d; }"
+                           , trap.start, trap.end, type.c_str(), handler->pos);
         }
     }
+    printer.println("return __err;");
 }
 

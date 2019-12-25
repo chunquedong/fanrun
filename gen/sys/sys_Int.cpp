@@ -16,7 +16,7 @@ fr_Err sys_Int_fromStr(fr_Env __env, sys_Int *__ret, sys_Str s, sys_Int radix, s
     sys_Int res = strtoll(str, &str_end, (int)radix);
     if (checked && str_end == str) {
         sys_ParseErr e = FR_ALLOC(sys_ParseErr);
-        FR_THROW(e);
+        return e;
     }
     *__ret = res;
     return NULL;
@@ -47,7 +47,7 @@ fr_Err sys_Int_equals_val(fr_Env __env, sys_Bool *__ret, sys_Int_val __self, sys
     return NULL;
 }
 fr_Err sys_Int_compare_val(fr_Env __env, sys_Int *__ret, sys_Int_val __self, sys_Obj obj){
-    if (!obj) FR_THROW_NPE();
+    if (!obj) FR_RET_THROW_NPE();
     if (FR_TYPE_IS(obj, sys_Int)) {
         sys_Int_ref other = (sys_Int_ref)obj;
         *__ret =  __self - other->_val;
@@ -141,7 +141,7 @@ fr_Err sys_Int_shifta_val(fr_Env __env, sys_Int *__ret, sys_Int_val __self, sys_
 fr_Err sys_Int_pow_val(fr_Env __env, sys_Int *__ret, sys_Int_val __self, sys_Int pow){
     if (pow < 0) {
         sys_ArgErr e = FR_ALLOC(sys_ArgErr);
-        FR_THROW(e);
+        FR_RET_THROW(e);
     }
     *__ret = powf(__self, pow);
     return NULL;
@@ -181,7 +181,7 @@ fr_Err sys_Int_toRadix_val(fr_Env __env, sys_Str *__ret, sys_Int_val __self, sys
     else if (radix == 16) {
         return sys_Int_toHex_val(__env, __ret, __self, width);
     }
-    FR_ALLOC_THROW(sys_UnsupportedErr);
+    FR_RET_ALLOC_THROW(sys_UnsupportedErr);
     *__ret = NULL;
     return NULL;
 }
@@ -197,7 +197,7 @@ fr_Err sys_Int_toCode_val(fr_Env __env, sys_Str *__ret, sys_Int_val __self, sys_
         snprintf(buf, 256, "%llx", __self);
         *__ret = (sys_Str)fr_newStrUtf8(__env, buf, -1);
     }
-    FR_ALLOC_THROW(sys_UnsupportedErr);
+    FR_RET_ALLOC_THROW(sys_UnsupportedErr);
     *__ret = NULL;
     return NULL;
 }

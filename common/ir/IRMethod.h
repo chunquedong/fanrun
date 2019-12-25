@@ -80,7 +80,7 @@ public:
     std::string name;
     bool isVoid;
     
-    std::vector<FErrTable*> errTable;
+    FErrTable *errTable;
     
     IRMethod(FPod *curPod, FMethod *method);
     

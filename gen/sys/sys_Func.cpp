@@ -42,5 +42,5 @@ fr_Err sys_Func_call1(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self, sy
     return sys_Func_call0(__env, __ret, __self);
 }
 fr_Err sys_Func_call0(fr_Env __env, sys_Obj_null *__ret, sys_Func_ref __self) {
-    FR_ALLOC_THROW(sys_ArgErr);
+    FR_RET_ALLOC_THROW(sys_ArgErr);
 }

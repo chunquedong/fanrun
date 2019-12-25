@@ -136,32 +136,36 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 //#define FR_TYPE(type) (sys_Type)fr_toTypeObj(__env, type##_class__)
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
-#define FR_CAST(ret, obj, type, toType) do{if (FR_TYPE_IS(obj, type)) ret = (toType)obj; else FR_THROW_NPE() }while(0)
+#define FR_CAST(pos, ret, obj, type, toType) do{if (FR_TYPE_IS(obj, type)) ret = (toType)obj; else FR_THROW_NPE(pos); }while(0)
 
 #define FR_ALLOC(type) ((type##_ref)fr_alloc(__env, type##_class__, -1))
 #define FR_INIT_VAL(val, type) (memset(&val, 0, sizeof(struct type##_struct)))
 
 #define FR_TRY /*try*/
 #define FR_CATCH /*catch(...)*/
-#define FR_THROW(err) {return err;}
-#define FR_THROW_NPE() { return fr_makeNPE(__env); }
-#define FR_CHECK_NULL(obj) do{ if (!obj) FR_THROW_NPE() }while(false)
+#define FR_THROW(pos, err) do{__err = err; __errOccurAt = pos; goto __errTable;}while(0)
+#define FR_THROW_NPE(pos) FR_THROW(pos, fr_makeNPE(__env))
+#define FR_CHECK_NULL(pos, obj) do{ if (!obj) FR_THROW_NPE(pos); }while(false)
 #define FR_ERR_TYPE(type) (FR_TYPE_IS(fr_getErr(__env), type))
-#define FR_ALLOC_THROW(errType) FR_THROW(FR_ALLOC(errType))
+#define FR_ALLOC_THROW(pos, errType) FR_THROW(pos, FR_ALLOC(errType))
+
+#define FR_RET_THROW(err) return err;
+#define FR_RET_ALLOC_THROW(errType) FR_RET_THROW(FR_ALLOC(errType))
+#define FR_RET_THROW_NPE() FR_RET_THROW(fr_makeNPE(__env))
 
 #define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
 #define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__) )
 
-#define _FR_CHECK_ERR(expr) { fr_Err __err = expr; if (__err) return __err; }
-#define FR_VOID_VCALL(type, method, self, ...) _FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
-#define FR_VOID_ICALL(type, method, self, ...) _FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__)
-#define FR_VOID_CALL(type, method, self, ...)  _FR_CHECK_ERR(type##_##method(__env, self, ## __VA_ARGS__))
-#define FR_VOID_SCALL(type, method, ...)  _FR_CHECK_ERR(type##_##method(__env, ## __VA_ARGS__))
+#define _FR_CHECK_ERR(expr, errPos) do{ __err = expr; if (__err) { __errOccurAt = errPos; goto __errTable;} }while(0)
+#define FR_VOID_VCALL(pos, type, method, self, ...) _FR_CHECK_ERR(_FR_VTABLE(type, self)->method(__env, self, ## __VA_ARGS__), pos)
+#define FR_VOID_ICALL(pos, type, method, self, ...) _FR_CHECK_ERR(_FR_IVTABLE(type, self)->method(__env, self, ## __VA_ARGS__), pos)
+#define FR_VOID_CALL(pos, type, method, self, ...)  _FR_CHECK_ERR(type##_##method(__env, self, ## __VA_ARGS__), pos)
+#define FR_VOID_SCALL(pos, type, method, ...)  _FR_CHECK_ERR(type##_##method(__env, ## __VA_ARGS__), pos)
 
-#define FR_VCALL(type, method, ret, self, ...) _FR_VTABLE(type, self)->method(__env, ret, self, ## __VA_ARGS__)
-#define FR_ICALL(type, method, ret, self, ...) _FR_IVTABLE(type, self)->method(__env, ret, self, ## __VA_ARGS__)
-#define FR_CALL(type, method, ret, self, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, self, ## __VA_ARGS__))
-#define FR_SCALL(type, method, ret, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, ## __VA_ARGS__))
+#define FR_VCALL(pos, type, method, ret, self, ...) _FR_CHECK_ERR(_FR_VTABLE(type, self)->method(__env, ret, self, ## __VA_ARGS__), pos)
+#define FR_ICALL(pos, type, method, ret, self, ...) _FR_CHECK_ERR(_FR_IVTABLE(type, self)->method(__env, ret, self, ## __VA_ARGS__), pos)
+#define FR_CALL(pos, type, method, ret, self, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, self, ## __VA_ARGS__), pos)
+#define FR_SCALL(pos, type, method, ret, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, ## __VA_ARGS__), pos)
 
 
 #define FR_BOXING(tagert, value, fromType, toType) {\
@@ -180,7 +184,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 
 #define FR_UNBOXING(obj, toType) (*((toType##_null)obj))
 #define FR_UNBOXING_VAL(obj, toType) (((toType##_null)obj)->_val)
-#define FR_NOT_NULL(ret, obj, toType) do{if (obj) ret = (toType)obj; else FR_THROW_NPE()}while(0)
+#define FR_NOT_NULL(pos, ret, obj, toType) do{if (obj) ret = (toType)obj; else FR_THROW_NPE(pos); }while(0)
     
 #define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
 #define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);
