@@ -147,7 +147,7 @@ void IRMethod::print(Printer& printer, int pass) {
         for (FTrap &trap : errTable->traps) {
             std::string type = FCodeUtil::getTypeRefName(curPod, trap.type, false);
             Block *handler = (Block*)trap.c_handler;
-            printer.println("if (%d < __errOccurAt && __errOccurAt > %d && FR_TYPE_IS(__err, %s)) { goto l__%d; }"
+            printer.println("if (%d < __errOccurAt && __errOccurAt < %d && FR_TYPE_IS(__err, %s)) { goto l__%d; }"
                            , trap.start, trap.end, type.c_str(), handler->pos);
         }
     }
