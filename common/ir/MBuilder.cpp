@@ -544,7 +544,7 @@ void MBuilder::parseBlock(Block *block, Block *previous) {
     }
     block->isVisited = true;
     
-//    if (irMethod.name == "echo") {
+//    if (irMethod.method->c_mangledName == "sys_ArrayList_make") {
 //        printf("");
 //    }
     

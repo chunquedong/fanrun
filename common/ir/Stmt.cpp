@@ -839,7 +839,10 @@ void CoerceStmt::print(Printer& printer) {
     std::string typeName1 = from.getTypeName();
     std::string typeName2 = to.getTypeName();
     
-    if (typeName1 == typeName2) return;
+    if (typeName1 == typeName2) {
+        printer.printf("%s = %s;", to.getName().c_str(), from.getName().c_str());
+        return;
+    }
     
     bool isVal1 = from.getType().isValue;
     bool isVal2 = to.getType().isValue;

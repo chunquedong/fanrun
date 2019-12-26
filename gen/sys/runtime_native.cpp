@@ -17,6 +17,10 @@
 
 //////////////////////////////////////////////////////////
 extern "C" {
+void fr_finalizeObj(fr_Env __env, fr_Obj _obj) {
+    sys_Obj obj = (sys_Obj)_obj;
+    _FR_VTABLE(sys_Obj, obj)->finalize(__env, obj);
+}
 fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int extType, size_t len) {
     int elemSize = sizeof(fr_Obj);
     fr_ValueType vtype = fr_vtObj;
@@ -43,7 +47,7 @@ fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int extType, size_t len) {
         elemSize = sizeof(bool);
     }
     
-    size_t allocSize = sizeof(struct sys_Array_struct) + (elemSize * len);
+    size_t allocSize = sizeof(struct sys_Array_struct) + (elemSize * len) + 1;
     sys_Array_ref array = (sys_Array_ref)fr_alloc(self, sys_Array_class__, allocSize);
     array->elemType = elemType;
     array->elemSize = elemSize;

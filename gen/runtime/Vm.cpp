@@ -47,9 +47,35 @@ void Vm::releaseEnv(Env *env) {
     delete env;
 }
 
+typedef struct fr_Array_ {
+    fr_Type elemType;
+    int32_t valueType;
+    int32_t elemSize;
+    int64_t size;
+    fr_Obj data[1];
+} fr_Array;
+
+extern fr_Type sys_Array_class__;
+
+
 void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::list<GcObj*> *list) {
     fr_Obj obj = fr_fromGcObj(gcobj);
     fr_Type type = (fr_Type)gc_getType(gcobj);
+    
+    if (type == sys_Array_class__) {
+        fr_Array *array = (fr_Array*)obj;
+        if (array->valueType == fr_vtObj) {
+            for (int i=0; i<array->size; ++i) {
+                fr_Obj elem = array->data[i];
+                if (elem) {
+                    GcObj *gp = fr_toGcObj(elem);
+                    list->push_back(gp);
+                }
+            }
+        }
+        return;
+    }
+    
     for (int i=0; i<type->fieldCount; ++i) {
         fr_Field &f = type->fieldList[i];
         if (!f.isStatic && !f.isValType) {
@@ -77,10 +103,12 @@ void Vm::walkRoot(Gc *gc) {
     }
 }
 
+extern "C" { void fr_finalizeObj(fr_Env __env, fr_Obj _obj); }
 void Vm::finalizeObj(GcObj *gcobj) {
-    //fr_Obj obj = fr_fromGcObj(gcobj);
+    fr_Obj obj = fr_fromGcObj(gcobj);
     //fr_Class type = (fr_Class)gc_getType(gcobj);
     //printf("release %s %p\n", type->name, obj);
+    fr_finalizeObj(getEnv(), obj);
 }
 
 void Vm::onStartGc() {

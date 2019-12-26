@@ -49,9 +49,9 @@ void fr_releaseEnv(fr_Fvm vm, fr_Env env);
 //#endif
 
 typedef fr_Obj fr_Err;
-fr_Obj fr_getErr(fr_Env self);
-void fr_setErr(fr_Env self, fr_Obj err);
-void fr_clearErr(fr_Env self);
+//fr_Obj fr_getErr(fr_Env self);
+//void fr_setErr(fr_Env self, fr_Obj err);
+//void fr_clearErr(fr_Env self);
 
 ////////////////////////////
 // GC
@@ -116,14 +116,6 @@ typedef float sys_Float32;
 
 typedef bool sys_Bool_val;
 typedef void * sys_Ptr_val;
-    
-//typedef struct fr_Array_ {
-//    fr_Type elemType;
-//    int32_t valueType;
-//    int32_t elemSize;
-//    int64_t size;
-//    fr_Obj data[1];
-//} fr_Array;
 
 fr_Obj fr_box_int(fr_Env, sys_Int_val val);
 fr_Obj fr_box_float(fr_Env, sys_Float_val val);

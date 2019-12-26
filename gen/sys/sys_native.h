@@ -33,7 +33,7 @@ struct sys_Array_struct {
     int32_t valueType;
     int32_t elemSize;
     int64_t size;
-    fr_Obj data[1];
+    fr_Obj data[0];
 };
 
 struct sys_Func_struct {

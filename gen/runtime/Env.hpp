@@ -24,11 +24,11 @@ class Vm;
 class Env : public fr_Env_ {
 public:
     Vm *vm;
-    fr_Obj error;
+    //fr_Obj error;
     //std::vector<const char*> stackTrace;
-#ifdef LONG_JMP_EXCEPTION
-    std::vector<JmpBuf> exception;
-#endif
+//#ifdef LONG_JMP_EXCEPTION
+//    std::vector<JmpBuf> exception;
+//#endif
 public:
     
     
