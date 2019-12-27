@@ -142,7 +142,7 @@ void IRMethod::print(Printer& printer, int pass) {
     }
     
     printer._print("__errTable:\n");
-    printer.println("if (!__err) abort();");
+    printer.println("if (!__err || !FR_TYPE_IS(__err, sys_Err)) abort();");
     if (errTable) {
         for (FTrap &trap : errTable->traps) {
             std::string type = FCodeUtil::getTypeRefName(curPod, trap.type, false);

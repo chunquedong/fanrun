@@ -21,26 +21,14 @@ void fr_finalizeObj(fr_Env __env, fr_Obj _obj) {
     sys_Obj obj = (sys_Obj)_obj;
     _FR_VTABLE(sys_Obj, obj)->finalize(__env, obj);
 }
-fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int extType, size_t len) {
-    int elemSize = sizeof(fr_Obj);
+fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int elemSize, size_t len) {
+    if (elemSize <= 0) elemSize = sizeof(fr_Obj);
     fr_ValueType vtype = fr_vtObj;
     if (elemType == sys_Int_class__) {
         vtype = fr_vtInt;
-        if (extType == -1) {
-            elemSize = 8;
-        }
-        else if (extType == 8 || extType == 16 || extType == 32 || extType == 64) {
-            elemSize = extType/8;
-        }
     }
     else if (elemType == sys_Float_class__) {
         vtype = fr_vtFloat;
-        if (extType == -1) {
-            elemSize = sizeof(double);
-        }
-        else if (extType == 32 || extType == 64) {
-            elemSize = extType/8;
-        }
     }
     else if (elemType == sys_Bool_class__) {
         vtype = fr_vtBool;

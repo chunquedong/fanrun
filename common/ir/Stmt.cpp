@@ -296,27 +296,27 @@ void CallStmt::print(Printer& printer) {
             std::string elemType;
             if (extName == "sys_Int8") {
                 elemType = "sys_Int";
-                extType = 8;
+                extType = 1;
             }
             else if (extName == "sys_Int16") {
                 elemType = "sys_Int";
-                extType = 16;
+                extType = 2;
             }
             else if (extName == "sys_Int32") {
                 elemType = "sys_Int";
-                extType = 32;
+                extType = 4;
             }
             else if (extName == "sys_Int" || extName == "sys_Int64") {
                 elemType = "sys_Int";
-                extType = 64;
+                extType = 8;
             }
             else if (extName == "sys_Float" || extName == "sys_Float64") {
                 elemType = "sys_Float";
-                extType = 64;
+                extType = 8;
             }
             else if (extName == "sys_Float32") {
                 elemType = "sys_Float";
-                extType = 32;
+                extType = 4;
             }
             else {
                 elemType = extName;
@@ -362,10 +362,12 @@ void CallStmt::print(Printer& printer) {
             printer.printf("FR%s_CALL(%d, %s, %s_val", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
         }
         else if (isVirtual) {
-            printer.printf("FR%s_VCALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
-        }
-        else if (isMixin) {
-            printer.printf("FR%s_ICALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
+            if (isMixin) {
+                printer.printf("FR%s_ICALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
+            }
+            else {
+                printer.printf("FR%s_VCALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());
+            }
         }
         else if (isStatic) {
             printer.printf("FR%s_SCALL(%d, %s, %s", voidFlag.c_str(), this->pos, typeName.c_str(), mthName.c_str());

@@ -84,7 +84,7 @@ typedef enum fr_ValueType_ {
     fr_vtPtr,
 } fr_ValueType;
 
-fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int extType, size_t len);
+fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int elemSize, size_t len);
 
 //fr_Obj fr_newStr(fr_Env __env, const wchar_t *data, size_t size, bool copy);
 fr_Obj fr_newStrUtf8(fr_Env self, const char *bytes, ssize_t size);

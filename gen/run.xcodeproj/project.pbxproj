@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		320544622203196300ECB5F2 /* baseTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 320544612203196300ECB5F2 /* baseTest.cpp */; };
+		320544622203196300ECB5F2 /* baseTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 320544612203196300ECB5F2 /* baseTest.c */; };
 		321248C32207214800EF1830 /* runtime_native.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248B52207214800EF1830 /* runtime_native.cpp */; };
 		321248C42207214800EF1830 /* sys_Obj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248B62207214800EF1830 /* sys_Obj.cpp */; };
 		321248C72207214800EF1830 /* sys_Bool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248B92207214800EF1830 /* sys_Bool.cpp */; };
 		321248C82207214800EF1830 /* sys_Float.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248BA2207214800EF1830 /* sys_Float.cpp */; };
 		321248C92207214800EF1830 /* sys_Func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248BB2207214800EF1830 /* sys_Func.cpp */; };
 		321248CA2207214800EF1830 /* sys_Int.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 321248BC2207214800EF1830 /* sys_Int.cpp */; };
-		324A54B42000EE130083C73E /* sys.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 324A54B22000EE130083C73E /* sys.cpp */; };
+		324A54B42000EE130083C73E /* sys.c in Sources */ = {isa = PBXBuildFile; fileRef = 324A54B22000EE130083C73E /* sys.c */; };
 		326165501FF8A578002174D6 /* Vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3261654F1FF8A578002174D6 /* Vm.cpp */; };
 		327A0D0622194A88001A6EF0 /* Gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 327A0CF922194A88001A6EF0 /* Gc.cpp */; };
 		327A0D0722194A88001A6EF0 /* tinycthread.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0CFC22194A88001A6EF0 /* tinycthread.c */; };
@@ -44,7 +44,7 @@
 
 /* Begin PBXFileReference section */
 		320544602203196300ECB5F2 /* baseTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseTest.h; sourceTree = "<group>"; };
-		320544612203196300ECB5F2 /* baseTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseTest.cpp; sourceTree = "<group>"; };
+		320544612203196300ECB5F2 /* baseTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = baseTest.c; sourceTree = "<group>"; };
 		321248B52207214800EF1830 /* runtime_native.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime_native.cpp; sourceTree = "<group>"; };
 		321248B62207214800EF1830 /* sys_Obj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Obj.cpp; sourceTree = "<group>"; };
 		321248B92207214800EF1830 /* sys_Bool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Bool.cpp; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 		321248BB2207214800EF1830 /* sys_Func.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Func.cpp; sourceTree = "<group>"; };
 		321248BC2207214800EF1830 /* sys_Int.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys_Int.cpp; sourceTree = "<group>"; };
 		321248BD2207214800EF1830 /* sys_native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys_native.h; sourceTree = "<group>"; };
-		324A54B22000EE130083C73E /* sys.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sys.cpp; sourceTree = "<group>"; };
+		324A54B22000EE130083C73E /* sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys.c; sourceTree = "<group>"; };
 		3261654E1FF8A578002174D6 /* Vm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Vm.hpp; sourceTree = "<group>"; };
 		3261654F1FF8A578002174D6 /* Vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vm.cpp; sourceTree = "<group>"; };
 		327A0CF822194A88001A6EF0 /* Gc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gc.h; sourceTree = "<group>"; };
@@ -179,8 +179,8 @@
 			isa = PBXGroup;
 			children = (
 				320544602203196300ECB5F2 /* baseTest.h */,
-				320544612203196300ECB5F2 /* baseTest.cpp */,
-				324A54B22000EE130083C73E /* sys.cpp */,
+				320544612203196300ECB5F2 /* baseTest.c */,
+				324A54B22000EE130083C73E /* sys.c */,
 				3291F92C1F6D416C00F12438 /* sys.h */,
 			);
 			path = temp;
@@ -253,7 +253,7 @@
 				3291F9311F6D416C00F12438 /* runtime.cpp in Sources */,
 				327A0D0922194A88001A6EF0 /* utf8.c in Sources */,
 				3291F9321F6D416C00F12438 /* Class.cpp in Sources */,
-				324A54B42000EE130083C73E /* sys.cpp in Sources */,
+				324A54B42000EE130083C73E /* sys.c in Sources */,
 				3291F92F1F6D416C00F12438 /* Env.cpp in Sources */,
 				32C77A1B23AA6F3F0045B3E3 /* sys_Array.cpp in Sources */,
 				32C77A1E23AA78000045B3E3 /* NativeC.cpp in Sources */,
@@ -262,7 +262,7 @@
 				321248C82207214800EF1830 /* sys_Float.cpp in Sources */,
 				321248C92207214800EF1830 /* sys_Func.cpp in Sources */,
 				32C77A1F23AA78000045B3E3 /* sys_Ptr.cpp in Sources */,
-				320544622203196300ECB5F2 /* baseTest.cpp in Sources */,
+				320544622203196300ECB5F2 /* baseTest.c in Sources */,
 				321248C42207214800EF1830 /* sys_Obj.cpp in Sources */,
 				326165501FF8A578002174D6 /* Vm.cpp in Sources */,
 			);

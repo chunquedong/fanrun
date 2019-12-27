@@ -15,7 +15,10 @@ int main() {
     fr_Env env = fr_getEnv(NULL);
     baseTest_init__(env);
     
-    baseTest_Main_main(env);
+    fr_Err e = baseTest_Main_main(env);
+    if (e) {
+        sys_Err_trace(env, &e, e);
+    }
     
     fr_releaseEnv(NULL, env);
 }
