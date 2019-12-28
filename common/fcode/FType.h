@@ -31,6 +31,7 @@ struct FField : public FSlot {
     //app
     uint16_t c_offset;
     FType *c_parent;
+    std::string c_mangledName;
 };
 
 struct FMethodVar : public FSlot {
@@ -60,6 +61,7 @@ struct FMethod : public FSlot {
     void *c_wrappedMethod;
     void (*c_jit)(void *env);
     uint16_t c_jitLocalCount;
+    std::string c_stdName;
     std::string c_mangledName;
     std::string c_mangledSimpleName;
 };

@@ -36,7 +36,7 @@ MethodGen::MethodGen(TypeGen *parent, FMethod *method) : parent(parent), method(
 bool MethodGen::genPrototype(Printer *printer, bool funcPtr, bool isValType) {
     int paramNum = method->paramCount;
     
-    auto typeName = parent->podGen->getTypeRefName(method->returnType);
+    auto typeName = parent->getTypeRefName(method->returnType);
     
     if (typeName == "sys_Void") {
         typeName = "void";
@@ -73,8 +73,8 @@ bool MethodGen::genPrototype(Printer *printer, bool funcPtr, bool isValType) {
     
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
-        auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
-        auto var_typeName = parent->podGen->getTypeRefName(var.type, true);
+        auto var_name = FCodeUtil::getIdentifierName(parent->type->c_pod, var.name);
+        auto var_typeName = parent->getTypeRefName(var.type, true);
         
         printer->printf(", %s %s", var_typeName.c_str(), var_name.c_str());
     }
@@ -89,7 +89,7 @@ void MethodGen::genDeclares(Printer *printer, bool funcPtr, bool isValType) {
 
 void MethodGen::genNativePrototype(Printer *printer, bool funcPtr, bool isValType) {
     genPrototype(printer, funcPtr, isValType);
-    printer->println(" { return 0; }");
+    printer->println(" { FR_RET_ALLOC_THROW(sys_UnsupportedErr); }");
 }
 
 void MethodGen::genImples(Printer *printer) {
@@ -110,7 +110,7 @@ void MethodGen::genImples(Printer *printer) {
             return;
         }
    
-        std::string &methodName = parent->podGen->pod->names[method->name];
+        std::string &methodName = method->c_stdName;
         if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
             //has code
         }
@@ -124,7 +124,7 @@ void MethodGen::genImples(Printer *printer) {
     genPrototype(printer, false, isVal);
     printer->println(" {");
     
-    IRMethod irMethod(parent->podGen->pod, method);
+    IRMethod irMethod(parent->type->c_pod, method);
     irMethod.name = this->name;
     MBuilder builder(method->code, irMethod);
     builder.buildMethod(method);
@@ -147,7 +147,7 @@ void MethodGen::genImplesToVal(Printer *printer) {
     printer->println(" {");
     printer->indent();
     
-    auto typeName = parent->podGen->getTypeRefName(method->returnType);
+    auto typeName = parent->getTypeRefName(method->returnType);
     
     std::string retVar;
     if (typeName != "sys_Void") {
@@ -167,7 +167,7 @@ void MethodGen::genImplesToVal(Printer *printer) {
     int paramNum = method->paramCount;
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
-        auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
+        auto var_name = FCodeUtil::getIdentifierName(parent->type->c_pod, var.name);
         printer->printf(", %s", var_name.c_str());
     }
     printer->println(");");
@@ -196,7 +196,7 @@ void MethodGen::genMethodStub(Printer *printer, bool isValType) {
     printer->println(" {");
     
     int paramNum = method->paramCount;
-    auto retTypeName = parent->podGen->getTypeRefName(method->returnType);
+    auto retTypeName = parent->getTypeRefName(method->returnType);
     
     printer->indent();
     printer->println("static fr_Method method = NULL;");
@@ -222,8 +222,8 @@ void MethodGen::genMethodStub(Printer *printer, bool isValType) {
     
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
-        auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
-        auto var_typeName = parent->podGen->getTypeRefName(var.type);
+        auto var_name = FCodeUtil::getIdentifierName(parent->type->c_pod, var.name);
+        auto var_typeName = parent->getTypeRefName(var.type);
         const char *tag = getUnionTagName(var_typeName);
         if (isStatic) {
             printer->println("args[%d].%s = %s;", j, tag, var_name.c_str());
@@ -289,15 +289,15 @@ void MethodGen::genRegisterWrap(Printer *printer, bool isValType) {
                      , parent->name.c_str(), name.c_str(), method->paramCount, valFlag);
     printer->indent();
     int paramNum = method->paramCount;
-    auto retTypeName = parent->podGen->getTypeRefName(method->returnType);
+    auto retTypeName = parent->getTypeRefName(method->returnType);
     
     if (!isStatic) {
         printer->println("%s __self = __args[0].%s;", parent->name.c_str(), getUnionTagName(parent->name));
     }
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
-        auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
-        auto var_typeName = parent->podGen->getTypeRefName(var.type);
+        auto var_name = FCodeUtil::getIdentifierName(parent->type->c_pod, var.name);
+        auto var_typeName = parent->getTypeRefName(var.type);
         
         if (isStatic) {
             printer->println("%s %s = __args[%d].%s;"
@@ -318,7 +318,7 @@ void MethodGen::genRegisterWrap(Printer *printer, bool isValType) {
     }
     for (int j=0; j<paramNum; ++j) {
         FMethodVar &var = method->vars[j];
-        auto var_name = FCodeUtil::getIdentifierName(parent->podGen->pod, var.name);
+        auto var_name = FCodeUtil::getIdentifierName(parent->type->c_pod, var.name);
         printer->printf(", %s", var_name.c_str());
     }
     printer->println(");");

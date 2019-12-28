@@ -18,7 +18,7 @@ PodGen::PodGen(PodLoader *podMgr, const std::string& podName) : podMgr(podMgr), 
     allTypes.reserve(pod->types.size());
     for (int i=0; i<pod->types.size(); ++i) {
         FType *type = &pod->types[i];
-        TypeGen gtype(this, type, module->defType(type));
+        TypeGen gtype(type, module->defType(type));
         gtype.c_sortFlag = 0;
         
         //if (gtype.name != "testlib_Main") continue;
@@ -196,14 +196,24 @@ void PodGen::genStaticInit(Printer *printer) {
         printer->println("%s_init__(__env);", dep.c_str());
     }
     
+    printer->newLine();
     for (int i=0; i<sortedTypes.size(); ++i) {
         TypeGen *gtype = sortedTypes[i];
+        gtype->irType->initVTable();
+        int vtableSize = 0;
+        for (int j=0; j<gtype->irType->vtables.size(); ++j) {
+            IRVTable *vtable = gtype->irType->vtables[j];
+            vtableSize += vtable->functions.size();
+        }
+        
         printer->println("%s_class__ = (fr_Type)"
-                         "malloc(sizeof(struct %s_vtable));"
+                         "malloc(sizeof(struct fr_Class_) + (%d * sizeof(void*)) );"
+                         , gtype->name.c_str(), vtableSize);
+        printer->println("%s_initClass__(__env, (struct fr_Class_ *)%s_class__);"
                          , gtype->name.c_str(), gtype->name.c_str());
-        printer->println("%s_initVTable(__env, (struct %s_vtable*)%s_class__);"
-                         , gtype->name.c_str(), gtype->name.c_str(), gtype->name.c_str());
+        printer->newLine();
     }
+    
     printer->newLine();
     printer->newLine();
     for (int i=0; i<sortedTypes.size(); ++i) {

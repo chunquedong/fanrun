@@ -16,8 +16,9 @@
 class IRType;
 
 class IRVirtualMethod {
-public:
     IRType *parent;
+public:
+    
     FMethod *method;
     
     IRVirtualMethod();
@@ -33,6 +34,7 @@ class IRVTable {
 public:
     IRType *type;
     IRType *owner;
+    int baseSize;
     
     IRVTable(IRType *owner, IRType *type);
     

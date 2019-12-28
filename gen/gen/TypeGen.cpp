@@ -13,10 +13,24 @@
 #include "FCodeUtil.hpp"
 #include <stdlib.h>
 
-TypeGen::TypeGen(PodGen *podGen, FType *type, IRType *irType)
-: podGen(podGen), type(type), irType(irType) {
-    name = podGen->getTypeRefName(type->meta.self);
+TypeGen::TypeGen(FType *type, IRType *irType)
+: type(type), irType(irType) {
+    name = type->c_mangledName;
+    podName = type->c_pod->name;
     isValueType = FCodeUtil::isValueType(type);
+}
+
+std::string TypeGen::getTypeRefName(uint16_t tid, bool forPass) {
+    FPod *pod = type->c_pod;
+    std::string t = FCodeUtil::getTypeRefName(pod, tid, true);
+    if (forPass) {
+        if (FCodeUtil::isValueTypeRef(pod, tid) && !FCodeUtil::isBuildinVal(t)) {
+            if (t.find("_null") != t.size()-5) {
+                t += "_pass";
+            }
+        }
+    }
+    return t;
 }
 
 void TypeGen::genTypeDeclare(Printer *printer) {
@@ -45,7 +59,7 @@ void TypeGen::genStruct(Printer *printer) {
         return;
     }
     
-    std::string baseName = podGen->getTypeRefName(type->meta.base);
+    std::string baseName = getTypeRefName(type->meta.base);
     
     printer->println("struct %s_struct {", name.c_str());
     
@@ -97,33 +111,27 @@ void TypeGen::genImple(Printer *printer) {
 void TypeGen::genVTable(Printer *printer) {
     
     printer->println("struct %s_vtable {", name.c_str());
-    
     printer->indent();
     
-    std::string baseName = podGen->getTypeRefName(type->meta.base);
+    irType->initVTable();
+//    if ((type->meta.flags & FFlags::Mixin) == 0) {
+//        if (type->meta.base != 0xFFFF) {
+//            std::string base = FCodeUtil::getTypeRefName(podGen->pod, type->meta.base, false);
+//            printer->println("struct %s_vtable super__;", base.c_str());
+//        }
+//    }
     
-    if (name == "sys_Obj") {
-        printer->println("struct fr_Class_ super__;");
-    } else {
-        printer->println("struct %s_vtable super__;", baseName.c_str());
-    }
-    
-    std::string base;
-    for (int i=0; i<type->meta.mixin.size(); ++i) {
-        base = podGen->getTypeRefName(type->meta.mixin[i]);
-        printer->println("struct %s_vtable %s_super__;", base.c_str(), base.c_str());
-    }
-    
-    for (int i=0; i<type->methods.size(); ++i) {
-        FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Ctor) != 0 || (method->flags & FFlags::Static) != 0) {
-            //TODO: why call novirtual function by callVirutal instruct?
+    IRVTable *vtable = irType->vtables[0];
+    for (int i = 0; i<vtable->functions.size(); ++i) {
+        IRVirtualMethod &method = vtable->functions[i];
+        if (method.method->c_parent != type) {
+            TypeGen tempType(method.method->c_parent, irType->module->defType(method.method->c_parent));
+            MethodGen gmethod(&tempType, method.method);
+            gmethod.genDeclares(printer, true, false);
             continue;
         }
-        MethodGen gmethod(this, method);
+        MethodGen gmethod(this, method.method);
         gmethod.genDeclares(printer, true, false);
-        //printer->printf(";");
-        //printer->newLine();
     }
     
     printer->unindent();
@@ -133,27 +141,27 @@ void TypeGen::genVTable(Printer *printer) {
     //printer->println("fr_Type %s_class__(fr_Env __env);", name.c_str());
     printer->println("extern fr_Type %s_class__;", name.c_str());
     
-    printer->println("void %s_initVTable(fr_Env __env, struct %s_vtable *vtable);"
-                     , name.c_str(), name.c_str());
+//    printer->println("void %s_initClass__(fr_Env __env, fr_Type type);"
+//                     , name.c_str(), name.c_str());
 }
 
 void TypeGen::genTypeMetadata(Printer *printer) {
     FTypeRef &typeRef = type->c_pod->typeRefs[type->meta.self];
     std::string &rawTypeName = type->c_pod->names[typeRef.typeName];
-    printer->println("((fr_Type)vtable)->name = \"%s\";", rawTypeName.c_str());
+    printer->println("type->name = \"%s\";", rawTypeName.c_str());
     
-    printer->println("((fr_Type)vtable)->allocSize = sizeof(struct %s_struct);", name.c_str());
+    printer->println("type->allocSize = sizeof(struct %s_struct);", name.c_str());
     
-    std::string baseName = podGen->getTypeRefName(type->meta.base);
+    std::string baseName = getTypeRefName(type->meta.base);
     //sys::Obj's base class is NULL
     if (baseName.size() == 0) {
-        printer->println("((fr_Type)vtable)->base = (fr_Type)NULL;");
+        printer->println("type->base = (fr_Type)NULL;");
     }
     else {
-        printer->println("((fr_Type)vtable)->base = (fr_Type)%s_class__;", baseName.c_str());
+        printer->println("type->base = (fr_Type)%s_class__;", baseName.c_str());
     }
-    printer->println("((fr_Type)vtable)->fieldCount = %d;", type->fields.size());
-    printer->println("((fr_Type)vtable)->fieldList = (struct fr_Field*)malloc(sizeof(struct fr_Field)*%d);", type->fields.size());
+    printer->println("type->fieldCount = %d;", type->fields.size());
+    printer->println("type->fieldList = (struct fr_Field*)malloc(sizeof(struct fr_Field)*%d);", type->fields.size());
     //int offset = 0;
     for (int i=0; i<type->fields.size(); ++i) {
         FField &field = type->fields[i];
@@ -161,191 +169,74 @@ void TypeGen::genTypeMetadata(Printer *printer) {
         std::string fieldIdName = fieldName;
         FCodeUtil::escapeIdentifierName(fieldIdName);
         
-        printer->println("((fr_Type)vtable)->fieldList[%d].name = \"%s\";", i, fieldName.c_str());
-        std::string typeName = podGen->getTypeRefName(field.type);
-        printer->println("((fr_Type)vtable)->fieldList[%d].type = \"%s\";", i, typeName.c_str());
+        printer->println("type->fieldList[%d].name = \"%s\";", i, fieldName.c_str());
+        std::string typeName = getTypeRefName(field.type);
+        printer->println("type->fieldList[%d].type = \"%s\";", i, typeName.c_str());
     
         bool isValType = FCodeUtil::isBuildinVal(typeName);
-        printer->println("((fr_Type)vtable)->fieldList[%d].isValType = %s;", i, isValType ? "true" : "false");
+        printer->println("type->fieldList[%d].isValType = %s;", i, isValType ? "true" : "false");
         
         if (field.flags & FFlags::Static) {
-            printer->println("((fr_Type)vtable)->fieldList[%d].isStatic = true;", i);
-            printer->println("((fr_Type)vtable)->fieldList[%d].pointer = (void*)(&%s_%s);"
+            printer->println("type->fieldList[%d].isStatic = true;", i);
+            printer->println("type->fieldList[%d].pointer = (void*)(&%s_%s);"
                              , i, name.c_str(), fieldIdName.c_str());
         } else if ((field.flags & FFlags::Storage) == 0) {
-            printer->println("((fr_Type)vtable)->fieldList[%d].isStatic = false;", i);
-            printer->println("((fr_Type)vtable)->fieldList[%d].offset = -1;//no storage", i);
+            printer->println("type->fieldList[%d].isStatic = false;", i);
+            printer->println("type->fieldList[%d].offset = -1;//no storage", i);
         } else {
-            printer->println("((fr_Type)vtable)->fieldList[%d].isStatic = false;", i);
+            printer->println("type->fieldList[%d].isStatic = false;", i);
             
-            printer->println("((fr_Type)vtable)->fieldList[%d].offset = offsetof(struct %s_struct, %s);"
+            printer->println("type->fieldList[%d].offset = offsetof(struct %s_struct, %s);"
                          , i, name.c_str(), fieldIdName.c_str());
         }
     }
     
-    printer->println("((fr_Type)vtable)->methodCount = %d;", type->methods.size());
-    
-//    if (baseName == "sys_Func") {
-//        auto itr = type->c_methodMap.find("doCall");
-//        if (itr != type->c_methodMap.end()) {
-//            int funcArity = itr->second->paramCount;
-//            printer->println("((fr_Type)vtable)->funcArity = %d;", funcArity);
-//        }
-//    }
+    printer->println("type->methodCount = %d;", type->methods.size());
     
     printer->println("fr_registerClass(__env, \"%s\", \"%s\", (fr_Type)%s_class__);"
-                     , podGen->podName.c_str(), rawTypeName.c_str(), name.c_str());
+                     , podName.c_str(), rawTypeName.c_str(), name.c_str());
 }
 
 void TypeGen::genVTableInit(Printer *printer) {
-    printer->println("void %s_initVTable(fr_Env __env, struct %s_vtable *vtable) {", name.c_str(), name.c_str());
+    irType->initVTable();
+    printer->println("void **vtable = (void*)(type+1);");
+
+    printer->println("if (%d >= MAX_INTERFACE_SIZE) abort();", irType->vtables.size()-1);
+    int pos = 0;
+    int i = 0;
+    for (; i<irType->vtables.size(); ++i) {
+        IRVTable *vtable = irType->vtables[i];
+        if (i != 0) {
+            printer->println("type->interfaceVTableIndex[%d].type = %s_class__;", i-1, vtable->type->ftype->c_mangledName.c_str());
+            printer->println("type->interfaceVTableIndex[%d].vtableOffset = %d;", i-1, pos);
+        }
+        
+        for (IRVirtualMethod &method : vtable->functions) {
+            //MethodGen gmethod(this, method.method);
+            if (method.method->flags & FFlags::Abstract) {
+                printer->println("vtable[%d] = NULL;", pos);
+            }
+            else {
+                printer->println("vtable[%d] = (void*)%s;", pos, method.method->c_mangledName.c_str());
+            }
+            ++pos;
+        }
+    }
+    printer->println("type->interfaceVTableIndex[%d].type = NULL;", i-1);
+    printer->println("type->interfaceVTableIndex[%d].vtableOffset = 0;", i-1);
+}
+
+void TypeGen::genTypeInit(Printer *printer) {
+    printer->println("fr_Type %s_class__ = NULL;", name.c_str());
     
+    printer->println("void %s_initClass__(fr_Env __env, struct fr_Class_ *type) {", name.c_str());
     printer->indent();
     
-    std::string baseName = podGen->getTypeRefName(type->meta.base);
-    
-    bool isRootType = false;
-    if (name == "sys_Obj") {
-        isRootType = true;
-        printer->println("fr_VTable_init(__env, &vtable->super__);");
-    } else {
-        printer->println("%s_initVTable(__env, &vtable->super__);", baseName.c_str());
-    }
-    
-    std::string base;
-    int minxinSize = (int)type->meta.mixin.size();
-    if (minxinSize > 10) {
-        printf("ERROR: too many mixin size %d > MAX_INTERFACE_SIZE\n", minxinSize);
-        abort();
-    }
-    for (int i=0; i<minxinSize; ++i) {
-        base = podGen->getTypeRefName(type->meta.mixin[i]);
-        printer->println("%s_initVTable(__env, &vtable->%s_super__);", base.c_str(), base.c_str());
-        printer->println("((fr_Type)vtable)->interfaceVTableMap[%d].type = %s_class__;"
-                         , i, base.c_str());
-        printer->println("((fr_Type)vtable)->interfaceVTableMap[%d].vtable = (fr_Type)&vtable->%s_super__;"
-                         , i, base.c_str());
-    }
-    
-    printer->println("((fr_Type)vtable)->mixinCount = %d;", minxinSize);
-    
-    //set self virutal func
-    for (int i=0; i<type->methods.size(); ++i) {
-        FMethod *method = &type->methods[i];
-        if ((method->flags & FFlags::Ctor) != 0 || (method->flags & FFlags::Static) != 0) {
-            continue;
-        }
-        MethodGen gmethod(this, method);
-        //int j = method->paramCount;
-        if ((method->flags & FFlags::Abstract) != 0) {
-            printer->println("vtable->%s = NULL;", gmethod.name.c_str());
-        } else {
-            printer->println("vtable->%s = %s_%s;", gmethod.name.c_str(),
-                             name.c_str(), gmethod.name.c_str());
-        }
-    }
-    
-    //override base and mixin
-    if (!isRootType) {
-        for (int i=0; i<type->methods.size(); ++i) {
-            FMethod *method = &type->methods[i];
-            if ((method->flags & FFlags::Override) == 0) {
-                continue;
-            }
-            std::string rawMethodName = podGen->pod->names[method->name];
-//            if (name == "sys_Type" && rawMethodName == "make") {
-//                continue;
-//            }
-            
-            MethodGen gmethod(this, method);
-            genOverrideVTable(type, rawMethodName, printer, gmethod, "vtable->");
-        }
-    }
-    
+    genVTableInit(printer);
     genTypeMetadata(printer);
     
     printer->unindent();
     printer->println("};");
-}
-
-void TypeGen::genTypeInit(Printer *printer) {
-    genVTableInit(printer);
-    
-    printer->println("fr_Type %s_class__ = NULL;", name.c_str());
-    /*
-    printer->println("fr_Type %s_class__(fr_Env __env) {", name.c_str());
-    printer->indent();
-    
-    printer->println("static struct %s_vtable *%s_class_instance = NULL;", name.c_str(), name.c_str());
-    
-    printer->println("if (%s_class_instance == NULL) {", name.c_str());
-    printer->indent();
-    printer->println("%s_class_instance = (struct %s_vtable*)"
-                     "malloc(sizeof(struct %s_vtable));"
-                     , name.c_str(), name.c_str(), name.c_str());
-    printer->println("%s_initVTable(__env, %s_class_instance);", name.c_str(), name.c_str());
-    
-    for (int i=0; i<type->methods.size(); ++i) {
-        FMethod *method = &type->methods[i];
-        std::string mname = FCodeUtil::getIdentifierName(podGen->pod, method->name);
-        if (mname == "static__init") {
-            printer->println("%s_static__init0(__env);", name.c_str());
-        }
-    }
-    
-    printer->unindent();
-    printer->println("}");
-    printer->println("return %s_class_instance;", name.c_str());
-    printer->unindent();
-    printer->println("}");
-     */
-}
-
-void TypeGen::genOverrideVTable(FType *type, std::string &rawMethodName
-                                , Printer *printer, MethodGen &gmethod, std::string from) {
-    /*
-    uint16_t tid = type->meta.base;
-    FPod *pod = type->c_pod;
-    FTypeRef &typeRef = pod->typeRefs[tid];
-    std::string &podName = pod->names[typeRef.podName];
-    std::string &typeName = pod->names[typeRef.typeName];
-    
-    FPod *tpod = podGen->podMgr->findPod(podName);
-    FType *ttype = tpod->c_typeMap[typeName];
-    */
-    FType *ttype = FCodeUtil::getFTypeFromTypeRef(type->c_pod, type->meta.base);
-    if (ttype == NULL) return;
-    
-    auto found = ttype->c_methodMap.find(rawMethodName);
-    
-    if (found != ttype->c_methodMap.end()) {
-        if ((found->second->flags & FFlags::Private)) {
-            return;
-        }
-        //int j = gmethod.method->paramCount;
-        //FMethod *parentMethod = found->second;
-        if (gmethod.method->flags & FFlags::Abstract) {
-            printer->println("*((int**)(&(%ssuper__.%s))) = NULL;", from.c_str()
-                             , gmethod.name.c_str());
-        }
-        else {
-            printer->println("*((int**)(&(%ssuper__.%s))) = (int*)%s_%s;", from.c_str()
-                             , gmethod.name.c_str()
-                             , name.c_str(), gmethod.name.c_str());
-        }
-    }
-    //if (podName == "sys" && typeName == "Obj") return;
-    genOverrideVTable(ttype, rawMethodName, printer, gmethod, from + "super__.");
-    
-    for (int i=0; i<type->meta.mixin.size(); ++i) {
-        uint16_t mixin = type->meta.mixin[i];
-        if (mixin == type->meta.base) continue;
-        
-        //from  = from + base + "_";
-        FType *mixinType = FCodeUtil::getFTypeFromTypeRef(type->c_pod, mixin);
-        std::string base = mixinType->c_name;
-        genOverrideVTable(mixinType, rawMethodName, printer, gmethod, from + base + "_");
-    }
 }
 
 void TypeGen::genMethodDeclare(Printer *printer) {
@@ -370,8 +261,8 @@ void TypeGen::genNativePrototype(Printer *printer) {
             if ((field->flags & FFlags::Static) == 0) {
                 continue;
             }
-            auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
-            auto typeName = podGen->getTypeRefName(field->type);
+            auto name = FCodeUtil::getIdentifierName(type->c_pod, field->name);
+            auto typeName = getTypeRefName(field->type);
             printer->println("%s %s_%s = 0;", typeName.c_str(), this->name.c_str(), name.c_str());
         }
         printer->newLine();
@@ -386,7 +277,7 @@ void TypeGen::genNativePrototype(Printer *printer) {
         if ((method->flags & FFlags::Abstract) != 0) {
             continue;
         }
-        std::string &methodName = podGen->pod->names[method->name];
+        std::string &methodName = method->c_stdName;
         if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
             continue;
         }
@@ -412,8 +303,8 @@ void TypeGen::genField(Printer *printer) {
         if ((field->flags & FFlags::Storage) == 0) {
             continue;
         }
-        auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
-        std::string typeName = podGen->getTypeRefName(field->type);
+        auto name = FCodeUtil::getIdentifierName(type->c_pod, field->name);
+        std::string typeName = getTypeRefName(field->type);
         if (typeName == "sys_Int") {
             /*TODO
             for (FAttr *attr : field->attrs) {
@@ -459,8 +350,8 @@ void TypeGen::genStaticField(Printer *printer, bool isExtern) {
         if ((field->flags & FFlags::Static) == 0) {
             continue;
         }
-        auto name = FCodeUtil::getIdentifierName(podGen->pod, field->name);
-        auto typeName = podGen->getTypeRefName(field->type);
+        auto name = FCodeUtil::getIdentifierName(type->c_pod, field->name);
+        auto typeName = getTypeRefName(field->type);
         if (isExtern) {
             printer->printf("extern ");
             printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());

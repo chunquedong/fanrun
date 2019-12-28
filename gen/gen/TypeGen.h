@@ -19,16 +19,19 @@ class MethodGen;
 
 class TypeGen {
 public:
-    PodGen *podGen;
+    //PodGen *podGen;
     FType *type;
     int c_sortFlag;
     IRType *irType;
 public:
     std::string name;
+    std::string podName;
     bool isValueType;
 public:
-    TypeGen(PodGen *podGen, FType *type, IRType *irType);
+    TypeGen(FType *type, IRType *irType);
     
+    std::string getTypeRefName(uint16_t tid, bool forPass = false);
+
     void genTypeDeclare(Printer *printer);
     void genStruct(Printer *printer);
     void genVTable(Printer *printer);
@@ -46,8 +49,6 @@ private:
     void genField(Printer *printer);
     void genTypeMetadata(Printer *printer);
     void genVTableInit(Printer *printer);
-    void genOverrideVTable(FType *type, std::string &name
-                           , Printer *printer, MethodGen &gmethod, std::string from);
     
 };
 

@@ -110,6 +110,8 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
             }
             
             std::string &name = pod->names[fields[i].name];
+            fields[i].c_mangledName = name;
+            escape(fields[i].c_mangledName);
             c_fieldMap[name] = &fields[i];
         }
     }
@@ -129,13 +131,15 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
                 //name += "$";
                 name += std::to_string(method.paramCount);
             }
+            method.c_stdName = name;
             
-            method.c_mangledName = typeName +"_"+ name;
-            escape(method.c_mangledName);
             method.c_mangledSimpleName = name;
             escape(method.c_mangledSimpleName);
             
-            c_methodMap[name] = &method;
+            method.c_mangledName = typeName +"_"+ method.c_mangledSimpleName;
+            escape(method.c_mangledName);
+            
+            c_methodMap[method.c_stdName] = &method;
         }
     }
     {

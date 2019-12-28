@@ -12,6 +12,10 @@
 #include <inttypes.h>
 #include "miss.h"
 
+#ifdef  __cplusplus
+extern  "C" {
+#endif
+
 typedef void *fr_Obj;
 struct fr_Env_;
 typedef struct fr_Env_ *fr_Env;
@@ -56,10 +60,10 @@ struct fr_Method {
 typedef struct fr_Class_ *fr_Type;
 struct fr_IVTableMapItem {
     fr_Type type;
-    fr_Type vtable;
+    uint64_t vtableOffset;
 };
 
-#define MAX_INTERFACE_SIZE 10
+#define MAX_INTERFACE_SIZE 20
 
 struct fr_Class_ {
     const char *name;
@@ -80,13 +84,11 @@ struct fr_Class_ {
     int facetCount;
     //Obj facetList;
     
-    //only for Func
-    int funcArity;
     bool staticInited;
   
-    fr_Function finalize;
+    //fr_Function finalize;
     
-    struct fr_IVTableMapItem interfaceVTableMap[MAX_INTERFACE_SIZE];
+    struct fr_IVTableMapItem interfaceVTableIndex[MAX_INTERFACE_SIZE];
 };
 
 void fr_VTable_init(fr_Env env, fr_Type type);
@@ -95,9 +97,12 @@ bool fr_isClass(fr_Env env, fr_Obj obj, fr_Type type);
 
 fr_Type fr_getClass(fr_Env env, fr_Obj obj);
 
-fr_Type fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Type itype);
+void **fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Type itype);
 
 void fr_registerClass(fr_Env env, const char *pod, const char *clz, fr_Type type);
 fr_Type fr_findClass(fr_Env env, const char *pod, const char *clz);
 
+#ifdef  __cplusplus
+}//extern  "C" {
+#endif
 #endif /* defined(__fcode__Type__) */

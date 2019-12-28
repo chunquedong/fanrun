@@ -26,7 +26,7 @@ bool IRVirtualMethod::fromObj() {
     return parent->ftype->c_name == "sys_Obj";
 }
 
-IRVTable::IRVTable(IRType *owner, IRType *type) : owner(owner), type(type) {
+IRVTable::IRVTable(IRType *owner, IRType *type) : owner(owner), type(type), baseSize(0) {
 }
 
 
@@ -107,18 +107,19 @@ void IRType::resolveMethod() {
     
     for (int i =0; i<ftype->methods.size(); ++i) {
         FMethod &m = ftype->methods[i];
-        if ((m.flags & FFlags::Virtual) || (m.flags & FFlags::Abstract) || (m.flags & FFlags::Override)) {
-            std::string &name = fpod->names[m.name];
+        if ((m.flags & FFlags::Static) || (m.flags & FFlags::Ctor)) continue;
+        //if ((m.flags & FFlags::Virtual) || (m.flags & FFlags::Abstract) || (m.flags & FFlags::Override)) {
+            std::string &name = m.c_stdName;
             IRVirtualMethod vm(this, &m);
             resolvedMethods[name] = vm;
-        }
+        //}
     }
 }
 
 void IRType::setVTable(IRVTable *vtable) {
     for (int i=0; i<vtable->functions.size(); ++i) {
         IRVirtualMethod &vm = vtable->functions[i];
-        std::string name = vm.parent->fpod->names[vm.method->name];
+        std::string &name = vm.method->c_stdName;
         
         vtable->position[name] = i;
         
@@ -168,13 +169,14 @@ void IRType::initMainVTable() {
     //init vtable from base
     IRVTable *vtable = NULL;
     IRType *base = NULL;
-    if (ftype->meta.base != 0xFFFF) {
+    if (((ftype->meta.flags & FFlags::Mixin) == 0) && ftype->meta.base != 0xFFFF) {
         base = module->getType(fpod, ftype->meta.base);
         base->initVTable();
         
         vtable = new IRVTable(this, base);
         vtables.push_back(vtable);
         vtable->functions = base->vtables.at(0)->functions;
+        vtable->baseSize = (int)vtable->functions.size();
     }
     else {
         vtable = new IRVTable(this, nullptr);
@@ -184,20 +186,22 @@ void IRType::initMainVTable() {
     //init vtable from self
     for (int i =0; i<ftype->methods.size(); ++i) {
         FMethod &m = ftype->methods[i];
-        if ((m.flags & FFlags::Virtual) || (m.flags & FFlags::Abstract) || (m.flags & FFlags::Override)) {
-            std::string &name = fpod->names[m.name];
-            
-            if (base == NULL) {
-                IRVirtualMethod vm(this, &m);
-                vtable->functions.push_back(vm);
-                continue;
-            }
-            
-            std::map<std::string, IRVirtualMethod>::iterator itr = base->resolvedMethods.find(name);
-            if (itr == base->resolvedMethods.end()) {
-                IRVirtualMethod vm(this, &m);
-                vtable->functions.push_back(vm);
-            }
+        
+        if ((m.flags & FFlags::Static) || (m.flags & FFlags::Ctor)) continue;
+        //always add to vtable, even if non-virtual method. some fcodes has error e.g. CallViritual StrBuf.add
+        //if ((m.flags & FFlags::Virtual) || (m.flags & FFlags::Abstract) || (m.flags & FFlags::Override))
+        
+        if (base == NULL) {
+            IRVirtualMethod vm(this, &m);
+            vtable->functions.push_back(vm);
+            continue;
+        }
+        
+        std::string &name = m.c_stdName;
+        std::map<std::string, IRVirtualMethod>::iterator itr = base->resolvedMethods.find(name);
+        if (itr == base->resolvedMethods.end()) {
+            IRVirtualMethod vm(this, &m);
+            vtable->functions.push_back(vm);
         }
     }
     

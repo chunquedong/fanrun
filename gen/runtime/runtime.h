@@ -145,7 +145,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_RET_ALLOC_THROW(errType) FR_RET_THROW(FR_ALLOC(errType))
 #define FR_RET_THROW_NPE() FR_RET_THROW(fr_makeNPE(__env))
 
-#define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getClass(__env, self) )
+#define _FR_VTABLE(typeName, self) ( (struct typeName##_vtable*)(((struct fr_Class_*)fr_getClass(__env, self))+1) )
 #define _FR_IVTABLE(typeName, self) ( (struct typeName##_vtable*)fr_getInterfaceVTable(__env, self, typeName##_class__) )
 
 #define _FR_CHECK_ERR(expr, errPos) do{ __err = expr; if (__err) { __errOccurAt = errPos; goto __errTable;} }while(0)

@@ -30,7 +30,6 @@ void fr_VTable_init(fr_Env env, fr_Type type) {
     type->methodCount = 0;
     type->allocSize = 0;
     type->typeObj = NULL;
-    type->funcArity = 0;
     type->staticInited = false;
 }
 
@@ -44,13 +43,16 @@ fr_Type fr_getClass(fr_Env env, fr_Obj obj) {
     return type;
 }
 
-fr_Type fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Type itype) {
+void **fr_getInterfaceVTable(fr_Env env, fr_Obj obj, fr_Type itype) {
     fr_Type type = fr_getClass(env, obj);
-    for (int i=0; i<type->mixinCount; ++i) {
-        struct fr_IVTableMapItem *item = &type->interfaceVTableMap[i];
+    int i = 0;
+    while (true) {
+        struct fr_IVTableMapItem *item = &type->interfaceVTableIndex[i];
         if (item->type == itype) {
-            return item->vtable;
+            void **base = (void**)((struct fr_Class_*)type+1);
+            return (base + item->vtableOffset);
         }
+        if (item->type == NULL) break;
     }
     printf("ERROR: not found interface vtable %s\n", itype->name);
     return NULL;
