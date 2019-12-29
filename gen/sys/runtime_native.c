@@ -16,7 +16,10 @@
 #include <wctype.h>
 
 //////////////////////////////////////////////////////////
-extern "C" {
+#ifdef  __cplusplus
+extern  "C" {
+#endif
+    
 void fr_finalizeObj(fr_Env __env, fr_Obj _obj) {
     sys_Obj obj = (sys_Obj)_obj;
     _FR_VTABLE(sys_Obj, obj)->finalize(__env, obj);
@@ -48,7 +51,7 @@ fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int elemSize, size_t len) {
 //size_t utf8encode(const wchar_t *us, char *des, size_t n, int *illegal);
 //size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal);
 fr_Err sys_Str_fromCStr(fr_Env __env, sys_Str *__ret, sys_Ptr utf8, sys_Int byteLen);
-}
+
 fr_Obj fr_newStrUtf8(fr_Env __env, const char *bytes, ssize_t size) {
     size_t len;
     sys_Str str;
@@ -115,32 +118,39 @@ const char *fr_getStrUtf8(fr_Env env__, fr_Obj obj, bool *isCopy) {
 ////////////////////////////////////////////////////////////////
 fr_Err fr_makeNPE(fr_Env __env) {
     sys_NullErr npe = FR_ALLOC(sys_NullErr);
-    sys_NullErr_make0(__env, npe);
+    sys_NullErr_make__0(__env, npe);
     return npe;
 }
 ////////////////////////////////////////////////////////////////
-#include <unordered_map>
-#include <mutex>
-
-std::mutex pool_mutex;
+//#include <unordered_map>
+//#include <mutex>
+//
+//std::mutex pool_mutex;
 
 fr_Obj fr_box_int(fr_Env __env, sys_Int_val val) {
     fr_Obj obj;
-    static std::unordered_map<sys_Int_val, fr_Obj> map;
-    if ((val < 256 && val > -256)
+    static fr_Obj map[515];
+    if ((val < 256 && val >= -256)
         || val == sys_Int_maxVal
         || val == sys_Int_minVal) {
         
-        std::lock_guard<std::mutex> lock(pool_mutex);
+//        std::lock_guard<std::mutex> lock(pool_mutex);
+//
+//        auto itr = map.find(val);
+//        if (itr != map.end()) {
+//            return itr->second;
+//        }
+        int index;
+        if (val == sys_Int_maxVal) index = 513;
+        if (val == sys_Int_minVal) index = 514;
+        else index = val + 256;
         
-        auto itr = map.find(val);
-        if (itr != map.end()) {
-            return itr->second;
-        }
+        obj = map[index];
+        if (obj) return obj;
         
         FR_BOXING_VAL(obj, val, sys_Int, sys_Obj);
         obj = fr_addGlobalRef(__env, obj);
-        map[val] = obj;
+        map[index] = obj;
         return obj;
     }
     FR_BOXING_VAL(obj, val, sys_Int, sys_Obj);
@@ -148,33 +158,35 @@ fr_Obj fr_box_int(fr_Env __env, sys_Int_val val) {
 }
 fr_Obj fr_box_float(fr_Env __env, sys_Float_val val) {
     fr_Obj obj;
-    static std::unordered_map<sys_Int_val, fr_Obj> map;
-    if (val == 0 || val == 1 || val == -1 || val == 0.5
-         || val == sys_Float_e
-         || val == sys_Float_pi
-         || val == sys_Float_negInf
-         || val == sys_Float_posInf) {
-        
-        std::lock_guard<std::mutex> lock(pool_mutex);
-        
-        auto itr = map.find(val);
-        if (itr != map.end()) {
-            return itr->second;
-        }
-        
+    static fr_Obj map[8];
+    int index;
+    if (val == 0) index = 0;
+    if (val == 1) index = 1;
+    if (val == -1) index = 2;
+    if (val == 0.5) index = 3;
+    if (val == sys_Float_e) index = 4;
+    if (val == sys_Float_pi) index = 5;
+    if (val == sys_Float_negInf) index = 6;
+    if (val == sys_Float_posInf) index = 7;
+    else {
         FR_BOXING_VAL(obj, val, sys_Int, sys_Obj);
-        obj = fr_addGlobalRef(__env, obj);
-        map[val] = obj;
         return obj;
     }
-    FR_BOXING_VAL(obj, val, sys_Int, sys_Obj);
+    
+    obj = map[index];
+    if (obj) return obj;
+    
+    FR_BOXING_VAL(obj, val, sys_Float, sys_Obj);
+    obj = fr_addGlobalRef(__env, obj);
+    map[index] = obj;
     return obj;
 }
+
 fr_Obj fr_box_bool(fr_Env __env, sys_Bool_val val) {
-    static fr_Obj trueObj = nullptr;
-    static fr_Obj falseObj = nullptr;
+    static fr_Obj trueObj = NULL;
+    static fr_Obj falseObj = NULL;
     if (!trueObj) {
-        std::lock_guard<std::mutex> lock(pool_mutex);
+        //std::lock_guard<std::mutex> lock(pool_mutex);
         FR_BOXING_VAL(trueObj, true, sys_Bool, sys_Obj);
         FR_BOXING_VAL(falseObj, false, sys_Bool, sys_Obj);
         trueObj = fr_addGlobalRef(__env, trueObj);
@@ -182,3 +194,7 @@ fr_Obj fr_box_bool(fr_Env __env, sys_Bool_val val) {
     }
     return val ? trueObj : falseObj;
 }
+
+#ifdef  __cplusplus
+}//extern "C"
+#endif

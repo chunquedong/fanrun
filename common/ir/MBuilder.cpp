@@ -392,10 +392,13 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
         }
     }
     
-    stmt->mthName = FCodeUtil::getIdentifierName(curPod, methodRef->name);
+    std::string mthName = curPod->names[methodRef->name];
     if (methodRef->flags & (FFlags::RefOverload | FFlags::RefSetter)) {
-        stmt->mthName += std::to_string(methodRef->paramCount);
+        mthName += "$";
+        mthName += std::to_string(methodRef->paramCount);
     }
+    FCodeUtil::escapeIdentifierName(mthName);
+    stmt->mthName = mthName;
     
     for (int i=methodRef->paramCount-1; i>=0; --i) {
         TypeInfo fvarType(curPod, methodRef->params.at(i));
@@ -415,11 +418,11 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
             FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, methodRef->parent);
             std::string name = curPod->names[methodRef->name];
             if (methodRef->flags & FFlags::RefSetter) {
-                //name += "$";
+                name += "$";
                 name += std::to_string(methodRef->paramCount);
             }
             else if (methodRef->flags & FFlags::RefOverload) {
-                //name += "$";
+                name += "$";
                 name += std::to_string(methodRef->paramCount);
             }
             FMethod *fmethod = ftype->c_methodMap[name];

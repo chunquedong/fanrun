@@ -3,10 +3,10 @@
 # fanrun
 
 ### gen
-A translator from fcode to C
+Compile to C
 
 ### vm
-The interpreter/JIT VM
+The interpreter VM
 
 ### llvm
 LLVM compiler

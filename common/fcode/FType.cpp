@@ -124,11 +124,11 @@ void FType::read(FPod *pod, FTypeMeta &meta, Buffer &buffer) {
             
             std::string name = pod->names[method.name];
             if (method.flags & FFlags::Setter) {
-                //name += "$";
+                name += "$";
                 name += std::to_string(method.paramCount);
             }
             else if (method.flags & FFlags::Overload) {
-                //name += "$";
+                name += "$";
                 name += std::to_string(method.paramCount);
             }
             method.c_stdName = name;
