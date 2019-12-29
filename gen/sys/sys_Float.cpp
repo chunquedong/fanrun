@@ -37,7 +37,10 @@ fr_Err sys_Float_minusInt_val(fr_Env __env, sys_Float *__ret, sys_Float_val __se
 fr_Err sys_Float_bits_val(fr_Env __env, sys_Int *__ret, sys_Float_val __self){ return 0; }
 fr_Err sys_Float_bits32_val(fr_Env __env, sys_Int *__ret, sys_Float_val __self){ return 0; }
 fr_Err sys_Float_toStr_val(fr_Env __env, sys_Str *__ret, sys_Float_val __self){ return 0; }
-fr_Err sys_Float_toInt_val(fr_Env __env, sys_Int *__ret, sys_Float_val __self){ return 0; }
+fr_Err sys_Float_toInt_val(fr_Env __env, sys_Int *__ret, sys_Float_val __self){
+    *__ret = (sys_Int)__self;
+    return NULL;
+}
 fr_Err sys_Float_toLocale_val(fr_Env __env, sys_Str *__ret, sys_Float_val __self, sys_Str_null pattern){ return 0; }
 
 fr_Err sys_Float_static__init(fr_Env __env) { return 0; }

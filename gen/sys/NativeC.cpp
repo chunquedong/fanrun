@@ -33,13 +33,15 @@ char *getTraceString() {
         return str;
     }
     
-    for (i = 0; i < size; i++) {
-        name = strrchr(strings[i], '/');
-        if (!name) continue;
+    const int OFFSET = 7;
+    for (i = OFFSET; i < size; i++) {
+        //name = strrchr(strings[i], '/');
+        //if (!name) continue;
+        name = strings[i];
         
         nameSize = strlen(name)+1;
-        if (strSize + nameSize > strAlloc) {
-            strAlloc = (strSize + nameSize)*3/2;
+        if (strSize + nameSize + 1 > strAlloc) {
+            strAlloc = (strSize + nameSize + 1)*3/2;
             str = (char*)realloc(str, strAlloc+1);
             if (str == NULL) {
                 abort();
@@ -47,8 +49,8 @@ char *getTraceString() {
         }
         strcpy(str+strSize, name);
         strSize += nameSize;
-        str[strSize-1] = ',';
-        str[strSize] = '\0';
+        str[strSize-1] = '\n';
+        str[strSize] = 0;
     }
     free (strings);
     
@@ -82,6 +84,14 @@ fr_Err sys_NativeC_printErr(fr_Env __env, sys_Array utf8){
 }
 
 fr_Err sys_NativeC_stackTrace(fr_Env __env, sys_Str *__ret){
+//    void* callstack[128];
+//    int i, frames = backtrace(callstack, 128);
+//    char** strs = backtrace_symbols(callstack, frames);
+//    for (i = 0; i < frames; ++i) {
+//        printf("%s\n", strs[i]);
+//    }
+//    free(strs);
+    
     char *data = getTraceString();
     sys_Str str = (sys_Str)fr_newStrUtf8(__env, data, -1);
     free(data);

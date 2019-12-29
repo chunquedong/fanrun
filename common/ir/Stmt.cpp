@@ -94,15 +94,38 @@ void escapeStr(const std::string &from, std::string &str) {
     long pos = 0;
     while (pos < from.length()) {
         switch (from[pos]) {
-            case '"':
+            case 0x27:
+                str += "\\'";
+                break;
+            case 0x22:
                 str += "\\\"";
                 break;
-            case '\n':
+            case 0x3f:
+                str += "\\?";
+                break;
+            case 0x5c:
+                str += "\\\\";
+                break;
+            case 0x07:
+                str += "\\a";
+                break;
+            case 0x08:
+                str += "\\b";
+                break;
+            case 0x0c:
+                str += "\\f";
+                break;
+            case 0x0a:
                 str += "\\n";
                 break;
-            case '\t':
+            case 0x0d:
+                str += "\\r";
+                break;
+            case 0x09:
                 str += "\\t";
                 break;
+            case 0x0b:
+                str += "\\v";
             default:
                 str += from[pos];
         }
@@ -140,9 +163,11 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             break;
         }
         case FOp::LoadStr: {
+            const std::string &rawstr = curPod->constantas.strings[opObj.i1];
             std::string str;
-            escapeStr(curPod->constantas.strings[opObj.i1], str);
-            size_t len = str.size();
+            size_t len = rawstr.size();
+            escapeStr(rawstr, str);
+            
             
             printer.println("(sys_Str)(%s_ConstPoolStrs[%d]);", curPod->name.c_str(), opObj.i1);
             printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStrUtf8(__env, \"%s\", %d);"
@@ -157,9 +182,10 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             break;
         }
         case FOp::LoadUri: {
+            const std::string &rawstr = curPod->constantas.strings[opObj.i1];
             std::string str;
-            escapeStr(curPod->constantas.strings[opObj.i1], str);
-            size_t len = str.size();
+            size_t len = rawstr.size();
+            escapeStr(rawstr, str);
             
             printer.println("(std_Uri)(%s_ConstPoolUris[%d]);", curPod->name.c_str(), opObj.i1);
             printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d));"
