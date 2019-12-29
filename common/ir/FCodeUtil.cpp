@@ -41,7 +41,7 @@ namespace FCodeUtil {
         return ttype;
     }
     
-    std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable) {
+    std::string getTypeNsName(FPod *pod, uint16_t tid) {
         //Obj's base class
         if (tid == 0xFFFF) {
             return "";
@@ -62,14 +62,78 @@ namespace FCodeUtil {
             }
             FType *ftype = itr->second;
             uint16_t ttid = ftype->findGenericParamBound(cname);
-            return getTypeRefName(curPod, ttid, checkNullable);
+            return getTypeNsName(curPod, ttid);
+        }
+        std::string res = podName + "_" + typeName;
+        escape(res);
+        return res;
+    }
+    
+    std::string getExtTypeName(const std::string &ext_ame, bool isFunc) {
+        std::string extName = ext_ame;
+        if (extName[0] != '<') return extName;
+        extName = extName.substr(1, extName.size()-2);
+        
+        // <sys::Ptr^T>
+        std::string::size_type pos0 = extName.find("^");
+        if (pos0 != std::string::npos) {
+            return "sys_Obj";
+        }
+        
+        if (extName[extName.size()-1] == '?') {
+            extName.resize(extName.size()-1);
+        }
+        int pos = (int)extName.find("::");
+        if (pos>0) {
+            extName = extName.replace(pos, 2, "_");
+        }
+        if (isFunc && extName == "sys_Int8") {
+            extName = "char";
+        }
+        return extName;
+    }
+    
+    std::string getTypeDeclName(FPod *pod, uint16_t tid, bool forPass) {
+        //Obj's base class
+        if (tid == 0xFFFF) {
+            return "";
+        }
+        
+        FTypeRef &typeRef = pod->typeRefs[tid];
+        std::string &podName = pod->names[typeRef.podName];
+        std::string &typeName = pod->names[typeRef.typeName];
+        
+        std::string::size_type pos = typeName.find("^");
+        if (pos != std::string::npos) {
+            std::string pname = typeName.substr(0, pos);
+            std::string cname = typeName.substr(pos+1);
+            FPod *curPod = pod->c_loader->findPod(podName);
+            auto itr = curPod->c_typeMap.find(pname);
+            if (itr == curPod->c_typeMap.end()) {
+                throw std::string("Unknow Type:")+typeName;
+            }
+            FType *ftype = itr->second;
+            uint16_t ttid = ftype->findGenericParamBound(cname);
+            return getTypeDeclName(curPod, ttid, forPass);
         }
         
         std::string &sig = typeRef.extName;
         
         std::string res = podName + "_" + typeName;
-        if (checkNullable && sig.size() > 0 && sig[sig.size()-1] == '?') {
+        if (sig.size() > 0 && sig[sig.size()-1] == '?') {
             res += "_null";
+        }
+        else if (res == "sys_Ptr") {
+            //res = getExtTypeName(sig, true) + "*";
+            res = "sys_Ptr";
+        }
+        else if (FCodeUtil::isBuildinVal(res)) {
+            res += sig;
+        }
+        else if (forPass) {
+            if (FCodeUtil::isValueTypeRef(pod, tid)) {
+                res += "_pass";
+            }
         }
         
         escape(res);

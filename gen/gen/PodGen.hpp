@@ -42,7 +42,6 @@ private:
     //void genStub(Printer *printer);
     void genStaticInit(Printer *printer);
 public:
-    std::string getTypeRefName(uint16_t tid, bool forPass = false);
     TypeGen* findType(std::string &name);
 private:
     void topoSortType();

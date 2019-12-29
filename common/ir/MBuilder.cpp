@@ -376,6 +376,7 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     stmt->isStatic = isStatic;
     stmt->isVirtual = isVirtual;
     stmt->isMixin = isMixin;
+    stmt->isCtor = isAlloc;
     stmt->curPod = curPod;
     stmt->pos = opObj.pos;
     stmt->block = block;
@@ -383,18 +384,11 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
     FMethodRef *methodRef = &curPod->methodRefs[opObj.i1];
     stmt->methodRef = methodRef;
     
-    stmt->typeName = FCodeUtil::getTypeRefName(curPod, methodRef->parent, false);
+    stmt->typeName = FCodeUtil::getTypeNsName(curPod, methodRef->parent);
     FTypeRef parentRef = curPod->typeRefs[methodRef->parent];
     if (stmt->typeName == "sys_Array" || stmt->typeName == "sys_Ptr") {
         if (parentRef.extName.size() > 0) {
-            std::string extName = parentRef.extName.substr(1, parentRef.extName.size()-2);
-            if (extName[extName.size()-1] == '?') {
-                extName.resize(extName.size()-1);
-            }
-            int pos = (int)extName.find("::");
-            if (pos>0) {
-                stmt->extName = extName.replace(pos, 2, "_");
-            }
+            stmt->extName = FCodeUtil::getExtTypeName(parentRef.extName);
         }
     }
     
@@ -430,7 +424,7 @@ void MBuilder::call(Block *block, FOpObj &opObj, bool isVirtual, bool isStatic
             }
             FMethod *fmethod = ftype->c_methodMap[name];
             if (fmethod) {
-                std::string returnType = FCodeUtil::getTypeRefName(ftype->c_pod, fmethod->returnType, false);
+                std::string returnType = FCodeUtil::getTypeNsName(ftype->c_pod, fmethod->returnType);
                 isThis = returnType == "sys_This";
             }
         }

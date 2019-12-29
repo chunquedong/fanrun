@@ -61,7 +61,16 @@ fr_Err sys_NativeC_toId(fr_Env __env, sys_Int *__ret, sys_Obj self){
     *__ret = (int64_t)self;
     return 0;
 }
-fr_Err sys_NativeC_typeName(fr_Env __env, sys_Str *__ret, sys_Obj self){return 0; }
+fr_Err sys_NativeC_typeName(fr_Env __env, sys_Str *__ret, sys_Obj self){
+    if (self == NULL) {
+        *__ret = sys_Str_defVal;
+        return NULL;
+    }
+    fr_Type type = fr_getClass(__env, self);
+    const char * name = type->name;
+    *__ret = (sys_Str)fr_newStrUtf8(__env, name, strlen(name));
+    return NULL;
+}
 
 fr_Err sys_NativeC_print(fr_Env __env, sys_Array utf8){
     puts((const char*)utf8->data);

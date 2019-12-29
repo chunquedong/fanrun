@@ -162,11 +162,12 @@ public:
     bool isStatic;
     bool isVirtual;
     bool isMixin;
+    bool isCtor;
     
     //for compare which no methodRef
     //std::vector<std::string> argsType;
     
-    CallStmt() : methodRef(NULL) {}
+    CallStmt() : methodRef(NULL), isCtor(false) {}
     
     virtual void print(Printer& printer) override;
     

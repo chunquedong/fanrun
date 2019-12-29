@@ -30,8 +30,6 @@ public:
 public:
     TypeGen(FType *type, IRType *irType);
     
-    std::string getTypeRefName(uint16_t tid, bool forPass = false);
-
     void genTypeDeclare(Printer *printer);
     void genStruct(Printer *printer);
     void genVTable(Printer *printer);
@@ -46,6 +44,7 @@ public:
     //void genMethodWrap(Printer *printer);
     //void genMethodRegister(Printer *printer);
 private:
+    std::string getTypeNsName(uint16_t tid);
     void genField(Printer *printer);
     void genTypeMetadata(Printer *printer);
     void genVTableInit(Printer *printer);

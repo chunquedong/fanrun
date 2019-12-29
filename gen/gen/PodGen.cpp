@@ -257,17 +257,6 @@ void PodGen::genStub(Printer *printer) {
     }
 }
 */
-std::string PodGen::getTypeRefName(uint16_t tid, bool forPass) {
-    std::string t = FCodeUtil::getTypeRefName(pod, tid, true);
-    if (forPass) {
-        if (FCodeUtil::isValueTypeRef(pod, tid) && !FCodeUtil::isBuildinVal(t)) {
-            if (t.find("_null") != t.size()-5) {
-                t += "_pass";
-            }
-        }
-    }
-    return t;
-}
 
 
 //////////////////////////////////////////////////
@@ -312,7 +301,7 @@ void PodGen::topoSortType() {
             continue;
         }
         
-        std::string baseName = getTypeRefName(type->type->meta.base);
+        std::string baseName = FCodeUtil::getTypeNsName(pod, type->type->meta.base);
         
         TypeGen *base = exitsBase(this, baseName);
         if (base) {
@@ -321,7 +310,7 @@ void PodGen::topoSortType() {
         }
         
         for (int i=0; i<type->type->meta.mixin.size(); ++i) {
-            std::string baseName = getTypeRefName(type->type->meta.mixin[i]);
+            std::string baseName = FCodeUtil::getTypeNsName(pod, type->type->meta.mixin[i]);
             base = exitsBase(this, baseName);
             if (base) break;
         }

@@ -23,6 +23,9 @@ std::string TypeInfo::getName() const {
     if (isNullable) {
         typeName += "_null";
     }
+    else if (isBuildin) {
+        typeName += extName;
+    }
     escape(typeName);
     return typeName;
 }
@@ -31,7 +34,8 @@ void TypeInfo::setFromTypeRef(FPod *curPod, uint16_t typeRefId) {
     FTypeRef &typeRef = curPod->typeRefs[typeRefId];
     pod = curPod->names[typeRef.podName];
     name = curPod->names[typeRef.typeName];
-    extName = typeRef.extName;
+    
+    extName = FCodeUtil::getExtTypeName(typeRef.extName);
     
     std::string::size_type pos = name.find("^");
     if (pos != std::string::npos) {
@@ -86,6 +90,26 @@ Expr Var::asRef() {
     return expr;
 }
 
+void escapeStr(const std::string &from, std::string &str) {
+    long pos = 0;
+    while (pos < from.length()) {
+        switch (from[pos]) {
+            case '"':
+                str += "\\\"";
+                break;
+            case '\n':
+                str += "\\n";
+                break;
+            case '\t':
+                str += "\\t";
+                break;
+            default:
+                str += from[pos];
+        }
+        ++pos;
+    }
+}
+
 void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpObj &opObj) {
     switch (opObj.opcode) {
         case FOp::LoadNull: {
@@ -116,17 +140,10 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             break;
         }
         case FOp::LoadStr: {
-            std::string str = curPod->constantas.strings[opObj.i1];
-            size_t len = str.size();//utf8len(str.c_str(), str.size());
-            long pos = 0;
-            while (pos < str.length()) {
-                if (str[pos] == '"') {
-                    str.replace(pos, 2, "\\\"");
-                    ++pos;
-                }
-                ++pos;
-            }
-
+            std::string str;
+            escapeStr(curPod->constantas.strings[opObj.i1], str);
+            size_t len = str.size();
+            
             printer.println("(sys_Str)(%s_ConstPoolStrs[%d]);", curPod->name.c_str(), opObj.i1);
             printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStrUtf8(__env, \"%s\", %d);"
                            , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
@@ -140,16 +157,9 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             break;
         }
         case FOp::LoadUri: {
-            std::string str = curPod->constantas.strings[opObj.i1];
-            size_t len = str.size();//utf8len(str.c_str(), str.size());
-            long pos = 0;
-            while (pos < str.length()) {
-                if (str[pos] == '"') {
-                    str.replace(pos, 2, "\\\"");
-                    ++pos;
-                }
-                ++pos;
-            }
+            std::string str;
+            escapeStr(curPod->constantas.strings[opObj.i1], str);
+            size_t len = str.size();
             
             printer.println("(std_Uri)(%s_ConstPoolUris[%d]);", curPod->name.c_str(), opObj.i1);
             printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d));"
@@ -158,8 +168,7 @@ void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpO
             break;
         }
         case FOp::LoadType: {
-            std::string typeName = FCodeUtil::getTypeRefName(curPod
-                                                             , opObj.i1, false);
+            std::string typeName = FCodeUtil::getTypeNsName(curPod, opObj.i1);
             printer.printf("FR_TYPE(%s)", typeName.c_str());
             break;
         }
@@ -275,7 +284,7 @@ void CallStmt::print(Printer& printer) {
         if (typeName == "sys_Array" && mthName == "make") {
             //pass
         }
-        else {
+        else if (isCtor || params.at(0).getType().isNullable) {
             printer.printf("FR_CHECK_NULL(%d, %s);", this->pos, params.at(0).getName().c_str());
         }
     }
@@ -394,18 +403,7 @@ void CallStmt::print(Printer& printer) {
                            , typeName.c_str(), params[i].getName(true).c_str());
         }
         else if (isExternC && params[i].getTypeName() == "sys_Ptr") {
-            std::string extName = params[i].getType().extName;
-            extName = extName.substr(1, extName.size()-2);
-            if (extName[extName.size()-1] == '?') {
-                extName.resize(extName.size()-1);
-            }
-            int pos = (int)extName.find("::");
-            if (pos>0) {
-                extName = extName.replace(pos, 2, "_");
-            }
-            if (extName == "sys_Int8") {
-                extName = "char";
-            }
+            std::string extName = FCodeUtil::getExtTypeName(params[i].getType().extName, true);
             printer.printf("(%s*)%s", extName.c_str(), params[i].getName(true).c_str());
         }
         else {
@@ -416,11 +414,11 @@ void CallStmt::print(Printer& printer) {
 }
 
 void FieldStmt::print(Printer& printer) {
-    std::string parentName = FCodeUtil::getTypeRefName(curPod, fieldRef->parent, false);
+    std::string parentName = FCodeUtil::getTypeDeclName(curPod, fieldRef->parent);
     std::string name = FCodeUtil::getIdentifierName(curPod, fieldRef->name);
     bool parentValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->parent);
     bool isValueType = FCodeUtil::isValueTypeRef(curPod, fieldRef->type);
-    std::string typeName = FCodeUtil::getTypeRefName(curPod, fieldRef->type, false);
+    std::string typeName = FCodeUtil::getTypeDeclName(curPod, fieldRef->type);
     bool isBuildinType = FCodeUtil::isBuildinVal(typeName);
     
     if (!isStatic && !parentValueType) {
@@ -535,7 +533,7 @@ void JumpStmt::print(Printer& printer) {
 }
 
 void AllocStmt::print(Printer& printer) {
-    std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+    std::string typeName = FCodeUtil::getTypeNsName(curPod, type);
     if (typeName == "sys_Array") {
         //move to CallStmt
     }
@@ -890,11 +888,11 @@ void CoerceStmt::print(Printer& printer) {
     }
     
     //cast
-    if (safe) {
+    if (safe || (isVal1 && isVal2 && !isNull1 && !isNull2)) {
         printer.printf("%s = (%s)(%s);", to.getName().c_str()
                    , typeName2.c_str(), from.getName().c_str());
     } else {
-        std::string toTypeName = FCodeUtil::getTypeRefName(curPod, toType, false);
+        std::string toTypeName = FCodeUtil::getTypeNsName(curPod, toType);
         
         if (checked) {
             printer.printf("FR_CAST(%d, %s, %s, %s, %s);", this->pos, to.getName().c_str()
@@ -915,14 +913,14 @@ void TypeCheckStmt::print(Printer& printer) {
                                , result.getName().c_str(), obj.getName().c_str());
             }
             else {
-                std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+                std::string typeName = FCodeUtil::getTypeNsName(curPod, type);
                 printer.printf("FR_BOXING(%s, %s, %s, %s);"
                                , result.getName().c_str(), obj.getName().c_str()
                                , typeName.c_str(), result.getTypeName().c_str());
             }
         }
     } else {
-        std::string typeName = FCodeUtil::getTypeRefName(curPod, type, false);
+        std::string typeName = FCodeUtil::getTypeNsName(curPod, type);
         printer.printf("%s = FR_TYPE_IS(%s, %s);"
                    , result.getName().c_str(), obj.getName().c_str(), typeName.c_str());
     }

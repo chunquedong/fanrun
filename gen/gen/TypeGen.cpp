@@ -20,17 +20,9 @@ TypeGen::TypeGen(FType *type, IRType *irType)
     isValueType = FCodeUtil::isValueType(type);
 }
 
-std::string TypeGen::getTypeRefName(uint16_t tid, bool forPass) {
+std::string TypeGen::getTypeNsName(uint16_t tid) {
     FPod *pod = type->c_pod;
-    std::string t = FCodeUtil::getTypeRefName(pod, tid, true);
-    if (forPass) {
-        if (FCodeUtil::isValueTypeRef(pod, tid) && !FCodeUtil::isBuildinVal(t)) {
-            if (t.find("_null") != t.size()-5) {
-                t += "_pass";
-            }
-        }
-    }
-    return t;
+    return FCodeUtil::getTypeNsName(pod, tid);
 }
 
 void TypeGen::genTypeDeclare(Printer *printer) {
@@ -59,7 +51,7 @@ void TypeGen::genStruct(Printer *printer) {
         return;
     }
     
-    std::string baseName = getTypeRefName(type->meta.base);
+    std::string baseName = getTypeNsName(type->meta.base);
     
     printer->println("struct %s_struct {", name.c_str());
     
@@ -152,7 +144,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
     
     printer->println("type->allocSize = sizeof(struct %s_struct);", name.c_str());
     
-    std::string baseName = getTypeRefName(type->meta.base);
+    std::string baseName = getTypeNsName(type->meta.base);
     //sys::Obj's base class is NULL
     if (baseName.size() == 0) {
         printer->println("type->base = (fr_Type)NULL;");
@@ -170,7 +162,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
         FCodeUtil::escapeIdentifierName(fieldIdName);
         
         printer->println("type->fieldList[%d].name = \"%s\";", i, fieldName.c_str());
-        std::string typeName = getTypeRefName(field.type);
+        std::string typeName = getTypeNsName(field.type);
         printer->println("type->fieldList[%d].type = \"%s\";", i, typeName.c_str());
     
         bool isValType = FCodeUtil::isBuildinVal(typeName);
@@ -262,7 +254,7 @@ void TypeGen::genNativePrototype(Printer *printer) {
                 continue;
             }
             auto name = FCodeUtil::getIdentifierName(type->c_pod, field->name);
-            auto typeName = getTypeRefName(field->type);
+            auto typeName = getTypeNsName(field->type);
             printer->println("%s %s_%s = 0;", typeName.c_str(), this->name.c_str(), name.c_str());
         }
         printer->newLine();
@@ -304,35 +296,7 @@ void TypeGen::genField(Printer *printer) {
             continue;
         }
         auto name = FCodeUtil::getIdentifierName(type->c_pod, field->name);
-        std::string typeName = getTypeRefName(field->type);
-        if (typeName == "sys_Int") {
-            /*TODO
-            for (FAttr *attr : field->attrs) {
-                FFacets *facets = dynamic_cast<FFacets*>(attr);
-                if (facets) {
-                    for (FFacet &facet : facets->facets) {
-                        std::string tname = FCodeUtil::getTypeRefName(podGen->pod, facet.type, false);
-                        if (tname == "sys_T8") {
-                            typeName = "int8_t";
-                            break;
-                        }
-                        else if (tname == "sys_T16") {
-                            typeName = "int16_t";
-                            break;
-                        }
-                        else if (tname == "sys_T32") {
-                            typeName = "int32_t";
-                            break;
-                        }
-                        else if (tname == "sys_T64") {
-                            typeName = "int64_t";
-                            break;
-                        }
-                    }
-                }
-            }
-             */
-        }
+        std::string typeName = FCodeUtil::getTypeDeclName(type->c_pod, field->type);
         printer->println("%s %s;", typeName.c_str(), name.c_str());
     }
 }
@@ -351,7 +315,7 @@ void TypeGen::genStaticField(Printer *printer, bool isExtern) {
             continue;
         }
         auto name = FCodeUtil::getIdentifierName(type->c_pod, field->name);
-        auto typeName = getTypeRefName(field->type);
+        auto typeName = FCodeUtil::getTypeDeclName(type->c_pod, field->type);
         if (isExtern) {
             printer->printf("extern ");
             printer->println("%s %s_%s;", typeName.c_str(), this->name.c_str(), name.c_str());

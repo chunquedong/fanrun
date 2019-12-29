@@ -13,7 +13,10 @@
 #include "PodLoader.h"
 
 namespace FCodeUtil {
-    std::string getTypeRefName(FPod *pod, uint16_t tid, bool checkNullable);
+    std::string getTypeNsName(FPod *pod, uint16_t tid);
+    std::string getTypeDeclName(FPod *pod, uint16_t tid, bool forPass = false);
+    std::string getExtTypeName(const std::string &ext_ame, bool isFunc = false);
+    
     FType *getFTypeFromTypeRef(FPod *pod, uint16_t tid);
     
     bool isValueTypeRef(FPod *curPod, uint16_t typeRefId);

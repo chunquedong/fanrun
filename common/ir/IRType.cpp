@@ -37,7 +37,7 @@ IRType *IRModule::defType(FType *ftype) {
 }
 
 IRType *IRModule::getType(FPod *pod, uint16_t typeRefId) {
-    std::string name = FCodeUtil::getTypeRefName(pod, typeRefId, false);
+    std::string name = FCodeUtil::getTypeNsName(pod, typeRefId);
     std::map<std::string, IRType*>::iterator itr = types.find(name);
     if (itr != types.end())
         return itr->second;

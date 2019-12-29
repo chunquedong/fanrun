@@ -32,6 +32,7 @@ struct MethodGen {
     void genRegisterWrap(Printer *printer, bool isValType);
     void genRegister(Printer *printer);
 private:
+    std::string getTypeDeclName(uint16_t tid, bool forPass = false);
     bool genPrototype(Printer *printer, bool funcPtr, bool isValType);
     void genMethodStub(Printer *printer, bool isValType);
 };
