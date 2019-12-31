@@ -133,6 +133,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_ALLOC(type) ((type##_ref)fr_alloc(__env, type##_class__, -1))
 #define FR_INIT_VAL(val, type) (memset(&val, 0, sizeof(struct type##_struct)))
 
+#define FR_BEGIN_FUNC fr_Err __err; int __errOccurAt;
 #define FR_TRY /*try*/
 #define FR_CATCH /*catch(...)*/
 #define FR_THROW(pos, err) do{__err = err; __errOccurAt = pos; goto __errTable;}while(0)

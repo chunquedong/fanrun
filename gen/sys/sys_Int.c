@@ -185,7 +185,16 @@ fr_Err sys_Int_toRadix_val(fr_Env __env, sys_Str *__ret, sys_Int_val __self, sys
     *__ret = NULL;
     return NULL;
 }
-fr_Err sys_Int_toChar_val(fr_Env __env, sys_Str *__ret, sys_Int_val __self){ return 0; }
+
+size_t utf8encode(wchar_t *us, char *des, size_t n, int *illegal);
+fr_Err sys_Int_toChar_val(fr_Env __env, sys_Str *__ret, sys_Int_val __self){
+    wchar_t buf[2] = {0};
+    buf[0] = (wchar_t)__self;
+    char out[16];
+    size_t len = utf8encode(buf, out, 16, NULL);
+    *__ret = (sys_Str)fr_newStrUtf8(__env, out, len);
+    return NULL;
+}
 fr_Err sys_Int_toCode_val(fr_Env __env, sys_Str *__ret, sys_Int_val __self, sys_Int base){
     if (base == 10) {
         char buf[256];

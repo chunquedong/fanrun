@@ -108,10 +108,13 @@ void MethodGen::genImples(Printer *printer) {
         return;
     }
     
+    if ((parent->name == "sys_BindFunc" || parent->name == "sys_Func") && parent->type->c_pod->names[method->name] == "call") {
+        return;
+    }
     
     if (parent->type->c_isExtern) {
         //skip Func
-        if ((parent->name == "sys_Func") || parent->name == "sys_Array") {
+        if (parent->name == "sys_Array") {
             return;
         }
    
