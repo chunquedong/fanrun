@@ -101,6 +101,8 @@
 		323C30B71BC0AC0600F15091 /* ObjFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjFactory.h; sourceTree = "<group>"; };
 		323EF2452306F0F600B27E68 /* IRType.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = IRType.hpp; sourceTree = "<group>"; };
 		323EF2462306F0F600B27E68 /* IRType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IRType.cpp; sourceTree = "<group>"; };
+		324BFA8623BCB94D007F2863 /* BitmapTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitmapTest.h; sourceTree = "<group>"; };
+		324BFA8723BCB94D007F2863 /* Bitmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Bitmap.hpp; sourceTree = "<group>"; };
 		325231111DAC88940044DBF8 /* ExeEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExeEngine.h; sourceTree = "<group>"; };
 		327A0DC8221950E3001A6EF0 /* escape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = escape.cpp; sourceTree = "<group>"; };
 		327A0DC9221950E3001A6EF0 /* tinycthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tinycthread.c; sourceTree = "<group>"; };
@@ -312,6 +314,8 @@
 		327A0DE5221950E3001A6EF0 /* gc */ = {
 			isa = PBXGroup;
 			children = (
+				324BFA8723BCB94D007F2863 /* Bitmap.hpp */,
+				324BFA8623BCB94D007F2863 /* BitmapTest.h */,
 				327A0DE6221950E3001A6EF0 /* Gc.h */,
 				327A0DE7221950E3001A6EF0 /* Gc.cpp */,
 				327A0DE8221950E3001A6EF0 /* gcobj.h */,

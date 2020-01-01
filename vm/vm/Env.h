@@ -26,8 +26,8 @@ struct StackFrame {
 class Env {
     ExeEngine *interpreter;
 public:
-    bool needStop;
-    bool isStoped;
+    volatile bool needStop;
+    volatile bool isStoped;
     
     PodManager *podManager;
 //private:

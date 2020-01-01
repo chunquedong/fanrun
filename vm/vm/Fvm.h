@@ -42,7 +42,7 @@ public:
     
     void registerMethod(const char *name, fr_NativeFunc func);
     
-    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::list<GcObj*> *list);
+    virtual void visitChildren(Gc *gc, GcObj *obj);
     virtual void walkRoot(Gc *gc);
     virtual void onStartGc();
     

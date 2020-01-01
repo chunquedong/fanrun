@@ -26,7 +26,7 @@ void Gc::gcThreadRun() {
     }
 }
 
-Gc::Gc() : allocSize(0), running(false), marker(0), trace(1), gcSupport(nullptr), gcThread(NULL), isMarking(false)
+Gc::Gc() : allocSize(0), running(false), marker(0), trace(2), gcSupport(nullptr), gcThread(NULL), isMarking(false)
 {
     lastAllocSize = 29;
     collectLimit = 1000;
@@ -41,13 +41,23 @@ Gc::Gc() : allocSize(0), running(false), marker(0), trace(1), gcSupport(nullptr)
 }
 
 Gc::~Gc() {
+    //gcThread->join();
     delete gcThread;
 }
 
-//bool Gc::marking() {
-//    std::lock_guard<std::recursive_mutex> lock_guard(lock);
-//    return isMarking;
-//}
+#if GC_USE_BITMAP
+bool Gc::isRef(void *p) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    bool found = allRefs.getPtr(p);
+    return found;
+}
+#else
+bool Gc::isRef(void *p) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    bool found = allRefs.find(p) != allRefs.end();
+    return found;
+}
+#endif
 
 void Gc::setMarking(bool m) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
@@ -75,6 +85,9 @@ void Gc::onVisit(GcObj* obj) {
 void Gc::setDirty(GcObj *obj) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
     if (!isMarking) return;
+    if (!isRef(obj)) {
+        abort();
+    }
     dirtyList.push_back(obj);
 }
 
@@ -98,21 +111,22 @@ GcObj* Gc::alloc(void *type, int asize) {
     //gc_setMark(obj, marker);
     //gc_setDirty(obj, 1);
     
+    {
+        std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    #if GC_USE_BITMAP
+        allRefs.putPtr(obj, true);
+        //assert(allRefs.getPtr(obj));
+    #else
+        //gc_setNext(obj, this->allRefs);
+        //allRefs = obj;
+        //allRefs.insert(obj);
+        allRefs[obj] = true;
+    #endif
+        //newAllocRef.push_back(obj);
+        allocSize += size;
+    }
+    
     setDirty(obj);
-    
-    lock.lock();
-#if GC_USE_BITMAP
-    allRefs.putPtr(obj, true);
-#else
-    //gc_setNext(obj, this->allRefs);
-    //allRefs = obj;
-    //allRefs.insert(obj);
-    allRefs[obj] = true;
-#endif
-    //newAllocRef.push_back(obj);
-    allocSize += size;
-    
-    lock.unlock();
     
     if (trace > 1) {
         printf("malloc ");

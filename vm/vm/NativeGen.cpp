@@ -96,7 +96,7 @@ void NativeGen::genNativeMethod(FPod *pod, FType *type, FMethod *method, Printer
                 FMethodVar &var = method->vars[varIndex];
                 varName = pod->names[var.name];
                 escape(varName);
-                escapeKeyword(varName);
+                //escapeKeyword(varName);
                 vtype = podMgr->getExactValueType(pod, var.type, nullable);
                 
                 if (!nullable) {
@@ -145,7 +145,7 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
         && (type->c_isExtern)) {
         std::string typeName = preName;
         escape(typeName);
-        escapeKeyword(typeName);
+        //escapeKeyword(typeName);
         printer->println("struct %s{", typeName.c_str());
         
         printer->indent();
@@ -169,7 +169,7 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
     if ((type->c_isExtern)) {
         std::string typeName = preName;
         escape(typeName);
-        escapeKeyword(typeName);
+        //escapeKeyword(typeName);
         
         if (printType == PrintType::pRegisterDef) {
             printer->println("int %s_allocSize__();", typeName.c_str());
@@ -226,7 +226,7 @@ void NativeGen::genNativeType(FPod *pod, FType *type, std::string &preName, Prin
         
         std::string escapeName = name;
         escape(escapeName);
-        escapeKeyword(escapeName);
+        //escapeKeyword(escapeName);
         
         //--------------------------------
         //get return type

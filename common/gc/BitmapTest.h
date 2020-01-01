@@ -12,6 +12,29 @@
 #include "Bitmap.hpp"
 
 
+void BimapTest_testReal() {
+    void *ptr = ((void*)(0x100c4dc10));
+    void *ptr1 = ((void*)( 0x100a46940));
+    void *ptr2 = ((void*)( 0x100900900));
+    void *ptr3 = ((void*)( 0x100900930));
+
+    Bitmap bitmap(2);
+    bitmap.putPtr(ptr, true);
+    assert(bitmap.getPtr(ptr));
+    bitmap.putPtr(ptr1, true);
+    assert(bitmap.getPtr(ptr));
+    assert(bitmap.getPtr(ptr1));
+    bitmap.putPtr(ptr2, true);
+    assert(bitmap.getPtr(ptr));
+    assert(bitmap.getPtr(ptr1));
+    assert(bitmap.getPtr(ptr2));
+    bitmap.putPtr(ptr3, true);
+    assert(bitmap.getPtr(ptr));
+    assert(bitmap.getPtr(ptr1));
+    assert(bitmap.getPtr(ptr2));
+    assert(bitmap.getPtr(ptr3));
+}
+
 void BitmapTest_testPtr() {
     Bitmap bitmap(2);
     bool r;
@@ -72,6 +95,7 @@ void BitmapTest_run() {
     assert(r);
     
     BitmapTest_testPtr();
+    BimapTest_testReal();
 }
 
 #endif /* BitmapTest_h */

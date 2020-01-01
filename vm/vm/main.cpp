@@ -148,7 +148,7 @@ int main(int argc, const char * argv[]) {
     sys_register(&vm);
     
     vm.start();
-    env->trace = debug;
+    //env->trace = debug;
     
     FObj *args = makeArgArray(env, i+1, argc, argv);
     
@@ -159,6 +159,8 @@ int main(int argc, const char * argv[]) {
     vm.stop();
 
     puts("DONE!");
+    
+    System_sleep(1000);
     return 0;
 }
 #endif

@@ -25,6 +25,7 @@ public:
         size = wordSize;
         useSize = 0;
         basePtr = 0;
+        if (sizeof(void*) != 8) abort();
     }
     ~Bitmap() {
         free(words);
@@ -55,7 +56,12 @@ public:
     void putPtr(void *ptr, bool v) {
         uint64_t p = (uint64_t)ptr;
         p = p >> 3;
-        if (p < basePtr) rebase(p);
+        if (p < basePtr) {
+            //uint64_t test = basePtr;
+            rebase(p);
+            //assert(get(test-basePtr));
+            assert(p >= basePtr);
+        }
         else if (basePtr == 0) {
             basePtr = p;
         }
@@ -107,14 +113,19 @@ public:
 private:
     void rebase(uint64_t ptr) {
         uint64_t shift = (basePtr - ptr) / 64;
+        if ((basePtr - ptr) % 64) {
+            ++shift;
+        }
+        
         if (size - useSize < shift) {
             resize(useSize + shift, false);
         }
-        memmove(words+shift, words, useSize);
+        memmove(words+shift, words, useSize*8);
         for (uint64_t i = 0; i < shift; ++i) {
             words[i] = 0;
         }
-        basePtr = ptr;
+        useSize += shift;
+        basePtr -= shift*64;
     }
     
     void resize(uint64_t nsize, bool clean) {

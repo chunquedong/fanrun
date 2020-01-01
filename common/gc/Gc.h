@@ -21,6 +21,7 @@
 #include "Bitmap.hpp"
 #include <thread>
 
+
 #define GC_USE_BITMAP 1
 
 class Gc;
@@ -68,27 +69,11 @@ public:
     int trace;
     
 public:
-#if GC_USE_BITMAP
-    bool isRef(void *p) {
-        //lock.lock();
-        bool found = allRefs.getPtr(p);
-        //lock.unlock();
-        return found;
-    }
-#else
-    bool isRef(void *p) {
-        //lock.lock();
-        bool found = allRefs.find(p) != allRefs.end();
-        //lock.unlock();
-        return found;
-    }
-#endif
 
-public:
     Gc();
     ~Gc();
     
-    //bool marking();
+    bool isRef(void *p);
     
     GcObj* alloc(void *type, int size);
     

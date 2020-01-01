@@ -153,6 +153,13 @@ void Env::push(fr_TagValue *val) {
         abort();
         return;
     }
+#ifndef NODEBUG
+    if (val->type == fr_vtObj) {
+        if (!vm->gc.isRef(val->any.o)) {
+            abort();
+        }
+    }
+#endif
     *((fr_TagValue*)stackTop) = *val;
     stackTop = (char*)(((fr_TagValue*)stackTop) + 1);
 }
@@ -166,6 +173,13 @@ bool Env::pop(fr_TagValue *val) {
     if (val) {
         *val = *((fr_TagValue*)stackTop);
     }
+#ifndef NODEBUG
+    if (val->type == fr_vtObj) {
+        if (!vm->gc.isRef(val->any.o)) {
+            abort();
+        }
+    }
+#endif
     return true;
 }
 
@@ -197,7 +211,6 @@ void Env::insertBack(fr_TagValue *entry, int count) {
 void Env::checkSafePoint() {
     if (needStop) {
         isStoped = true;
-        System_barrier();
         while (needStop) {
             System_sleep(5);
         }
@@ -250,16 +263,16 @@ void Env::walkLocalRoot(Gc *gc) {
         fr_TagValue *val = (fr_TagValue*)(((char*)(frame+1)) + frame->paddingSize);
         for (; val<(fr_TagValue*)stackTop; ++val) {
             if (val->type == fr_vtObj && val->any.o) {
-                gc->onRoot((FObj*)val->any.o);
+                gc->onVisit((FObj*)val->any.o);
             }
         }
     }
     
     if (getError()) {
-        gc->onRoot(getError());
+        gc->onVisit(getError());
     }
     if (thread) {
-        gc->onRoot(thread);
+        gc->onVisit(thread);
     }
 }
 
@@ -475,10 +488,14 @@ void Env::setStaticField(FField *field, fr_Value *val) {
         fr_ValueType vtype = podManager->getValueType(this, field->c_parent->c_pod, field->type);
         //assert(vtype == val->type);
         if (vtype == fr_vtObj) {
+//            if (!vm->gc.isRef(val->o)) {
+//                abort();
+//            }
             *sfield = *val;
             
             if (sfield->o) {
-                gc_setDirty(sfield->o, 1);
+                //gc_setDirty(sfield->o, 1);
+                vm->gc.setDirty(sfield->o);
             }
         } else {
             *sfield = *val;
@@ -513,7 +530,8 @@ void Env::setInstanceField(fr_Value &bottom, FField *field, fr_Value *val) {
         if (vtype == fr_vtObj) {
             *sfield = *val;
             if (sfield->o) {
-                gc_setDirty(sfield->o, 1);
+                //gc_setDirty(sfield->o, 1);
+                vm->gc.setDirty(sfield->o);
             }
         } else {
             *sfield = *val;

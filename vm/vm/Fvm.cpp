@@ -57,12 +57,6 @@ void Fvm::registerMethod(const char *name, fr_NativeFunc func) {
     podManager->registerMethod(name, func);
 }
 
-struct sys_ObjArray_{
-    fr_ObjHeader super;
-    FObj ** data;
-    size_t size;
-};
-
 void Fvm::onStartGc() {
     
 }
@@ -75,10 +69,23 @@ int Fvm::allocSize(void *type) {
     return ((FType *)(type))->c_allocSize;
 }
 
-void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::list<GcObj*> *list) {
+void Fvm::visitChildren(Gc *gc, FObj* obj) {
     Env *env = nullptr;
     
     FType *ftype = fr_getFType(env, obj);
+    FType *objArray = podManager->findType(env, "sys", "Array");
+    if (ftype == objArray) {
+        fr_Array *array = (fr_Array *)obj;
+        if (array->valueType == fr_vtObj) {
+            for (size_t i=0; i<array->size; ++i) {
+                FObj * obj = array->data[i];
+                //list->push_back((FObj*)obj);
+                gc->onVisit((FObj*)obj);
+            }
+        }
+        return;
+    }
+    
     for (int i=0; i<ftype->fields.size(); ++i) {
         FField &f = ftype->fields[i];
         if ((f.flags & FFlags::Storage) == 0) {
@@ -90,18 +97,9 @@ void Fvm::getNodeChildren(Gc *gc, FObj* obj, std::list<GcObj*> *list) {
             fr_Value *val = podManager->getInstanceFieldValue(obj, &f);
             fr_ValueType vtype = podManager->getValueType(env, ftype->c_pod, f.type);
             if (vtype == fr_vtObj) {
-                list->push_back((FObj*)val->o);
+                //list->push_back((FObj*)val->o);
+                gc->onVisit((FObj*)val->o);
             }
-        }
-    }
-    
-    //TODO
-    FType *objArray = podManager->findType(env, "sys", "ObjArray");
-    if (ftype == objArray) {
-        sys_ObjArray_ *array = (sys_ObjArray_ *)obj;
-        for (size_t i=0; i<array->size; ++i) {
-            FObj * obj = array->data[i];
-            list->push_back((FObj*)obj);
         }
     }
 }
@@ -110,13 +108,13 @@ void Fvm::walkRoot(Gc *gc) {
     LinkedListElem *it = LinkedList_first(&globalRefList);
     LinkedListElem *end = LinkedList_end(&globalRefList);
     while (it != end) {
-        gc->onRoot(reinterpret_cast<FObj*>(it->data));
+        gc->onVisit(reinterpret_cast<FObj*>(it->data));
         it = it->next;
     }
     
     //static field
     for (auto it = staticFieldRef.begin(); it != staticFieldRef.end(); ++it) {
-        gc->onRoot(*reinterpret_cast<FObj **>(*it));
+        gc->onVisit(*reinterpret_cast<FObj **>(*it));
     }
     
     //local
@@ -134,7 +132,7 @@ void Fvm::finalizeObj(FObj* obj) {
     env->push(&val);
     
     FMethod *m = env->findMethod("sys", "Obj", "finalize");
-    env->callVirtual(m, 0);
+    env->callVirtual(m, -1);
     //env->callVirtualMethod("finalize", 0);
 }
 void Fvm::puaseWorld(bool bloking) {
@@ -143,9 +141,10 @@ void Fvm::puaseWorld(bool bloking) {
         env->needStop = true;
     }
     
-    System_barrier();
     if (bloking) {
+      std::thread::id tid = std::this_thread::get_id();
       for (auto it = threads.begin(); it != threads.end(); ++it) {
+        if (it->first ==  tid) continue;
         Env *env = it->second;
         while (!env->isStoped) {
             System_sleep(5);
