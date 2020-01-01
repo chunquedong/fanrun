@@ -18,7 +18,7 @@
 		324BFA7923B8AB43007F2863 /* sys_Obj.c in Sources */ = {isa = PBXBuildFile; fileRef = 324BFA7023B8AB43007F2863 /* sys_Obj.c */; };
 		324BFA7A23B8AB43007F2863 /* runtime_native.c in Sources */ = {isa = PBXBuildFile; fileRef = 324BFA7123B8AB43007F2863 /* runtime_native.c */; };
 		324BFA7B23B8AB43007F2863 /* NativeC.c in Sources */ = {isa = PBXBuildFile; fileRef = 324BFA7223B8AB43007F2863 /* NativeC.c */; };
-		324BFA7E23B8AB5B007F2863 /* class.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 324BFA7C23B8AB5B007F2863 /* class.cpp */; };
+		324BFA8523BC692A007F2863 /* type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 324BFA8423BC692A007F2863 /* type.cpp */; };
 		326165501FF8A578002174D6 /* Vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3261654F1FF8A578002174D6 /* Vm.cpp */; };
 		327A0D0622194A88001A6EF0 /* Gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 327A0CF922194A88001A6EF0 /* Gc.cpp */; };
 		327A0D0722194A88001A6EF0 /* tinycthread.c in Sources */ = {isa = PBXBuildFile; fileRef = 327A0CFC22194A88001A6EF0 /* tinycthread.c */; };
@@ -56,10 +56,10 @@
 		324BFA7023B8AB43007F2863 /* sys_Obj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Obj.c; sourceTree = "<group>"; };
 		324BFA7123B8AB43007F2863 /* runtime_native.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = runtime_native.c; sourceTree = "<group>"; };
 		324BFA7223B8AB43007F2863 /* NativeC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NativeC.c; sourceTree = "<group>"; };
-		324BFA7C23B8AB5B007F2863 /* class.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = class.cpp; sourceTree = "<group>"; };
-		324BFA7D23B8AB5B007F2863 /* class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = class.h; sourceTree = "<group>"; };
 		324BFA8023BB962B007F2863 /* Bitmap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitmap.hpp; sourceTree = "<group>"; };
 		324BFA8223BC4711007F2863 /* BitmapTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BitmapTest.h; sourceTree = "<group>"; };
+		324BFA8323BC692A007F2863 /* type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = type.h; sourceTree = "<group>"; };
+		324BFA8423BC692A007F2863 /* type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = type.cpp; sourceTree = "<group>"; };
 		3261654E1FF8A578002174D6 /* Vm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Vm.hpp; sourceTree = "<group>"; };
 		3261654F1FF8A578002174D6 /* Vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vm.cpp; sourceTree = "<group>"; };
 		327A0CF822194A88001A6EF0 /* Gc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gc.h; sourceTree = "<group>"; };
@@ -166,8 +166,8 @@
 		3291F9211F6D416C00F12438 /* runtime */ = {
 			isa = PBXGroup;
 			children = (
-				324BFA7C23B8AB5B007F2863 /* class.cpp */,
-				324BFA7D23B8AB5B007F2863 /* class.h */,
+				324BFA8423BC692A007F2863 /* type.cpp */,
+				324BFA8323BC692A007F2863 /* type.h */,
 				3261654E1FF8A578002174D6 /* Vm.hpp */,
 				3261654F1FF8A578002174D6 /* Vm.cpp */,
 				3291F9221F6D416C00F12438 /* Env.cpp */,
@@ -250,6 +250,7 @@
 			files = (
 				324BFA7523B8AB43007F2863 /* sys_Float.c in Sources */,
 				327A0D0822194A88001A6EF0 /* system.c in Sources */,
+				324BFA8523BC692A007F2863 /* type.cpp in Sources */,
 				327A0D0A22194A88001A6EF0 /* LinkedList.c in Sources */,
 				324BFA7A23B8AB43007F2863 /* runtime_native.c in Sources */,
 				32C107071FE6B57B006248C6 /* main.c in Sources */,
@@ -263,7 +264,6 @@
 				324BFA7423B8AB43007F2863 /* sys_Int.c in Sources */,
 				324BFA7323B8AB43007F2863 /* sys_Array.c in Sources */,
 				3291F92F1F6D416C00F12438 /* Env.cpp in Sources */,
-				324BFA7E23B8AB5B007F2863 /* class.cpp in Sources */,
 				327A0D0622194A88001A6EF0 /* Gc.cpp in Sources */,
 				327A0D0722194A88001A6EF0 /* tinycthread.c in Sources */,
 				320544622203196300ECB5F2 /* baseTest.c in Sources */,
