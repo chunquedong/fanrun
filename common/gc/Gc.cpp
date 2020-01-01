@@ -13,6 +13,7 @@
 #include <assert.h>
 //#include "BitmapTest.h"
 #include <functional>
+#include "system.h"
 
 void Gc::gcThreadRun() {
     while (true) {
@@ -26,7 +27,7 @@ void Gc::gcThreadRun() {
     }
 }
 
-Gc::Gc() : allocSize(0), running(false), marker(0), trace(2), gcSupport(nullptr), gcThread(NULL), isMarking(false)
+Gc::Gc() : allocSize(0), running(false), marker(0), trace(1), gcSupport(nullptr), gcThread(NULL), isMarking(false)
 {
     lastAllocSize = 29;
     collectLimit = 1000;
@@ -108,7 +109,7 @@ GcObj* Gc::alloc(void *type, int asize) {
     
     assert(obj);
     obj->type = type;
-    //gc_setMark(obj, marker);
+    gc_setMark(obj, marker);
     //gc_setDirty(obj, 1);
     
     {
@@ -237,11 +238,15 @@ void Gc::sweep() {
 #if GC_USE_BITMAP
     uint64_t pos = 0;
     while (true) {
+        lock.lock();
         GcObj *obj = (GcObj*)allRefs.nextPtr(pos);
+        lock.unlock();
+        
         if (!obj) break;
         if (gc_getMark(obj) != marker) {
             remove(obj);
         }
+        //System_sleep(10);
     }
 #else
     lock.lock();

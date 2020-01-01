@@ -161,6 +161,7 @@ int main(int argc, const char * argv[]) {
     puts("DONE!");
     
     System_sleep(1000);
+    exit(0);
     return 0;
 }
 #endif

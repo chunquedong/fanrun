@@ -22,7 +22,7 @@
 #include <thread>
 
 
-#define GC_USE_BITMAP 1
+#define GC_USE_BITMAP 0
 
 class Gc;
 
