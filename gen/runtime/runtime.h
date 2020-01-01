@@ -15,7 +15,7 @@ extern  "C" {
 
 //#include "common.h"
 #include "miss.h"
-#include "Class.h"
+#include "class.h"
 #include "gcobj.h"
 
 #include <stdlib.h>
@@ -26,8 +26,8 @@ extern  "C" {
 //#define LONG_JMP_EXCEPTION
 
 struct fr_Env_ {
-    bool needStop;
-    bool isStoped;
+    volatile bool needStop;
+    volatile bool isStoped;
 };
 typedef struct fr_Env_ *fr_Env;
 typedef void *fr_Fvm;
@@ -69,6 +69,7 @@ void fr_gc(fr_Env self);
 #define fr_fromGcObj(g) ((fr_Obj)(((GcObj*)(g))+1))
 void fr_checkPoint(fr_Env self);
 void fr_yieldGc(fr_Env self);
+void fr_setGcDirty(fr_Env self, fr_Obj obj);
 
 ////////////////////////////
 // Util
@@ -180,7 +181,7 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_NOT_NULL(pos, ret, obj, toType) do{if (obj) ret = (toType)obj; else FR_THROW_NPE(pos); }while(0)
     
 #define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
-#define FR_SET_DIRTY(obj) gc_setDirty(fr_toGcObj((fr_Obj)obj), 1);
+#define FR_SET_DIRTY(obj) fr_setGcDirty(__env, (fr_Obj)obj)
     
 #define FR_STATIC_INIT(type) do{if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init(__env);}}while(0)
 

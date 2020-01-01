@@ -58,7 +58,7 @@ typedef struct fr_Array_ {
 extern fr_Type sys_Array_class__;
 
 
-void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::list<GcObj*> *list) {
+void Vm::visitChildren(Gc *gc, GcObj *gcobj) {
     fr_Obj obj = fr_fromGcObj(gcobj);
     fr_Type type = (fr_Type)gc_getType(gcobj);
     
@@ -69,7 +69,8 @@ void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::list<GcObj*> *list) {
                 fr_Obj elem = array->data[i];
                 if (elem) {
                     GcObj *gp = fr_toGcObj(elem);
-                    list->push_back(gp);
+                    //list->push_back(gp);
+                    gc->onVisit(gp);
                 }
             }
         }
@@ -82,7 +83,8 @@ void Vm::getNodeChildren(Gc *gc, GcObj *gcobj, std::list<GcObj*> *list) {
             fr_Obj* objAddress = (fr_Obj*)(((char*)(obj)) + f.offset);
             if (*objAddress == NULL) continue;
             GcObj *gp = fr_toGcObj(*objAddress);
-            list->push_back(gp);
+            //list->push_back(gp);
+            gc->onVisit(gp);
         }
     }
 }
@@ -93,7 +95,8 @@ void Vm::walkRoot(Gc *gc) {
         fr_Obj *obj = *it;
         if (*obj == NULL) continue;
         GcObj *gobj = fr_toGcObj(*obj);
-        gc->onRoot(gobj);
+        //gc->onRoot(gobj);
+        gc->onVisit(gobj);
     }
     
     //local
@@ -102,6 +105,14 @@ void Vm::walkRoot(Gc *gc) {
         env->walkLocalRoot(gc);
     }
 }
+
+//void Vm::walkDirtyList(Gc *gc) {
+//    //local
+//    for (auto it = threads.begin(); it != threads.end(); ++it) {
+//        Env *env = it->second;
+//        env->walkDirtyList(gc);
+//    }
+//}
 
 extern "C" { void fr_finalizeObj(fr_Env __env, fr_Obj _obj); }
 void Vm::finalizeObj(GcObj *gcobj) {

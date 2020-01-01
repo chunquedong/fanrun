@@ -15,7 +15,7 @@ extern  "C" {
     
 #include "miss.h"
 typedef struct GcObj_ {
-    void *next;
+//    void *next;
     void *type;
 } GcObj;
 
@@ -31,14 +31,14 @@ inline void setBitField(uint64_t *target, int pos, int val) {
     }
 }
 
-#define gc_getType(obj) ((obj)->type)
-#define gc_getNext(obj) ((void*)(((uint64_t)((obj)->next)) & headerPtrMask))
-#define gc_getMark(obj) (((uint64_t)((obj)->next)) & headerMarkMask)
-#define gc_isDirty(obj) (((uint64_t)((obj)->next)) & headerDirtyMask)
+#define gc_getType(obj) ((void*)(((uint64_t)((obj)->type)) & headerPtrMask))
+//#define gc_getNext(obj) ((void*)(((uint64_t)((obj)->next)) & headerPtrMask))
+#define gc_getMark(obj) (((uint64_t)((obj)->type)) & headerMarkMask)
+//#define gc_isDirty(obj) (((uint64_t)((obj)->type)) & headerDirtyMask)
 
-#define gc_setNext(obj, ptr) ((obj)->next = (void*)((((uint64_t)((obj)->next))&((uint64_t)(7))) | ((uint64_t)ptr)))
-#define gc_setMark(obj, marker) setBitField((uint64_t *)(&(obj->next)), 0, marker)
-#define gc_setDirty(obj, dirty) setBitField((uint64_t *)(&(obj->next)), 1, dirty)
+//#define gc_setNext(obj, ptr) ((obj)->next = (void*)((((uint64_t)((obj)->next))&((uint64_t)(7))) | ((uint64_t)ptr)))
+#define gc_setMark(obj, marker) setBitField((uint64_t *)(&(obj->type)), 0, marker)
+//#define gc_setDirty(obj, dirty) setBitField((uint64_t *)(&(obj->type)), 1, dirty)
 
 #ifdef  __cplusplus
 }//extern "C"

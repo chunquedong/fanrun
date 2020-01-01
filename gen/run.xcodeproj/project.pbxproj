@@ -58,6 +58,8 @@
 		324BFA7223B8AB43007F2863 /* NativeC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NativeC.c; sourceTree = "<group>"; };
 		324BFA7C23B8AB5B007F2863 /* class.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = class.cpp; sourceTree = "<group>"; };
 		324BFA7D23B8AB5B007F2863 /* class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = class.h; sourceTree = "<group>"; };
+		324BFA8023BB962B007F2863 /* Bitmap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitmap.hpp; sourceTree = "<group>"; };
+		324BFA8223BC4711007F2863 /* BitmapTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BitmapTest.h; sourceTree = "<group>"; };
 		3261654E1FF8A578002174D6 /* Vm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Vm.hpp; sourceTree = "<group>"; };
 		3261654F1FF8A578002174D6 /* Vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vm.cpp; sourceTree = "<group>"; };
 		327A0CF822194A88001A6EF0 /* Gc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gc.h; sourceTree = "<group>"; };
@@ -116,6 +118,8 @@
 				327A0CF822194A88001A6EF0 /* Gc.h */,
 				327A0CF922194A88001A6EF0 /* Gc.cpp */,
 				327A0CFA22194A88001A6EF0 /* gcobj.h */,
+				324BFA8023BB962B007F2863 /* Bitmap.hpp */,
+				324BFA8223BC4711007F2863 /* BitmapTest.h */,
 			);
 			name = gc;
 			path = ../common/gc;

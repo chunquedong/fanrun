@@ -20,6 +20,8 @@ int main() {
         sys_Err_trace(env, &e, e);
     }
     
+    fr_gc(env);
+    
     fr_releaseEnv(NULL, env);
 }
 

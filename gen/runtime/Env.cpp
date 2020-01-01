@@ -36,10 +36,17 @@ void Env::walkLocalRoot(Gc *gc) {
     for (void **ptr = min; ptr <= max; ++ptr) {
         if (isPointer(vm, gc, (int64_t)(*ptr))) {
             GcObj *obj = fr_toGcObj((fr_Obj)(*ptr));
-            gc->onRoot(obj);
+            //gc->onRoot(obj);
+            gc->onVisit(obj);
         }
     }
 }
+
+//void Env::walkDirtyList(Gc *gc) {
+//    for (GcObj *g : dirtyList) {
+//        gc->onVisit(g);
+//    }
+//}
 
 ////////////////////////////
 // Exception

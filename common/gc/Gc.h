@@ -17,14 +17,18 @@
 #include <vector>
 #include <set>
 #include <mutex>
+#include <map>
+#include "Bitmap.hpp"
 
+#define GC_USE_BITMAP 1
 
 class Gc;
 
 class GcSupport {
 public:
-    virtual void getNodeChildren(Gc *gc, GcObj *obj, std::list<GcObj*> *list) = 0;
+    virtual void visitChildren(Gc *gc, GcObj *obj) = 0;
     virtual void walkRoot(Gc *gc) = 0;
+//    virtual void walkDirtyList(Gc *gc) = 0;
     virtual void onStartGc() = 0;
     
     virtual void finalizeObj(GcObj *obj) = 0;
@@ -36,11 +40,15 @@ public:
 
 class Gc {
     std::list<GcObj*> pinObjs;
+
+#if GC_USE_BITMAP
+    Bitmap allRefs;
+#else
+    std::map<void *, bool> allRefs;
+#endif
+    std::vector<GcObj*> markStack;
     
-    GcObj *allRefHead;
-    //GcObj *allRefTail;
-    //GcObj *newRefHead;
-    std::vector<GcObj*> tempGcRoot;
+    std::vector<GcObj*> dirtyList;
     
     std::recursive_mutex lock;
     bool isStopWorld;
@@ -54,15 +62,19 @@ public:
     long allocSize;
     bool trace;
     
-#ifdef GC_REF_TABLE
-private:
-    //for lock shard
-    std::set<void*> allRefs;
 public:
+#if GC_USE_BITMAP
     bool isRef(void *p) {
-        lock.lock();
+        //lock.lock();
+        bool found = allRefs.getPtr(p);
+        //lock.unlock();
+        return found;
+    }
+#else
+    bool isRef(void *p) {
+        //lock.lock();
         bool found = allRefs.find(p) != allRefs.end();
-        lock.unlock();
+        //lock.unlock();
         return found;
     }
 #endif
@@ -76,9 +88,11 @@ public:
     void pinObj(GcObj* obj);
     void unpinObj(GcObj* obj);
     
-    void onRoot(GcObj* obj);
+    void onVisit(GcObj* obj);
  
     void collect();
+    
+    void setDirty(GcObj *obj);
     
 private:
     void puaseWorld(bool bloking) {
@@ -90,6 +104,9 @@ private:
         gcSupport->resumeWorld();
         isStopWorld = false;
     }
+    
+    void beginGc();
+    void endGc();
     
     //void mergeNewAlloc();
     bool mark();

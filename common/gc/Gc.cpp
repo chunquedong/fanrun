@@ -11,12 +11,18 @@
 #include <stdlib.h>
 //#include "FType.h"
 #include <assert.h>
+//#include "BitmapTest.h"
 
 Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr)
     {
     lastAllocSize = 29;
     collectLimit = 1000;
-    allRefHead = NULL;
+#if GC_USE_BITMAP
+    //pass
+#else
+    //allRefs = NULL;
+#endif
+    //BitmapTest_run();
 }
 
 Gc::~Gc() {
@@ -30,11 +36,19 @@ void Gc::unpinObj(GcObj* obj) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
     pinObjs.remove(obj);
 }
-void Gc::onRoot(GcObj* obj) {
+void Gc::onVisit(GcObj* obj) {
     if (obj == NULL) {
         return;
     }
-    tempGcRoot.push_back(obj);
+    if (!isRef(obj)) {
+        abort();
+    }
+    markStack.push_back(obj);
+}
+
+void Gc::setDirty(GcObj *obj) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    dirtyList.push_back(obj);
 }
 
 GcObj* Gc::alloc(void *type, int asize) {
@@ -55,17 +69,19 @@ GcObj* Gc::alloc(void *type, int asize) {
     assert(obj);
     obj->type = type;
     gc_setMark(obj, marker);
-    gc_setDirty(obj, 1);
+    //gc_setDirty(obj, 1);
     
     lock.lock();
-
-    gc_setNext(obj, this->allRefHead);
-    allRefHead = obj;
+#if GC_USE_BITMAP
+    allRefs.putPtr(obj, true);
+#else
+    //gc_setNext(obj, this->allRefs);
+    //allRefs = obj;
+    //allRefs.insert(obj);
+    allRefs[obj] = true;
+#endif
     //newAllocRef.push_back(obj);
     allocSize += size;
-#ifdef GC_REF_TABLE
-    allRefs.insert(obj);
-#endif
     
     lock.unlock();
     
@@ -77,22 +93,30 @@ GcObj* Gc::alloc(void *type, int asize) {
     return obj;
 }
 
+void Gc::beginGc() {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    if (running) {
+        return;
+    }
+    running = true;
+    //mergeNewAlloc();
+    marker = !marker;
+}
+void Gc::endGc() {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    lastAllocSize = allocSize;
+    running = false;
+}
+
 void Gc::collect() {
     if (trace) {
-        printf("******* start gc: %ld (%ld, %ld)\n", allocSize, collectLimit, lastAllocSize);
+        printf("******* start gc: memory:%ld (limit:%ld, last:%ld)\n", allocSize, collectLimit, lastAllocSize);
     }
+    long beginSize = allocSize;
     
     //ready for gc
     gcSupport->onStartGc();
-    {
-        std::lock_guard<std::recursive_mutex> lock_guard(lock);
-        if (running) {
-            return;
-        }
-        running = true;
-        //mergeNewAlloc();
-        marker = !marker;
-    }
+    beginGc();
     
     //get root
     puaseWorld(true);
@@ -101,10 +125,11 @@ void Gc::collect() {
     resumeWorld();
     //concurrent mark
     mark();
+    mark();
     
     //remark root
     puaseWorld(true);
-    getRoot();
+    //gcSupport->walkDirtyList(this);
     
     //remark changed
     mark();
@@ -113,22 +138,18 @@ void Gc::collect() {
     resumeWorld();
     sweep();
     
-    {
-        std::lock_guard<std::recursive_mutex> lock_guard(lock);
-        lastAllocSize = allocSize;
-        running = false;
-    }
+    endGc();
     
     if (trace) {
-        printf("******* end gc: %ld\n", allocSize);
+        printf("******* end gc: memory:%ld, free:%ld\n", allocSize, beginSize - allocSize);
     }
 }
 
 void Gc::getRoot() {
-    tempGcRoot.clear();
+    markStack.clear();
     lock.lock();
     for (auto it = pinObjs.begin(); it != pinObjs.end(); ++it) {
-        tempGcRoot.push_back(*it);
+        markStack.push_back(*it);
     }
     lock.unlock();
     
@@ -136,7 +157,7 @@ void Gc::getRoot() {
     
     if (trace) {
         printf("ROOT:\n");
-        for (auto it = tempGcRoot.begin(); it != tempGcRoot.end(); ++it) {
+        for (auto it = markStack.begin(); it != markStack.end(); ++it) {
             gcSupport->printObj(*it);
             printf(", ");
         }
@@ -145,41 +166,66 @@ void Gc::getRoot() {
 }
 
 bool Gc::mark() {
-    std::list<GcObj*> visitQueue;
-    for (int i=0; i<tempGcRoot.size(); ++i) {
-        visitQueue.push_back(tempGcRoot[i]);
+    if (markStack.size() == 0) {
+        lock.lock();
+        markStack.swap(dirtyList);
+        lock.unlock();
     }
     
-    while (visitQueue.size() > 0) {
-        GcObj *obj = visitQueue.front();
-        visitQueue.pop_front();
+    while (markStack.size() > 0) {
+        GcObj *obj = markStack.back();
+        markStack.pop_back();
         if (markNode(obj)) {
-            gcSupport->getNodeChildren(this, obj, &visitQueue);
+            gcSupport->visitChildren(this, obj);
         }
     }
     return true;
 }
 
 void Gc::sweep() {
-    GcObj *obj = allRefHead;
-    GcObj *pre = NULL;
-    while (obj) {
-        GcObj *next = (GcObj*)gc_getNext(obj);
+#if GC_USE_BITMAP
+    uint64_t pos = 0;
+    while (true) {
+        GcObj *obj = (GcObj*)allRefs.nextPtr(pos);
+        if (!obj) break;
         if (gc_getMark(obj) != marker) {
             remove(obj);
-            if (pre == NULL) {
-                allRefHead = next;
-            }
-            else {
-                gc_setNext(pre, next);
-            }
-            obj = next;
-        }
-        else {
-            pre = obj;
-            obj = next;
         }
     }
+#else
+    lock.lock();
+    for (auto itr = allRefs.begin(); itr != allRefs.end();) {
+        GcObj *obj = (GcObj*)(itr->first);
+        if (!obj) break;
+        if (gc_getMark(obj) != marker) {
+            remove(obj);
+            itr = allRefs.erase(itr);
+        }
+        else {
+            ++itr;
+        }
+    }
+    lock.unlock();
+//    GcObj *pre = NULL;
+//    while (obj) {
+//        GcObj *next = (GcObj*)gc_getNext(obj);
+//        if (gc_getMark(obj) != marker) {
+//            remove(obj);
+//            if (pre == NULL) {
+//                allRefLink = next;
+//            }
+//            else {
+//                gc_setNext(pre, next);
+//            }
+//            obj = next;
+//        }
+//        else {
+//            pre = obj;
+//            obj = next;
+//        }
+//    }
+#endif
+    
 }
 
 void Gc::remove(GcObj* obj) {
@@ -196,13 +242,15 @@ void Gc::remove(GcObj* obj) {
     
     lock.lock();
     allocSize -= size;
-#ifdef GC_REF_TABLE
-    allRefs.erase(obj);
+#if GC_USE_BITMAP
+    allRefs.putPtr(obj, false);
+#else
+    //
 #endif
     lock.unlock();
     
     obj->type = NULL;
-    obj->next = NULL;
+    //obj->next = NULL;
     free(obj);
 }
 
@@ -211,11 +259,11 @@ bool Gc::markNode(GcObj* obj) {
         return false;
     }
 
-    if (!gc_isDirty(obj) && gc_getMark(obj) == marker) {
+    if (gc_getMark(obj) == marker) {
         return false;
     }
     gc_setMark(obj, marker);
-    gc_setDirty(obj, 0);
+    //gc_setDirty(obj, 0);
 
     return true;
 }

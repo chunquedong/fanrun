@@ -516,7 +516,7 @@ void FieldStmt::print(Printer& printer) {
     
     printer.printf(";");
     if (!isLoad && !isStatic && !isValueType) {
-        printer.printf("FR_SET_DIRTY(%s)", instance.getName().c_str());
+        printer.printf("FR_SET_DIRTY(%s);", instance.getName().c_str());
     }
 }
 

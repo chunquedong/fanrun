@@ -38,6 +38,7 @@ public:
 public:
     Env(Vm *vm);
     void walkLocalRoot(Gc *gc);
+    //void walkDirtyList(Gc *gc);
 };
 
 
