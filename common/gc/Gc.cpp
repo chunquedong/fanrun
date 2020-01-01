@@ -12,9 +12,22 @@
 //#include "FType.h"
 #include <assert.h>
 //#include "BitmapTest.h"
+#include <functional>
 
-Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullptr)
-    {
+void Gc::gcThreadRun() {
+    while (true) {
+        {
+            std::unique_lock<std::mutex> lck(cdLock);
+            condition.wait(lck);
+        }
+        if (running) {
+            doCollect();
+        }
+    }
+}
+
+Gc::Gc() : allocSize(0), running(false), marker(0), trace(1), gcSupport(nullptr), gcThread(NULL), isMarking(false)
+{
     lastAllocSize = 29;
     collectLimit = 1000;
 #if GC_USE_BITMAP
@@ -23,9 +36,22 @@ Gc::Gc() : allocSize(0), running(false), marker(0), trace(true), gcSupport(nullp
     //allRefs = NULL;
 #endif
     //BitmapTest_run();
+    gcThread = new std::thread(std::bind(&Gc::gcThreadRun, this));
+    gcThread->detach();
 }
 
 Gc::~Gc() {
+    delete gcThread;
+}
+
+//bool Gc::marking() {
+//    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+//    return isMarking;
+//}
+
+void Gc::setMarking(bool m) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    isMarking = m;
 }
 
 void Gc::pinObj(GcObj* obj) {
@@ -48,6 +74,7 @@ void Gc::onVisit(GcObj* obj) {
 
 void Gc::setDirty(GcObj *obj) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    if (!isMarking) return;
     dirtyList.push_back(obj);
 }
 
@@ -68,8 +95,10 @@ GcObj* Gc::alloc(void *type, int asize) {
     
     assert(obj);
     obj->type = type;
-    gc_setMark(obj, marker);
+    //gc_setMark(obj, marker);
     //gc_setDirty(obj, 1);
+    
+    setDirty(obj);
     
     lock.lock();
 #if GC_USE_BITMAP
@@ -85,7 +114,7 @@ GcObj* Gc::alloc(void *type, int asize) {
     
     lock.unlock();
     
-    if (trace) {
+    if (trace > 1) {
         printf("malloc ");
         gcSupport->printObj(obj);
         printf("\n");
@@ -94,11 +123,6 @@ GcObj* Gc::alloc(void *type, int asize) {
 }
 
 void Gc::beginGc() {
-    std::lock_guard<std::recursive_mutex> lock_guard(lock);
-    if (running) {
-        return;
-    }
-    running = true;
     //mergeNewAlloc();
     marker = !marker;
 }
@@ -109,6 +133,15 @@ void Gc::endGc() {
 }
 
 void Gc::collect() {
+    std::lock_guard<std::mutex> lock_guard(cdLock);
+    if (running) {
+        return;
+    }
+    running = true;
+    condition.notify_all();
+}
+
+void Gc::doCollect() {
     if (trace) {
         printf("******* start gc: memory:%ld (limit:%ld, last:%ld)\n", allocSize, collectLimit, lastAllocSize);
     }
@@ -122,6 +155,7 @@ void Gc::collect() {
     puaseWorld(true);
     getRoot();
     
+    setMarking(true);
     resumeWorld();
     //concurrent mark
     mark();
@@ -135,6 +169,7 @@ void Gc::collect() {
     mark();
     
     //concurrent sweep
+    setMarking(false);
     resumeWorld();
     sweep();
     
@@ -155,7 +190,7 @@ void Gc::getRoot() {
     
     gcSupport->walkRoot(this);
     
-    if (trace) {
+    if (trace > 1) {
         printf("ROOT:\n");
         for (auto it = markStack.begin(); it != markStack.end(); ++it) {
             gcSupport->printObj(*it);
@@ -178,6 +213,8 @@ bool Gc::mark() {
         if (markNode(obj)) {
             gcSupport->visitChildren(this, obj);
         }
+        //printf("trace:%p,", obj);
+        //gcSupport->printObj(obj);
     }
     return true;
 }
@@ -202,6 +239,7 @@ void Gc::sweep() {
             itr = allRefs.erase(itr);
         }
         else {
+            //printf("%p,", obj);
             ++itr;
         }
     }
@@ -234,7 +272,7 @@ void Gc::remove(GcObj* obj) {
     
     gcSupport->finalizeObj(obj);
     
-    if (trace) {
+    if (trace > 1) {
         printf("free ");
         gcSupport->printObj(obj);
         printf("\n");

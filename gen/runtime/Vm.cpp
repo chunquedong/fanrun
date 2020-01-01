@@ -100,7 +100,12 @@ void Vm::walkRoot(Gc *gc) {
     }
     
     //local
+    std::thread::id tid = std::this_thread::get_id();
     for (auto it = threads.begin(); it != threads.end(); ++it) {
+        if (it->first == tid) {
+            //finalizeObj thread
+            continue;
+        }
         Env *env = it->second;
         env->walkLocalRoot(gc);
     }
@@ -123,36 +128,39 @@ void Vm::finalizeObj(GcObj *gcobj) {
 }
 
 void Vm::onStartGc() {
-    void *statckVar = 0;
-    //set statckEnd address
-    std::thread::id tid = std::this_thread::get_id();
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
-        Env *env = it->second;
-        //is current thread
-        if (it->first == tid) {
-            env->statckEnd = &statckVar;
-            continue;
-        }
-    }
+//    void *statckVar = 0;
+//    //set statckEnd address
+//    std::thread::id tid = std::this_thread::get_id();
+//    for (auto it = threads.begin(); it != threads.end(); ++it) {
+//        Env *env = it->second;
+//        //is current thread
+//        if (it->first == tid) {
+//            env->statckEnd = &statckVar;
+//            continue;
+//        }
+//    }
 }
 
 void Vm::puaseWorld(bool bloking) {
+    void *statckVar = 0;
+    
     for (auto it = threads.begin(); it != threads.end(); ++it) {
         Env *env = it->second;
         env->needStop = true;
     }
-    System_barrier();
+    
     if (bloking) {
         std::thread::id tid = std::this_thread::get_id();
         for (auto it = threads.begin(); it != threads.end(); ++it) {
             Env *env = it->second;
             //is current thread
             if (it->first == tid) {
+                env->statckEnd = &statckVar;
                 continue;
             }
             
             while (!env->isStoped) {
-                System_sleep(10);
+                System_sleep(1);
             }
         }
     }

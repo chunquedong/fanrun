@@ -486,9 +486,7 @@ void FieldStmt::print(Printer& printer) {
             }
         }
     } else {
-        if (name == "r__0") {
-            printf("");
-        }
+        
         if (isValueType && !isBuildinType) {
             if (isStatic) {
                 printer.printf("memcpy(&(%s_%s), &%s, sizeof(%s))", parentName.c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
@@ -515,7 +513,7 @@ void FieldStmt::print(Printer& printer) {
     }
     
     printer.printf(";");
-    if (!isLoad && !isStatic && !isValueType) {
+    if (!isLoad && !isStatic && !isBuildinType) {
         printer.printf("FR_SET_DIRTY(%s);", instance.getName().c_str());
     }
 }

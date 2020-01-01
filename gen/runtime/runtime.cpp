@@ -51,12 +51,10 @@ void fr_checkPoint(fr_Env self) {
         env->statckEnd = &statckVar;
         env->isStoped = true;
         
-        System_barrier();
         do {
-            System_sleep(10);
+            System_sleep(1);
         } while(env->needStop);
         env->isStoped = false;
-        System_barrier();
     }
 }
 
@@ -65,7 +63,11 @@ void fr_yieldGc(fr_Env self) {
     void *statckVar = 0;
     env->statckEnd = &statckVar;
     env->isStoped = true;
-    System_barrier();
+}
+
+void fr_endYieldGc(fr_Env self) {
+    Env *env = (Env*)self;
+    env->isStoped = false;
 }
 
 fr_Obj fr_alloc(fr_Env self, fr_Type vtable, ssize_t size) {

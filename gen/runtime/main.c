@@ -20,7 +20,11 @@ int main() {
         sys_Err_trace(env, &e, e);
     }
     
+    //test gc
+    System_sleep(1000);
+    fr_yieldGc(env);
     fr_gc(env);
+    System_sleep(2000);
     
     fr_releaseEnv(NULL, env);
 }

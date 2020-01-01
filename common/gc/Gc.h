@@ -19,6 +19,7 @@
 #include <mutex>
 #include <map>
 #include "Bitmap.hpp"
+#include <thread>
 
 #define GC_USE_BITMAP 1
 
@@ -54,13 +55,17 @@ class Gc {
     bool isStopWorld;
     int marker;
     bool running;
+    bool isMarking;
+    std::thread *gcThread;
+    std::mutex cdLock;
+    std::condition_variable condition;
 public:
     GcSupport *gcSupport;
     
     long collectLimit;
     long lastAllocSize;
     long allocSize;
-    bool trace;
+    int trace;
     
 public:
 #if GC_USE_BITMAP
@@ -83,6 +88,8 @@ public:
     Gc();
     ~Gc();
     
+    //bool marking();
+    
     GcObj* alloc(void *type, int size);
     
     void pinObj(GcObj* obj);
@@ -94,7 +101,12 @@ public:
     
     void setDirty(GcObj *obj);
     
+    void gcThreadRun();
+    
 private:
+    void setMarking(bool m);
+    void doCollect();
+    
     void puaseWorld(bool bloking) {
         isStopWorld = true;
         gcSupport->puaseWorld(bloking);
