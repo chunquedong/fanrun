@@ -46,14 +46,14 @@ fr_Obj fr_fromGcObj(GcObj *g) {
 */
 void fr_checkPoint(fr_Env self) {
     Env *env = (Env*)self;
-    if (env->needStop) {
+    if (env->vm->getGc()->isStopTheWorld()) {
         void *statckVar = 0;
         env->statckEnd = &statckVar;
         env->isStoped = true;
         
         do {
             System_sleep(1);
-        } while(env->needStop);
+        } while(env->vm->getGc()->isStopTheWorld());
         env->isStoped = false;
     }
 }

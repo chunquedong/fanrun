@@ -23,7 +23,7 @@
 class Env;
 
 class Vm : public GcSupport {
-    Gc *gc;
+    Collector *gc;
     //std::vector<GcObj*> globalRef;
     std::unordered_map<std::thread::id, Env*> threads;
     std::vector<fr_Obj*> staticFieldRef;
@@ -45,13 +45,13 @@ public:
     void start();
     void stop();
     
-    Gc *getGc() { return gc; }
+    Collector *getGc() { return gc; }
     Env *getEnv();
     void releaseEnv(Env *env);
     void addStaticRef(fr_Obj *obj);
     
-    virtual void visitChildren(Gc *gc, GcObj *obj) override;
-    virtual void walkRoot(Gc *gc) override;
+    virtual void visitChildren(Collector *gc, GcObj *obj) override;
+    virtual void walkRoot(Collector *gc) override;
     //virtual void walkDirtyList(Gc *gc) override;
     virtual void onStartGc() override;
     virtual void finalizeObj(GcObj *obj) override;

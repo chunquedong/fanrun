@@ -9,6 +9,8 @@
 #include "Fvm.h"
 #include "Env.h"
 #include <assert.h>
+#include <atomic>
+#include "Gc.h"
 
 #ifdef FR_LLVM
     #include "SimpleLLVMJIT.hpp"
@@ -17,7 +19,8 @@
 Fvm::Fvm(PodManager *podManager)
     : podManager(podManager), executeEngine(nullptr)
 {
-    gc.gcSupport = this;
+    gc = new Gc(this);
+    //gc->gcSupport = this;
     LinkedList_make(&globalRefList);
 #ifdef FR_LLVM
     executeEngine = new SimpleLLVMJIT();
@@ -36,6 +39,7 @@ void Fvm::stop() {
 }
 
 Env *Fvm::getEnv() {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     std::thread::id tid = std::this_thread::get_id();
     auto found = threads.find(tid);
     Env *env;
@@ -48,12 +52,14 @@ Env *Fvm::getEnv() {
     return env;
 }
 void Fvm::releaseEnv(Env *env) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     std::thread::id tid = std::this_thread::get_id();
     threads.erase(tid);
     delete env;
 }
 
 void Fvm::registerMethod(const char *name, fr_NativeFunc func) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     podManager->registerMethod(name, func);
 }
 
@@ -69,7 +75,7 @@ int Fvm::allocSize(void *type) {
     return ((FType *)(type))->c_allocSize;
 }
 
-void Fvm::visitChildren(Gc *gc, FObj* obj) {
+void Fvm::visitChildren(Collector *gc, FObj* obj) {
     Env *env = nullptr;
     
     FType *ftype = fr_getFType(env, obj);
@@ -103,7 +109,7 @@ void Fvm::visitChildren(Gc *gc, FObj* obj) {
         }
     }
 }
-void Fvm::walkRoot(Gc *gc) {
+void Fvm::walkRoot(Collector *gc) {
     //global ref
     LinkedListElem *it = LinkedList_first(&globalRefList);
     LinkedListElem *end = LinkedList_end(&globalRefList);
@@ -136,10 +142,12 @@ void Fvm::finalizeObj(FObj* obj) {
     //env->callVirtualMethod("finalize", 0);
 }
 void Fvm::puaseWorld(bool bloking) {
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
-        Env *env = it->second;
-        env->needStop = true;
-    }
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+//    for (auto it = threads.begin(); it != threads.end(); ++it) {
+//        Env *env = it->second;
+//        env->needStop = true;
+//    }
+//    std::atomic_thread_fence(std::memory_order_release);
     
     if (bloking) {
       std::thread::id tid = std::this_thread::get_id();
@@ -148,35 +156,38 @@ void Fvm::puaseWorld(bool bloking) {
         Env *env = it->second;
         while (!env->isStoped) {
             System_sleep(5);
+            std::atomic_thread_fence(std::memory_order_acquire);
         }
       }
     }
 }
+
 void Fvm::resumeWorld() {
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
-        Env *env = it->second;
-        env->needStop = false;
-    }
+//    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+//    for (auto it = threads.begin(); it != threads.end(); ++it) {
+//        Env *env = it->second;
+//        env->needStop = false;
+//    }
+//    std::atomic_thread_fence(std::memory_order_release);
 }
 
 fr_Obj Fvm::newGlobalRef(FObj * obj) {
-    lock.lock();
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     LinkedListElem *elem = LinkedList_newElem(&globalRefList, 0);
     elem->data = obj;
     LinkedList_add(&globalRefList, elem);
     fr_Obj objRef = (fr_Obj)(&elem->data);
-    lock.unlock();
     return objRef;
 }
 
 void Fvm::deleteGlobalRef(fr_Obj objRef) {
-    lock.lock();
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     LinkedListElem *elem =  reinterpret_cast<LinkedListElem *>((char*)(objRef) - offsetof(LinkedListElem, data));
     elem->data = NULL;
     LinkedList_remove(&globalRefList, elem);
-    lock.unlock();
 }
 
 void Fvm::addStaticRef(fr_Obj obj) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     staticFieldRef.push_back(obj);
 }

@@ -82,6 +82,7 @@
 		3291F9271F6D416C00F12438 /* runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
 		3291F92C1F6D416C00F12438 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys.h; sourceTree = "<group>"; };
 		32C107051FE6B57B006248C6 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		32DED48923BF8F2100348B1E /* gci.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gci.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +116,7 @@
 		327A0CF722194A88001A6EF0 /* gc */ = {
 			isa = PBXGroup;
 			children = (
+				32DED48923BF8F2100348B1E /* gci.h */,
 				327A0CF822194A88001A6EF0 /* Gc.h */,
 				327A0CF922194A88001A6EF0 /* Gc.cpp */,
 				327A0CFA22194A88001A6EF0 /* gcobj.h */,

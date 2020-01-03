@@ -12,12 +12,12 @@
 Env::Env(Vm *vm) : vm(vm)//, error(0)
 , statckStart(NULL) {
     isStoped = false;
-    needStop = false;
+    //needStop = false;
     statckStart = NULL;
     statckEnd = statckStart;
 }
 
-static bool isPointer(Vm *vm, Gc *gc, int64_t pointer) {
+static bool isPointer(Vm *vm, Collector *gc, int64_t pointer) {
     if (pointer == 0) return false;
     if (pointer % 8 != 0) return false;
     GcObj *gcobj = fr_toGcObj((fr_Obj)(pointer));
@@ -26,7 +26,7 @@ static bool isPointer(Vm *vm, Gc *gc, int64_t pointer) {
     return gc->isRef(gcobj);
 }
 
-void Env::walkLocalRoot(Gc *gc) {
+void Env::walkLocalRoot(Collector *gc) {
 //    if (error) {
 //        gc->onRoot(fr_toGcObj(error));
 //    }

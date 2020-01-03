@@ -13,7 +13,7 @@
 #include <assert.h>
 #include <vector>
 #include "runtime.h"
-
+#include <atomic>
 
 struct JmpBuf {
     jmp_buf buf;
@@ -21,8 +21,9 @@ struct JmpBuf {
 
 class Vm;
 
-class Env : public fr_Env_ {
+class Env {
 public:
+    std::atomic<bool> isStoped;
     Vm *vm;
     //fr_Obj error;
     //std::vector<const char*> stackTrace;
@@ -37,7 +38,7 @@ public:
 
 public:
     Env(Vm *vm);
-    void walkLocalRoot(Gc *gc);
+    void walkLocalRoot(Collector *gc);
     //void walkDirtyList(Gc *gc);
 };
 

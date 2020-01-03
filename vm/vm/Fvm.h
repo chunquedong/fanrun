@@ -12,12 +12,13 @@
 #include <stdio.h>
 #include "PodManager.h"
 #include "vm.h"
-#include "Gc.h"
+#include "gci.h"
 #include <unordered_map>
 #include <thread>
 #include "LinkedList.h"
 #include "../vm/ExeEngine.h"
 #include <assert.h>
+#include <mutex>
 
 class Env;
 
@@ -27,7 +28,7 @@ class Fvm : public GcSupport {
     std::vector<fr_Obj> staticFieldRef;
     std::recursive_mutex lock;
 public:
-    Gc gc;
+    Collector *gc;
     PodManager *podManager;
     ExeEngine *executeEngine;
 public:
@@ -42,8 +43,8 @@ public:
     
     void registerMethod(const char *name, fr_NativeFunc func);
     
-    virtual void visitChildren(Gc *gc, GcObj *obj);
-    virtual void walkRoot(Gc *gc);
+    virtual void visitChildren(Collector *gc, GcObj *obj);
+    virtual void walkRoot(Collector *gc);
     virtual void onStartGc();
     
     virtual void finalizeObj(GcObj *obj);

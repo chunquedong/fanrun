@@ -11,8 +11,8 @@
 #include "system.h"
 
 Vm::Vm() {
-    gc = new Gc();
-    gc->gcSupport = this;
+    gc = new Gc(this);
+    //gc->gcSupport = this;
 }
 
 Vm::~Vm() {
@@ -58,7 +58,7 @@ typedef struct fr_Array_ {
 extern fr_Type sys_Array_class__;
 
 
-void Vm::visitChildren(Gc *gc, GcObj *gcobj) {
+void Vm::visitChildren(Collector *gc, GcObj *gcobj) {
     fr_Obj obj = fr_fromGcObj(gcobj);
     fr_Type type = (fr_Type)gc_getType(gcobj);
     
@@ -89,7 +89,7 @@ void Vm::visitChildren(Gc *gc, GcObj *gcobj) {
     }
 }
 
-void Vm::walkRoot(Gc *gc) {
+void Vm::walkRoot(Collector *gc) {
     //static field
     for (auto it = staticFieldRef.begin(); it != staticFieldRef.end(); ++it) {
         fr_Obj *obj = *it;
@@ -142,12 +142,13 @@ void Vm::onStartGc() {
 }
 
 void Vm::puaseWorld(bool bloking) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     void *statckVar = 0;
     
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
-        Env *env = it->second;
-        env->needStop = true;
-    }
+//    for (auto it = threads.begin(); it != threads.end(); ++it) {
+//        Env *env = it->second;
+//        env->needStop = true;
+//    }
     
     if (bloking) {
         std::thread::id tid = std::this_thread::get_id();
@@ -161,16 +162,18 @@ void Vm::puaseWorld(bool bloking) {
             
             while (!env->isStoped) {
                 System_sleep(1);
+                std::atomic_thread_fence(std::memory_order_acquire);
             }
         }
     }
 }
 
 void Vm::resumeWorld() {
-    for (auto it = threads.begin(); it != threads.end(); ++it) {
-        Env *env = it->second;
-        env->needStop = false;
-    }
+//    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+//    for (auto it = threads.begin(); it != threads.end(); ++it) {
+//        Env *env = it->second;
+//        env->needStop = false;
+//    }
 }
 void Vm::printObj(GcObj *gcobj) {
     fr_Obj obj = fr_fromGcObj(gcobj);

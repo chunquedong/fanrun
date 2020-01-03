@@ -205,6 +205,7 @@
 		32C77A0B23A533F60045B3E3 /* sys_Ptr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Ptr.c; sourceTree = "<group>"; };
 		32C77A0C23A533F60045B3E3 /* sys_Array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Array.c; sourceTree = "<group>"; };
 		32C77A0D23A533F60045B3E3 /* sys_Func.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sys_Func.c; sourceTree = "<group>"; };
+		32DED48823BF88BD00348B1E /* gci.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gci.h; sourceTree = "<group>"; };
 		32FF47071D85ACF000724EB6 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -319,6 +320,7 @@
 				327A0DE6221950E3001A6EF0 /* Gc.h */,
 				327A0DE7221950E3001A6EF0 /* Gc.cpp */,
 				327A0DE8221950E3001A6EF0 /* gcobj.h */,
+				32DED48823BF88BD00348B1E /* gci.h */,
 			);
 			name = gc;
 			path = ../common/gc;

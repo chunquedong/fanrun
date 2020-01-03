@@ -17,17 +17,22 @@
 
 void Gc::gcThreadRun() {
     while (true) {
+        bool runGc = false;
         {
             std::unique_lock<std::mutex> lck(cdLock);
             condition.wait(lck);
+            if (running) {
+                runGc = true;
+            }
         }
-        if (running) {
+        if (runGc) {
             doCollect();
         }
     }
 }
 
-Gc::Gc() : allocSize(0), running(false), marker(0), trace(1), gcSupport(nullptr), gcThread(NULL), isMarking(false)
+Gc::Gc(GcSupport *support) : Collector(support), allocSize(0)
+    , running(false), marker(0), trace(1), gcThread(NULL), isMarking(false), isStopWorld(false)
 {
     lastAllocSize = 29;
     collectLimit = 1000;
@@ -61,8 +66,8 @@ bool Gc::isRef(void *p) {
 #endif
 
 void Gc::setMarking(bool m) {
-    std::lock_guard<std::recursive_mutex> lock_guard(lock);
-    isMarking = m;
+    //std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    isMarking.store(m);
 }
 
 void Gc::pinObj(GcObj* obj) {
@@ -84,7 +89,6 @@ void Gc::onVisit(GcObj* obj) {
 }
 
 void Gc::setDirty(GcObj *obj) {
-    std::lock_guard<std::recursive_mutex> lock_guard(lock);
     if (!isMarking) return;
     if (!isRef(obj)) {
         abort();
@@ -156,6 +160,26 @@ void Gc::collect() {
     condition.notify_all();
 }
 
+void Gc::puaseWorld(bool bloking) {
+    isStopWorld.store(true);
+    gcSupport->puaseWorld(bloking);
+//    if (trace) {
+//        printf("puaseWorld\n");
+//    }
+}
+
+void Gc::resumeWorld() {
+    gcSupport->resumeWorld();
+    isStopWorld.store(false);
+//    if (trace) {
+//        printf("resumeWorld\n");
+//    }
+}
+
+bool Gc::isStopTheWorld() {
+    return isStopWorld.load();
+}
+
 void Gc::doCollect() {
     if (trace) {
         printf("******* start gc: memory:%ld (limit:%ld, last:%ld)\n", allocSize, collectLimit, lastAllocSize);
@@ -167,7 +191,7 @@ void Gc::doCollect() {
     beginGc();
     
     //get root
-    puaseWorld(true);
+    puaseWorld();
     getRoot();
     
     setMarking(true);
@@ -177,7 +201,7 @@ void Gc::doCollect() {
     mark();
     
     //remark root
-    puaseWorld(true);
+    puaseWorld();
     //gcSupport->walkDirtyList(this);
     
     //remark changed

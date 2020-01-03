@@ -25,11 +25,7 @@ extern  "C" {
 
 //#define LONG_JMP_EXCEPTION
 
-struct fr_Env_ {
-    volatile bool needStop;
-    volatile bool isStoped;
-};
-typedef struct fr_Env_ *fr_Env;
+typedef void *fr_Env;
 typedef void *fr_Fvm;
 
 ////////////////////////////
@@ -180,8 +176,8 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_UNBOXING(obj, toType) (*((toType##_null)obj))
 #define FR_UNBOXING_VAL(obj, toType) (((toType##_null)obj)->_val)
 #define FR_NOT_NULL(pos, ret, obj, toType) do{if (obj) ret = (toType)obj; else FR_THROW_NPE(pos); }while(0)
-    
-#define FR_CHECK_POINT {if(__env->needStop)fr_checkPoint(__env);}
+
+#define FR_CHECK_POINT() fr_checkPoint(__env)
 #define FR_SET_DIRTY(obj) fr_setGcDirty(__env, (fr_Obj)obj)
     
 #define FR_STATIC_INIT(type) do{if(!type##_class__->staticInited) {type##_class__->staticInited=true;type##_static__init(__env);}}while(0)

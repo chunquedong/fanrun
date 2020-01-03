@@ -15,6 +15,7 @@
 #include <set>
 #include "tinycthread.h"
 #include "system.h"
+#include <atomic>
 
 struct StackFrame {
     StackFrame *preFrame;
@@ -26,8 +27,8 @@ struct StackFrame {
 class Env {
     ExeEngine *interpreter;
 public:
-    volatile bool needStop;
-    volatile bool isStoped;
+    //volatile bool needStop;
+    std::atomic<bool> isStoped;
     
     PodManager *podManager;
 //private:
@@ -82,7 +83,7 @@ public:
     void deleteGlobalRef(fr_Obj obj);
     
     FObj * allocObj(FType *type, int addRef, int size = 0);
-    void walkLocalRoot(Gc *gc);
+    void walkLocalRoot(Collector *gc);
     void gc();
     
     ////////////////////////////

@@ -10,6 +10,7 @@
 #define Gc_hpp
 
 #include "gcobj.h"
+#include "gci.h"
 
 #include <stdio.h>
 //#include "vm.h"
@@ -20,27 +21,12 @@
 #include <map>
 #include "Bitmap.hpp"
 #include <thread>
+#include <atomic>
 
 
 #define GC_USE_BITMAP 0
 
-class Gc;
-
-class GcSupport {
-public:
-    virtual void visitChildren(Gc *gc, GcObj *obj) = 0;
-    virtual void walkRoot(Gc *gc) = 0;
-//    virtual void walkDirtyList(Gc *gc) = 0;
-    virtual void onStartGc() = 0;
-    
-    virtual void finalizeObj(GcObj *obj) = 0;
-    virtual void puaseWorld(bool bloking) = 0;
-    virtual void resumeWorld() = 0;
-    virtual void printObj(GcObj *obj) = 0;
-    virtual int allocSize(void *type) = 0;
-};
-
-class Gc {
+class Gc : public Collector {
     std::list<GcObj*> pinObjs;
 
 #if GC_USE_BITMAP
@@ -53,15 +39,15 @@ class Gc {
     std::vector<GcObj*> dirtyList;
     
     std::recursive_mutex lock;
-    bool isStopWorld;
+    std::atomic<bool> isStopWorld;
     int marker;
     bool running;
-    bool isMarking;
+    std::atomic<bool> isMarking;
     std::thread *gcThread;
     std::mutex cdLock;
     std::condition_variable condition;
 public:
-    GcSupport *gcSupport;
+    //GcSupport *gcSupport;
     
     long collectLimit;
     long lastAllocSize;
@@ -70,7 +56,7 @@ public:
     
 public:
 
-    Gc();
+    Gc(GcSupport *support);
     ~Gc();
     
     bool isRef(void *p);
@@ -88,19 +74,13 @@ public:
     
     void gcThreadRun();
     
+    bool isStopTheWorld();
 private:
     void setMarking(bool m);
     void doCollect();
     
-    void puaseWorld(bool bloking) {
-        isStopWorld = true;
-        gcSupport->puaseWorld(bloking);
-    }
-    
-    void resumeWorld() {
-        gcSupport->resumeWorld();
-        isStopWorld = false;
-    }
+    void puaseWorld(bool bloking = true);
+    void resumeWorld();
     
     void beginGc();
     void endGc();

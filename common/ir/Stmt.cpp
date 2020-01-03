@@ -522,14 +522,14 @@ void JumpStmt::print(Printer& printer) {
     switch (jmpType) {
         case trueJmp:{
             if (targetPos < selfPos) {
-                printer.println("FR_CHECK_POINT");
+                printer.println("FR_CHECK_POINT();");
             }
             printer.printf("if (%s) goto ", expr.getName().c_str());
         }
             break;
         case falseJmp: {
             if (targetPos < selfPos) {
-                printer.println("FR_CHECK_POINT");
+                printer.println("FR_CHECK_POINT();");
             }
             printer.printf("if (!%s) goto ", expr.getName().c_str());
         }
@@ -547,7 +547,7 @@ void JumpStmt::print(Printer& printer) {
             break;
         default: {
             if (targetPos < selfPos) {
-                printer.println("FR_CHECK_POINT");
+                printer.println("FR_CHECK_POINT();");
             }
             printer.printf("goto ");
         }

@@ -85,7 +85,7 @@ FObj * ObjFactory::allocObj(Env *env, FType *type, int addRef, int size) {
         size = ftype->c_allocSize;
     }
     
-    FObj * obj = (FObj *)env->vm->gc.alloc(ftype, size);
+    FObj * obj = (FObj *)env->vm->gc->alloc(ftype, size);
     //obj->type = ftype;
 //    for (int i=0; i<ftype->fields.size(); ++i) {
 //        FField &f = ftype->fields[i];
