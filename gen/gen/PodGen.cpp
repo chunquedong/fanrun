@@ -44,7 +44,7 @@ void printDocComment(Printer &printer) {
     printer.println("*/");
 }
 
-void PodGen::gen(std::string &path) {
+void PodGen::gen(const std::string &path) {
     std::string headerFile = path + podName + ".h";
     Printer headerPrinter(headerFile.c_str());
     printDocComment(headerPrinter);
@@ -319,11 +319,21 @@ void PodGen::topoSortType() {
             type = base;
             continue;
         }
-        else {
-            sortedTypes.push_back(type);
-            type->c_sortFlag = 1;
-            type = getOne(this);
+        
+        for (FField &field : type->type->fields) {
+            if (FCodeUtil::isValueTypeRef(pod, field.type)) {
+                std::string fieldTypeName = FCodeUtil::getTypeNsName(pod, field.type);
+                TypeGen *fieldType = exitsBase(this, fieldTypeName);
+                if (fieldType) {
+                    type = fieldType;
+                    continue;
+                }
+            }
         }
+
+        sortedTypes.push_back(type);
+        type->c_sortFlag = 1;
+        type = getOne(this);
     }
 }
 

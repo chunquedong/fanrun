@@ -239,10 +239,10 @@
 				327A0D1E22194ACC001A6EF0 /* IRMethod.cpp */,
 				327A0D1F22194ACC001A6EF0 /* IRMethod.h */,
 				327A0D2022194ACC001A6EF0 /* Stmt.cpp */,
+				327A0D2422194ACC001A6EF0 /* Stmt.hpp */,
 				327A0D2122194ACC001A6EF0 /* MBuilder.cpp */,
 				327A0D2222194ACC001A6EF0 /* MBuilder.hpp */,
 				327A0D2322194ACC001A6EF0 /* FCodeUtil.cpp */,
-				327A0D2422194ACC001A6EF0 /* Stmt.hpp */,
 			);
 			name = ir;
 			path = ../common/ir;

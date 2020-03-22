@@ -31,7 +31,7 @@ public:
 public:
     PodGen(PodLoader *podMgr, const std::string& podName);
     ~PodGen();
-    void gen(std::string &path);
+    void gen(const std::string &path);
 private:
     void genHeader(Printer *printer);
     void genNativePrototype(Printer *printer);

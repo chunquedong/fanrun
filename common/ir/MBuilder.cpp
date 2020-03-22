@@ -158,6 +158,7 @@ bool MBuilder::buildMethod(FMethod *method) {
         //var.typeRef = method->c_parent->meta.self;
         var.name = "__self";
         var.isArg = true;
+        var.type.isPass = true;
         irMethod.paramCount++;
     }
     
@@ -168,6 +169,7 @@ bool MBuilder::buildMethod(FMethod *method) {
         //var.typeRef = fvar->type;
         if (i < method->paramCount) {
             var.isArg = true;
+            var.type.isPass = true;
         }
         var.name = curPod->names[fvar->name];
     }

@@ -8,6 +8,20 @@
 #include "PodLoader.h"
 #include "PodGen.hpp"
 
+void getDepends(PodLoader &podMgr, const std::string &pod, std::map<std::string, FPod*> &depends) {
+    FPod *fpod = podMgr.findPod(pod);
+    if (fpod == NULL) {
+        printf("ERROR: not found pod:%s", pod.c_str());
+        return;
+    }
+    
+    for (const std::string name : fpod->c_dependPods) {
+        getDepends(podMgr, name, depends);
+    }
+    
+    depends[pod] = fpod;
+}
+
 // /Users/yangjiandong/workspace/code/fanx/env/ baseTest /Users/yangjiandong/workspace/code/fanrun/gen/temp/
 int main(int argc, const char * argv[]) {
     std::string libPath;
@@ -27,14 +41,13 @@ int main(int argc, const char * argv[]) {
     libPath += "lib/fan/";
     podMgr.load(libPath, pod);
     
-    PodGen gen(&podMgr, "sys");
-    gen.gen(outPath);
+    std::map<std::string, FPod*> depends;
+    getDepends(podMgr, pod, depends);
     
-    //PodGen gen1(&podMgr, "std");
-    //gen1.gen(outPath);
-    
-    PodGen gen2(&podMgr, "baseTest");
-    gen2.gen(outPath);
+    for (std::map<std::string, FPod*>::iterator itr = depends.begin(); itr != depends.end(); ++itr) {
+        PodGen gen1(&podMgr, itr->first);
+        gen1.gen(outPath);
+    }
     
     puts("DONE!");
     return 0;

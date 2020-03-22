@@ -26,6 +26,9 @@ std::string TypeInfo::getName() const {
     else if (isBuildin) {
         typeName += extName;
     }
+    else if (isPass && isValue && !isBuildin && !isNullable) {
+        typeName += "_pass";
+    }
     escape(typeName);
     return typeName;
 }
@@ -133,82 +136,10 @@ void escapeStr(const std::string &from, std::string &str) {
     }
 }
 
-void printValue(const std::string &varName, Printer& printer, FPod *curPod, FOpObj &opObj) {
-    switch (opObj.opcode) {
-        case FOp::LoadNull: {
-            printer.printf("NULL");
-            break;
-        }
-        case FOp::LoadFalse: {
-            printer.printf("false");
-            break;
-        }
-        case FOp::LoadTrue: {
-            printer.printf("true");
-            break;
-        }
-        case FOp::LoadInt: {
-            int64_t i = curPod->constantas.ints[opObj.i1];
-            printer.printf("%lld", i);
-            break;
-        }
-        case FOp::LoadFloat: {
-            double i = curPod->constantas.reals[opObj.i1];
-            printer.printf("%g", i);
-            break;
-        }
-        case FOp::LoadDecimal: {
-            double i = curPod->constantas.reals[opObj.i1];
-            printer.printf("%g", i);
-            break;
-        }
-        case FOp::LoadStr: {
-            const std::string &rawstr = curPod->constantas.strings[opObj.i1];
-            std::string str;
-            size_t len = rawstr.size();
-            escapeStr(rawstr, str);
-            
-            
-            printer.println("(sys_Str)(%s_ConstPoolStrs[%d]);", curPod->name.c_str(), opObj.i1);
-            printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStrUtf8(__env, \"%s\", %d);"
-                           , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
-            printer.printf("%s = (sys_Str)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
-            break;
-        }
-        case FOp::LoadDuration: {
-            int64_t i = curPod->constantas.ints[opObj.i1];
-            printer.printf("%lld", i);
-            break;
-            break;
-        }
-        case FOp::LoadUri: {
-            const std::string &rawstr = curPod->constantas.strings[opObj.i1];
-            std::string str;
-            size_t len = rawstr.size();
-            escapeStr(rawstr, str);
-            
-            printer.println("(std_Uri)(%s_ConstPoolUris[%d]);", curPod->name.c_str(), opObj.i1);
-            printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d));"
-                           , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
-            printer.printf("%s = (std_Uri)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
-            break;
-        }
-        case FOp::LoadType: {
-            std::string typeName = FCodeUtil::getTypeNsName(curPod, opObj.i1);
-            printer.printf("FR_TYPE(%s)", typeName.c_str());
-            break;
-        }
-        default: {
-            printer.printf("other");
-            break;
-        }
-    }
-}
-
 std::string Expr::getName(bool deRef) {
     Var &var = block->locals.at(index);
     std::string vname = var.name;
-    if (deRef && var.isArg && var.type.isValue && !var.type.isBuildin && !var.type.isNullable) {
+    if (deRef && var.type.isPass && var.type.isValue && !var.type.isBuildin && !var.type.isNullable) {
         vname = "(*" +vname+ ")";
     }
     return vname;
@@ -228,9 +159,80 @@ bool Expr::isValueType() {
 }
 
 void ConstStmt::print(Printer& printer) {
-    printer.printf("%s = ", dst.getName().c_str());
-    printValue(dst.getName(), printer, curPod, opObj);
-    printer.printf(";");
+//    printer.printf("%s = ", dst.getName().c_str());
+//    printValue(dst.getName(), printer, curPod, opObj);
+//    printer.printf(";");
+//
+    const std::string &varName = dst.getName();
+    
+    switch (opObj.opcode) {
+        case FOp::LoadNull: {
+            printer.printf("%s = NULL;", varName.c_str());
+            break;
+        }
+        case FOp::LoadFalse: {
+            printer.printf("%s = false;", varName.c_str());
+            break;
+        }
+        case FOp::LoadTrue: {
+            printer.printf("%s = true;", varName.c_str());
+            break;
+        }
+        case FOp::LoadInt: {
+            int64_t i = curPod->constantas.ints[opObj.i1];
+            printer.printf("%s = %lld;", varName.c_str(), i);
+            break;
+        }
+        case FOp::LoadFloat: {
+            double i = curPod->constantas.reals[opObj.i1];
+            printer.printf("%s = %g;", varName.c_str(), i);
+            break;
+        }
+        case FOp::LoadDecimal: {
+            const std::string &i = curPod->constantas.decimals[opObj.i1];
+            printer.printf("%s = %s;", varName.c_str(), i.c_str());
+            break;
+        }
+        case FOp::LoadStr: {
+            const std::string &rawstr = curPod->constantas.strings[opObj.i1];
+            std::string str;
+            size_t len = rawstr.size();
+            escapeStr(rawstr, str);
+            
+            
+            printer.println("%s = (sys_Str)(%s_ConstPoolStrs[%d]);", varName.c_str(), curPod->name.c_str(), opObj.i1);
+            printer.printf("if (%s == NULL) { %s_ConstPoolStrs[%d] = (sys_Str)fr_newStrUtf8(__env, \"%s\", %d);"
+                           , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
+            printer.printf("%s = (sys_Str)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
+            break;
+        }
+        case FOp::LoadDuration: {
+            int64_t i = curPod->constantas.durations[opObj.i1];
+            printer.printf("std_Duration_fromTicks(__env, &%s, %lld);", varName.c_str(), i);
+            break;
+        }
+        case FOp::LoadUri: {
+            const std::string &rawstr = curPod->constantas.uris[opObj.i1];
+            std::string str;
+            size_t len = rawstr.size();
+            escapeStr(rawstr, str);
+            
+            printer.println("%s = (std_Uri)(%s_ConstPoolUris[%d]);", varName.c_str(), curPod->name.c_str(), opObj.i1);
+            printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d));"
+                           , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
+            printer.printf("%s = (std_Uri)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
+            break;
+        }
+        case FOp::LoadType: {
+            std::string typeName = FCodeUtil::getTypeNsName(curPod, opObj.i1);
+            printer.printf("%s = FR_TYPE(%s);", varName.c_str(), typeName.c_str());
+            break;
+        }
+        default: {
+            printer.printf("//other");
+            break;
+        }
+    }
 }
 
 TypeInfo ConstStmt::getType() {
@@ -279,16 +281,19 @@ TypeInfo ConstStmt::getType() {
         }
         case FOp::LoadDuration: {
             name = "Duration";
+            pod = "std";
             isValue = true;
             break;
         }
         case FOp::LoadUri: {
             name = "Uri";
+            pod = "std";
             isValue = true;
             break;
         }
         case FOp::LoadType: {
             name = "Type";
+            pod = "std";
             break;
         }
         default: {
@@ -302,7 +307,15 @@ TypeInfo ConstStmt::getType() {
 }
 
 void StoreStmt::print(Printer& printer) {
-    printer.printf("%s = %s;", dst.getName().c_str(), src.getName().c_str());
+    if (dst.getType().isValueType() && !src.getType().isValueType()) {
+        printer.printf("%s = *(%s);", dst.getName().c_str(), src.getName().c_str());
+    }
+    else if (!dst.getType().isValueType() && src.getType().isValueType()) {
+        printer.printf("%s = &(%s);", dst.getName().c_str(), src.getName().c_str());
+    }
+    else {
+        printer.printf("%s = %s;", dst.getName().c_str(), src.getName().c_str());
+    }
 }
 
 void CallStmt::print(Printer& printer) {
@@ -420,8 +433,14 @@ void CallStmt::print(Printer& printer) {
         if (!isFirstArg || i>0) printer.printf(", ");
         TypeInfo &typeInfo = params[i].getType();
         if (typeInfo.isValue && !typeInfo.isBuildin && !typeInfo.isNullable) {
-            printer.printf("(%s_pass)&%s"
-                           , typeInfo.getName().c_str(), params[i].getName(true).c_str());
+            if (typeInfo.isPass) {
+                printer.printf("(%s)%s"
+                               , typeInfo.getName().c_str(), params[i].getName().c_str());
+            }
+            else {
+                printer.printf("(%s_pass)&%s"
+                           , typeInfo.getName().c_str(), params[i].getName().c_str());
+            }
             continue;
         }
         if (!isStatic && i == 0) {
@@ -453,9 +472,10 @@ void FieldStmt::print(Printer& printer) {
     if (isLoad) {
         //lazy init class
         if (isStatic) {
-            FTypeRef &typeRef = curPod->typeRefs[fieldRef->parent];
-            const std::string &purName = curPod->names[typeRef.typeName];
-            FType *ftype = curPod->c_typeMap[purName];
+//            FTypeRef &typeRef = curPod->typeRefs[fieldRef->parent];
+//            const std::string &purName = curPod->names[typeRef.typeName];
+            FType *ftype = FCodeUtil::getFTypeFromTypeRef(curPod, fieldRef->parent);
+            
             auto itr = ftype->c_methodMap.find("static$init");
             if (itr != ftype->c_methodMap.end()) {
                 printer.println("FR_STATIC_INIT(%s);", parentName.c_str());
@@ -464,13 +484,16 @@ void FieldStmt::print(Printer& printer) {
         
         if (isValueType && !isBuildinType) {
             if (isStatic) {
-                printer.printf("memcpy(&%s, &(%s_%s), sizeof(%s))", value.getName().c_str(), parentName.c_str(), name.c_str(), typeName.c_str());
+                printer.printf("memcpy(&%s, &(%s_%s), sizeof(%s))", value.getName().c_str(),
+                               parentName.c_str(), name.c_str(), typeName.c_str());
             }
             else if (parentValueType) {
-                printer.printf("memcpy(&%s, &(%s.%s), sizeof(%s))", value.getName().c_str(), instance.getName(true).c_str(), name.c_str(), typeName.c_str());
+                printer.printf("memcpy(&%s, &(%s.%s), sizeof(%s))", value.getName().c_str(),
+                               instance.getName(true).c_str(), name.c_str(), typeName.c_str());
             }
             else {
-                printer.printf("memcpy(&%s, &(%s->%s), sizeof(%s))", value.getName().c_str(), instance.getName(true).c_str(), name.c_str(), typeName.c_str());
+                printer.printf("memcpy(&%s, &(((%s)(%s))->%s), sizeof(%s))", value.getName().c_str(),
+                               parentName.c_str(), instance.getName(true).c_str(), name.c_str(), typeName.c_str());
             }
         }
         else {
@@ -482,7 +505,7 @@ void FieldStmt::print(Printer& printer) {
                 printer.printf("%s.%s", instance.getName(true).c_str(), name.c_str());
             }
             else {
-                printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
+                printer.printf("((%s)(%s))->%s", parentName.c_str(), instance.getName().c_str(), name.c_str());
             }
         }
     } else {
@@ -492,10 +515,12 @@ void FieldStmt::print(Printer& printer) {
                 printer.printf("memcpy(&(%s_%s), &%s, sizeof(%s))", parentName.c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
             }
             else if (parentValueType) {
-                printer.printf("memcpy(&(%s.%s), &%s, sizeof(%s))", instance.getName(true).c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
+                printer.printf("memcpy(&(%s.%s), &%s, sizeof(%s))",
+                               instance.getName(true).c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
             }
             else {
-                printer.printf("memcpy(&(%s->%s), &%s, sizeof(%s))", instance.getName(true).c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
+                printer.printf("memcpy(&(((%s)%s)->%s), &%s, sizeof(%s))",
+                               parentName.c_str(), instance.getName(true).c_str(), name.c_str(), value.getName().c_str(), typeName.c_str());
             }
         }
         else {
@@ -506,7 +531,7 @@ void FieldStmt::print(Printer& printer) {
                 printer.printf("%s.%s", instance.getName(true).c_str(), name.c_str());
             }
             else {
-                printer.printf("%s->%s", instance.getName().c_str(), name.c_str());
+                printer.printf("((%s)%s)->%s", parentName.c_str(), instance.getName().c_str(), name.c_str());
             }
             printer.printf("= %s", value.getName().c_str());
         }
@@ -776,7 +801,7 @@ void ReturnStmt::print(Printer& printer) {
     if (isVoid) {
         printer.printf("return NULL;");
     } else {
-        printer.printf("*__ret = %s; return NULL;", retValue.getName().c_str());
+        printer.printf("*__ret = %s; return NULL;", retValue.getName(true).c_str());
     }
 }
 
@@ -868,8 +893,8 @@ void CoerceStmt::print(Printer& printer) {
         return;
     }
     
-    bool isVal1 = from.getType().isValue;
-    bool isVal2 = to.getType().isValue;
+    bool isVal1 = from.getType().isValueType();
+    bool isVal2 = to.getType().isValueType();
     bool isNull1 = from.getType().isNullable;
     bool isNull2 = to.getType().isNullable;
     
@@ -886,7 +911,7 @@ void CoerceStmt::print(Printer& printer) {
                            , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
         } else {
             printer.printf("%s = FR_UNBOXING(%s, %s);"
-                       , to.getName().c_str(), from.getName(true).c_str(), typeName2.c_str());
+                       , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
         }
         return;
     }

@@ -45,6 +45,7 @@ cstr keyword[] = {
     "volatile",
     //"while",
     "typeof",
+    "delete",
     
     "not",
     "and",
@@ -52,7 +53,7 @@ cstr keyword[] = {
     "xor",
 };
 
-const int keywordCount = 27;
+const int keywordCount = 28;
 
 void escapeKeyword(std::string &astr) {
     for (int i=0; i<keywordCount; ++i) {
