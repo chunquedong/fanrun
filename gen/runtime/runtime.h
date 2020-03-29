@@ -123,7 +123,9 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 // Other
 ////////////////////////////
 
-//#define FR_TYPE(type) (sys_Type)fr_toTypeObj(__env, type##_class__)
+#define FR_TYPE(type) (std_Type)0;
+    //TODO fr_toTypeObj(__env, type##_class__)
+    
 #define FR_TYPE_IS(obj, type) fr_isClass(__env, obj, type##_class__)
 #define FR_TYPE_AS(obj, type) (type)(FR_TYPE_IS(obj, type)?obj:NULL)
 #define FR_CAST(pos, ret, obj, type, toType) do{if (FR_TYPE_IS(obj, type)) ret = (toType)obj; else FR_THROW_NPE(pos); }while(0)
@@ -159,21 +161,21 @@ fr_Obj fr_box_bool(fr_Env, sys_Bool_val val);
 #define FR_SCALL(pos, type, method, ret, ...)  _FR_CHECK_ERR(type##_##method(__env, ret, ## __VA_ARGS__), pos)
 
 
-#define FR_BOXING(tagert, value, fromType, toType) {\
+#define FR_BOXING_STRUCT(target, value, fromType, toType) {\
     fromType##_ref tmp__ = FR_ALLOC(fromType);\
-    *tmp__ = value;\
-    tagert = (toType)tmp__;}
+    memcpy(tmp__, &value, sizeof(struct fromType##_struct));\
+    target = (toType)tmp__;}
     
-#define FR_BOXING_VAL(tagert, value, fromType, toType) {\
+#define FR_BOXING_VAL(target, value, fromType, toType) {\
     fromType##_ref tmp__ = FR_ALLOC(fromType);\
     tmp__->_val = value;\
-    tagert = (toType)tmp__;}
+    target = (toType)tmp__;}
 
 #define FR_BOX_INT(value) ((sys_Int_ref)fr_box_int(__env, value))
 #define FR_BOX_FLOAT(value) ((sys_Float_ref)fr_box_float(__env, value))
 #define FR_BOX_BOOL(value) ((sys_Bool_ref)fr_box_bool(__env, value))
 
-#define FR_UNBOXING(obj, toType) (*((toType##_null)obj))
+#define FR_UNBOXING_STRUCT(target, obj, toType) (memcpy(&target, (toType##_null)obj, sizeof(struct toType##_struct)), target)
 #define FR_UNBOXING_VAL(obj, toType) (((toType##_null)obj)->_val)
 #define FR_NOT_NULL(pos, ret, obj, toType) do{if (obj) ret = (toType)obj; else FR_THROW_NPE(pos); }while(0)
 

@@ -218,7 +218,7 @@ void ConstStmt::print(Printer& printer) {
             escapeStr(rawstr, str);
             
             printer.println("%s = (std_Uri)(%s_ConstPoolUris[%d]);", varName.c_str(), curPod->name.c_str(), opObj.i1);
-            printer.printf("if (%s == NULL) { %s_ConstPoolUris[%d] = std_Uri_fromStr1((sys_Str)fr_newStr(__env, L\"%s\", %d));"
+            printer.printf("if (%s == NULL) { std_Uri_fromStr__1(__env, ((std_Uri)(%s_ConstPoolStrs[%d])), (sys_Str)fr_newStrUtf8(__env, \"%s\", %d));"
                            , varName.c_str(), curPod->name.c_str(), opObj.i1, str.c_str(), len);
             printer.printf("%s = (std_Uri)(%s_ConstPoolStrs[%d]); }", varName.c_str(), curPod->name.c_str(), opObj.i1);
             break;
@@ -613,12 +613,12 @@ void CompareStmt::print(Printer& printer) {
     }
     
     if (opObj.i1 > 0 || opObj.i2 > 0) {
-        isVal1 = TypeInfo(curPod, opObj.i1).isValue;
-        isVal2 = TypeInfo(curPod, opObj.i2).isValue;
+        isVal1 = TypeInfo(curPod, opObj.i1).isValueType();
+        isVal2 = TypeInfo(curPod, opObj.i2).isValueType();
     }
     else {
-        isVal1 = param1.getType().isValue;
-        isVal2 = param2.getType().isValue;
+        isVal1 = param1.getType().isValueType();
+        isVal2 = param2.getType().isValueType();
     }
     
     const char *op = "==";
@@ -690,18 +690,12 @@ void CompareStmt::print(Printer& printer) {
                 printer.printf("%s = false;", result.getName().c_str());
             }
             
-            if (FCodeUtil::isBuildinVal(param2.getTypeName())) {
-                printer.printf("else %s = FR_UNBOXING_VAL(%s, %s) %s %s;", result.getName().c_str()
-                               , param1.getName().c_str(), param2.getTypeName().c_str()
-                               , op, param2.getName().c_str());
-            } else {
-                printer.printf("else %s = FR_UNBOXING(%s, %s) %s %s;", result.getName().c_str()
+            printer.printf("else %s = FR_UNBOXING_VAL(%s, %s) %s %s;", result.getName().c_str()
                            , param1.getName().c_str(), param2.getTypeName().c_str()
                            , op, param2.getName().c_str());
-            }
         }
         else if (!isVal2) {
-            printer.printf("if (%s == NULL) FR_THROW_NPE();", param2.getName().c_str());
+            printer.printf("if (%s == NULL) FR_THROW_NPE(%d);", param2.getName().c_str(), this->pos);
             printer.printf("if (!FR_TYPE_IS(%s, %s) )"
                            , param2.getName().c_str(), param1.getTypeName().c_str());
             if (opObj.opcode == FOp::Compare) {
@@ -710,15 +704,9 @@ void CompareStmt::print(Printer& printer) {
                 printer.printf("%s = false;", result.getName().c_str());
             }
             
-            if (FCodeUtil::isBuildinVal(param1.getTypeName())) {
-                printer.printf("else %s = %s %s FR_UNBOXING_VAL(%s, %s);", result.getName().c_str()
+            printer.printf("else %s = %s %s FR_UNBOXING_VAL(%s, %s);", result.getName().c_str()
                            , param1.getName().c_str(), op
                            , param2.getName().c_str(), param1.getTypeName().c_str());
-            } else {
-                printer.printf("else %s = %s %s FR_UNBOXING(%s, %s);", result.getName().c_str()
-                               , param1.getName().c_str(), op
-                               , param2.getName().c_str(), param1.getTypeName().c_str());
-            }
         }
     }
     
@@ -910,7 +898,7 @@ void CoerceStmt::print(Printer& printer) {
             printer.printf("%s = FR_UNBOXING_VAL(%s, %s);"
                            , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
         } else {
-            printer.printf("%s = FR_UNBOXING(%s, %s);"
+            printer.printf("FR_UNBOXING_STRUCT(%s, %s, %s);"
                        , to.getName().c_str(), from.getName().c_str(), typeName2.c_str());
         }
         return;
@@ -929,7 +917,7 @@ void CoerceStmt::print(Printer& printer) {
                            , to.getName().c_str(), typeName2.c_str(), from.getName().c_str());
         }
         else {
-            printer.printf("FR_BOXING(%s, %s, %s, %s);"
+            printer.printf("FR_BOXING_STRUCT(%s, %s, %s, %s);"
                            , to.getName().c_str(), from.getName(true).c_str()
                            , typeName1.c_str(), typeName2.c_str());
         }
@@ -963,7 +951,7 @@ void TypeCheckStmt::print(Printer& printer) {
             }
             else {
                 std::string typeName = FCodeUtil::getTypeNsName(curPod, type);
-                printer.printf("FR_BOXING(%s, %s, %s, %s);"
+                printer.printf("FR_BOXING_STRUCT(%s, %s, %s, %s);"
                                , result.getName().c_str(), obj.getName().c_str()
                                , typeName.c_str(), result.getTypeName().c_str());
             }
