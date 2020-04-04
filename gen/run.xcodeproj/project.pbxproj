@@ -39,6 +39,10 @@
 		3284BBC0243063D10043DA3F /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBB4243063D10043DA3F /* File.cpp */; };
 		3284BBC1243063D10043DA3F /* FileBuf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBB5243063D10043DA3F /* FileBuf.cpp */; };
 		3284BBC2243063D10043DA3F /* BufCrypto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBB6243063D10043DA3F /* BufCrypto.cpp */; };
+		3284BBC72431DF9D0043DA3F /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBC32431DF9C0043DA3F /* Math.cpp */; };
+		3284BBC82431DF9D0043DA3F /* Zip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBC42431DF9C0043DA3F /* Zip.cpp */; };
+		3284BBC92431DF9D0043DA3F /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBC52431DF9C0043DA3F /* Env.cpp */; };
+		3284BBCA2431DF9D0043DA3F /* Decimal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3284BBC62431DF9C0043DA3F /* Decimal.cpp */; };
 		3291F92F1F6D416C00F12438 /* Env.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9221F6D416C00F12438 /* Env.cpp */; };
 		3291F9311F6D416C00F12438 /* runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3291F9261F6D416C00F12438 /* runtime.cpp */; };
 		329448672427396A00FB2D26 /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 329448662427396A00FB2D26 /* Atomic.cpp */; };
@@ -105,6 +109,11 @@
 		3284BBB4243063D10043DA3F /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		3284BBB5243063D10043DA3F /* FileBuf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileBuf.cpp; sourceTree = "<group>"; };
 		3284BBB6243063D10043DA3F /* BufCrypto.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufCrypto.cpp; sourceTree = "<group>"; };
+		3284BBC32431DF9C0043DA3F /* Math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Math.cpp; sourceTree = "<group>"; };
+		3284BBC42431DF9C0043DA3F /* Zip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Zip.cpp; sourceTree = "<group>"; };
+		3284BBC52431DF9C0043DA3F /* Env.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Env.cpp; sourceTree = "<group>"; };
+		3284BBC62431DF9C0043DA3F /* Decimal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Decimal.cpp; sourceTree = "<group>"; };
+		3284BBCF2434A73A0043DA3F /* Reflect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reflect.h; sourceTree = "<group>"; };
 		3291F9111F6D40C200F12438 /* run */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = run; sourceTree = BUILT_PRODUCTS_DIR; };
 		3291F9221F6D416C00F12438 /* Env.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Env.cpp; sourceTree = "<group>"; };
 		3291F9231F6D416C00F12438 /* Env.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Env.hpp; sourceTree = "<group>"; };
@@ -232,6 +241,11 @@
 		329448652427396A00FB2D26 /* std */ = {
 			isa = PBXGroup;
 			children = (
+				3284BBCF2434A73A0043DA3F /* Reflect.h */,
+				3284BBC62431DF9C0043DA3F /* Decimal.cpp */,
+				3284BBC52431DF9C0043DA3F /* Env.cpp */,
+				3284BBC32431DF9C0043DA3F /* Math.cpp */,
+				3284BBC42431DF9C0043DA3F /* Zip.cpp */,
 				3284BBB6243063D10043DA3F /* BufCrypto.cpp */,
 				3284BBB0243063D00043DA3F /* Extension.cpp */,
 				3284BBB4243063D10043DA3F /* File.cpp */,
@@ -311,6 +325,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				324BFA7523B8AB43007F2863 /* sys_Float.c in Sources */,
+				3284BBC92431DF9D0043DA3F /* Env.cpp in Sources */,
 				3284BBBD243063D10043DA3F /* Reflect.cpp in Sources */,
 				327A0D0822194A88001A6EF0 /* system.c in Sources */,
 				324BFA8523BC692A007F2863 /* type.cpp in Sources */,
@@ -321,6 +336,8 @@
 				324BFA7A23B8AB43007F2863 /* runtime_native.c in Sources */,
 				32C107071FE6B57B006248C6 /* main.c in Sources */,
 				3294486A2427398100FB2D26 /* std.c in Sources */,
+				3284BBC72431DF9D0043DA3F /* Math.cpp in Sources */,
+				3284BBC82431DF9D0043DA3F /* Zip.cpp in Sources */,
 				3291F9311F6D416C00F12438 /* runtime.cpp in Sources */,
 				3284BBC2243063D10043DA3F /* BufCrypto.cpp in Sources */,
 				3284BBB7243063D10043DA3F /* Uuid.cpp in Sources */,
@@ -342,6 +359,7 @@
 				327A0D0622194A88001A6EF0 /* Gc.cpp in Sources */,
 				327A0D0722194A88001A6EF0 /* tinycthread.c in Sources */,
 				3284BBAA243061730043DA3F /* Process.cpp in Sources */,
+				3284BBCA2431DF9D0043DA3F /* Decimal.cpp in Sources */,
 				320544622203196300ECB5F2 /* baseTest.c in Sources */,
 				326165501FF8A578002174D6 /* Vm.cpp in Sources */,
 				3284BBC1243063D10043DA3F /* FileBuf.cpp in Sources */,

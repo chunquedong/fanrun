@@ -205,6 +205,11 @@ void Vm::registerClass(const char *pod, const char *clz, fr_Type type) {
         }
     }
 }
+void Vm::registerPod(struct fr_Pod *pod) {
+    std::lock_guard<std::recursive_mutex> lock_guard(lock);
+    pods[pod->name] = pod;
+}
+
 fr_Type Vm::findClass(const char *pod, const char *clz) {
     std::lock_guard<std::recursive_mutex> lock_guard(lock);
     auto itr = typeDb.find(pod);

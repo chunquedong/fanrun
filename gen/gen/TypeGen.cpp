@@ -164,6 +164,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
         printer->println("type->fieldList[%d].name = \"%s\";", i, fieldName.c_str());
         std::string typeName = getTypeNsName(field.type);
         printer->println("type->fieldList[%d].type = \"%s\";", i, typeName.c_str());
+        printer->println("type->fieldList[%d].flags = %d;", i, field.flags);
     
         bool isValType = FCodeUtil::isBuildinVal(typeName);
         printer->println("type->fieldList[%d].isValType = %s;", i, isValType ? "true" : "false");
@@ -172,6 +173,7 @@ void TypeGen::genTypeMetadata(Printer *printer) {
             printer->println("type->fieldList[%d].isStatic = true;", i);
             printer->println("type->fieldList[%d].pointer = (void*)(&%s_%s);"
                              , i, name.c_str(), fieldIdName.c_str());
+            printer->println("type->fieldList[%d].offset = -1;//is static", i);
         } else if ((field.flags & FFlags::Storage) == 0) {
             printer->println("type->fieldList[%d].isStatic = false;", i);
             printer->println("type->fieldList[%d].offset = -1;//no storage", i);
@@ -181,9 +183,43 @@ void TypeGen::genTypeMetadata(Printer *printer) {
             printer->println("type->fieldList[%d].offset = offsetof(struct %s_struct, %s);"
                          , i, name.c_str(), fieldIdName.c_str());
         }
+        
     }
     
     printer->println("type->methodCount = %d;", type->methods.size());
+    printer->println("type->methodList = (struct fr_Method*)malloc(sizeof(struct fr_Method)*%d);", type->methods.size());
+    //int offset = 0;
+    for (int i=0; i<type->methods.size(); ++i) {
+        FMethod &method = type->methods[i];
+        std::string fieldName = type->c_pod->names[method.name];
+        std::string fieldIdName = fieldName;
+        FCodeUtil::escapeIdentifierName(fieldIdName);
+        
+        printer->println("type->methodList[%d].name = \"%s\";", i, fieldName.c_str());
+        std::string typeName = getTypeNsName(method.returnType);
+        printer->println("type->methodList[%d].retType = \"%s\";", i, typeName.c_str());
+        printer->println("type->methodList[%d].flags = %d;", i, method.flags);
+        
+        if ((method.flags & FFlags::Abstract) != 0 || type->c_mangledName.find("sys_Libc") != std::string::npos ) {
+            printer->println("type->methodList[%d].func = (fr_Function)NULL;", i);
+        }
+        else {
+            printer->println("type->methodList[%d].func = (fr_Function)%s;", i, method.c_mangledName.c_str());
+        }
+        
+        printer->println("type->methodList[%d].paramsCount = %d;", i, method.paramCount);
+        printer->println("type->methodList[%d].paramsList = (struct fr_MethodParam*)malloc(sizeof(struct fr_MethodParam)*%d);"
+                         , i, method.paramCount);
+        
+        for (int j=0; j<method.paramCount; ++j) {
+            FMethodVar &var = method.vars[j];
+            std::string name = type->c_pod->names[var.name];
+            printer->println("type->methodList[%d].paramsList[%d].name = \"%s\";", i, j, name.c_str());
+            name = type->c_pod->names[var.type];
+            printer->println("type->methodList[%d].paramsList[%d].type = \"%s\";", i, j, name.c_str());
+            printer->println("type->methodList[%d].paramsList[%d].flags = %d;", i, j, var.flags);
+        }
+    }
     
     printer->println("fr_registerClass(__env, \"%s\", \"%s\", (fr_Type)%s_class__);"
                      , podName.c_str(), rawTypeName.c_str(), name.c_str());
@@ -248,6 +284,7 @@ void TypeGen::genMethodDeclare(Printer *printer) {
 
 void TypeGen::genNativePrototype(Printer *printer) {
     if (type->c_isExtern) {
+        //gen static fields
         for (int i=0; i<type->fields.size(); ++i) {
             FField *field = &type->fields[i];
             if ((field->flags & FFlags::Static) == 0) {
@@ -263,12 +300,16 @@ void TypeGen::genNativePrototype(Printer *printer) {
     for (int i=0; i<type->methods.size(); ++i) {
         FMethod *method = &type->methods[i];
         
-        if ((method->flags & FFlags::Native) == 0 && !method->c_parent->c_isExtern) {
+        if ((method->flags & FFlags::Native) == 0 && (method->c_parent->meta.flags & FFlags::Native) == 0) {
             continue;
         }
         if ((method->flags & FFlags::Abstract) != 0) {
             continue;
         }
+        if (!method->code.isEmpty()) {
+            continue;
+        }
+        
         std::string &methodName = method->c_stdName;
         if (!method->code.isEmpty() && methodName != "static$init" && methodName != "instance$init$") {
             continue;

@@ -63,7 +63,12 @@ void fr_registerClass(fr_Env env, const char *pod, const char *clz, fr_Type type
     e->vm->registerClass(pod, clz, type);
 }
 
-fr_Type fr_findClass(fr_Env env, const char *pod, const char *clz) {
+//fr_Type fr_findClass(fr_Env env, const char *pod, const char *clz) {
+//    Env *e = (Env*)env;
+//    return e->vm->findClass(pod, clz);
+//}
+
+void fr_registerPod(fr_Env env, struct fr_Pod *pod) {
     Env *e = (Env*)env;
-    return e->vm->findClass(pod, clz);
+    e->vm->registerPod(pod);
 }

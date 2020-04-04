@@ -29,10 +29,13 @@ class Vm : public GcSupport {
     std::vector<fr_Obj*> staticFieldRef;
     std::recursive_mutex lock;
     
-    //typedef std::unordered_map<std::string, std::unordered_map<std::string, fr_Class> > ClassMap;
-    typedef std::map<std::string, fr_Type> ClassMap;
+public:
+    //reflect info
+    typedef std::map<std::string, fr_Type > ClassMap;
     typedef std::map<std::string, ClassMap > PodMap;
     PodMap typeDb;
+    std::map<std::string, struct fr_Pod*> pods;
+
 public:
     //std::set<fr_Type> classSet;
 public:
@@ -40,6 +43,7 @@ public:
     ~Vm();
     
     void registerClass(const char *pod, const char *clz, fr_Type type);
+    void registerPod(struct fr_Pod *pod);
     fr_Type findClass(const char *pod, const char *clz);
     
     void start();

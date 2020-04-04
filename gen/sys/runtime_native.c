@@ -47,6 +47,10 @@ fr_Obj fr_arrayNew(fr_Env self, fr_Type elemType, int elemSize, size_t len) {
     return array;
 }
 
+fr_Err sys_Str_format(fr_Env __env, sys_Str *__ret, sys_Str format, sys_List args) {
+    FR_RET_ALLOC_THROW(sys_UnsupportedErr);
+}
+
 //sys_Int strHash(sys_Str str);
 //size_t utf8encode(const wchar_t *us, char *des, size_t n, int *illegal);
 //size_t utf8decode(char const *str, wchar_t *des, size_t n, int *illegal);

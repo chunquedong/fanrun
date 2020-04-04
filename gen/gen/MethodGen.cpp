@@ -127,7 +127,7 @@ void MethodGen::genImples(Printer *printer) {
         }
     }
     
-    //if (method->code.isEmpty()) return;
+    if ((parent->type->meta.flags & FFlags::Native) != 0 && method->code.isEmpty()) return;
     
     genPrototype(printer, false, isVal);
     printer->println(" {");

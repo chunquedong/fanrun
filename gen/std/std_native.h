@@ -40,6 +40,19 @@ extern  "C" {
         sys_Bool _val;
     };
     
+    
+    struct std_Decimal_struct {
+        sys_Float _val;
+    };
+    
+    struct std_RegexMatcher_struct {
+        
+    };
+    
+    struct std_Env_struct {
+        
+    };
+    
 #ifdef  __cplusplus
 } //end "C"
 #endif

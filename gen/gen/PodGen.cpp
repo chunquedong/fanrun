@@ -224,6 +224,20 @@ void PodGen::genStaticInit(Printer *printer) {
             printer->println("FR_STATIC_INIT(%s);", gtype->name.c_str());
         }
     }
+    
+    printer->newLine();
+    printer->newLine();
+    
+    printer->println("struct fr_Pod *pod = (struct fr_Pod *)malloc(sizeof(struct fr_Pod));");
+    printer->println("pod->name = \"%s\";", podName.c_str());
+    printer->println("pod->version = \"%s\";", pod->version.c_str());
+    printer->println("pod->depends = \"%s\";", pod->depends.c_str());
+    
+    printer->println("pod->metaCount = %d;", 0);
+    printer->println("pod->metas = NULL;");
+    
+    printer->println("fr_registerPod(__env, pod);");
+    
     printer->unindent();
     printer->println("}");
 }
